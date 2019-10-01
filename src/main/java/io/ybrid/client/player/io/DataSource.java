@@ -20,4 +20,5 @@ import java.io.Closeable;
 
 public interface DataSource extends Closeable {
     DataBlock read();
+    String getContentType();
 }
