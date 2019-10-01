@@ -110,11 +110,6 @@ public class AudioBuffer implements PCMDataSource {
     }
 
     @Override
-    public String getContentType() {
-        return backend.getContentType();
-    }
-
-    @Override
     public void close() throws IOException {
         thread.interrupt();
         thread = null;

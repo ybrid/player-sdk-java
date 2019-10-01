@@ -20,21 +20,21 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-public class BufferedDataSource implements DataSource {
+public class BufferedByteDataSource implements ByteDataSource {
     static private final int MAX_BUFFER = 4;
 
-    private DataSource backend;
-    private LinkedList<DataBlock> inputBuffer;
-    private LinkedList<DataBlock> outputBuffer;
+    private ByteDataSource backend;
+    private LinkedList<ByteDataBlock> inputBuffer;
+    private LinkedList<ByteDataBlock> outputBuffer;
     private boolean valid = true;
 
-    public BufferedDataSource(DataSource backend) {
+    public BufferedByteDataSource(ByteDataSource backend) {
         this.backend = backend;
     }
 
     @Override
-    public DataBlock read() throws IOException {
-        DataBlock ret = null;
+    public ByteDataBlock read() throws IOException {
+        ByteDataBlock ret = null;
 
         if (outputBuffer != null) {
             try {

@@ -20,4 +20,5 @@ import java.io.IOException;
 
 public interface ByteDataSource extends DataSource {
     ByteDataBlock read() throws IOException;
+    String getContentType();
 }

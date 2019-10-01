@@ -21,7 +21,6 @@ import java.io.IOException;
 
 public interface DataSource extends Closeable {
     DataBlock read() throws IOException;
-    String getContentType();
 
     default void mark() {
         throw new UnsupportedOperationException();
