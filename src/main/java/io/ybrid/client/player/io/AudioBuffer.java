@@ -60,6 +60,16 @@ public class AudioBuffer implements PCMDataSource {
                 return buffer.remove();
             }
         }
+
+        PCMDataBlock element() {
+            synchronized (buffer) {
+                if (buffer.size() == 0) {
+                    pump();
+                }
+
+                return buffer.element();
+            }
+        }
     }
 
     public AudioBuffer(double target, PCMDataSource backend) {
@@ -79,6 +89,10 @@ public class AudioBuffer implements PCMDataSource {
         }
 
         return ret;
+    }
+
+    public PCMDataBlock element() {
+        return thread.element();
     }
 
     @Override
