@@ -29,6 +29,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>io.ybrid.client</groupId>
+            <artifactId>control</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
