@@ -16,11 +16,80 @@
 
 package io.ybrid.client.player.io;
 
+import io.ybrid.client.control.Metadata;
 import io.ybrid.client.control.Session;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+
 public class DataSourceFactory {
-    public static ByteDataSource getSourceBySession(Session session) {
+    private static class URLSource implements ByteDataSource {
+        private InputStream inputStream;
+        private String contentType;
+
+        private static class Block implements ByteDataBlock {
+            private byte[] buffer;
+
+            Block(InputStream inputStream) throws IOException {
+                buffer = new byte[1024];
+                int ret = inputStream.read(buffer);
+                if (ret < 1)
+                    throw new EOFException();
+
+                if (ret != buffer.length) {
+                    byte[] newBuffer = new byte[ret];
+                    System.arraycopy(buffer, 0, newBuffer, 0, ret);
+                    buffer = newBuffer;
+                }
+            }
+
+            @Override
+            public byte[] getData() {
+                return buffer;
+            }
+
+            @Override
+            public Metadata getMetadata() {
+                return null;
+            }
+        }
+
+        public URLSource(URL url) throws IOException {
+            URLConnection connection = url.openConnection();
+
+            connection.setDoInput(true);
+            connection.setDoOutput(false);
+            connection.connect();
+
+            inputStream = connection.getInputStream();
+            contentType = connection.getContentType();
+        }
+
+        @Override
+        public ByteDataBlock read() throws IOException {
+            return new Block(inputStream);
+        }
+
+        @Override
+        public String getContentType() {
+            return contentType;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public void close() throws IOException {
+            inputStream.close();
+        }
+    }
+    public static ByteDataSource getSourceBySession(Session session) throws IOException {
         // TODO.
-        return null;
+        return new URLSource(session.getStreamURL());
     }
 }
