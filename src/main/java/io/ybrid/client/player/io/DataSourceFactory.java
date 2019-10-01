@@ -19,7 +19,7 @@ package io.ybrid.client.player.io;
 import io.ybrid.client.control.Session;
 
 public class DataSourceFactory {
-    public ByteDataSource getSourceBySession(Session session) {
+    public static ByteDataSource getSourceBySession(Session session) {
         // TODO.
         return null;
     }
