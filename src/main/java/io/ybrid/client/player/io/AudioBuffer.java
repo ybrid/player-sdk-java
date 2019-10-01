@@ -38,12 +38,16 @@ public class AudioBuffer implements PCMDataSource {
                         return;
                     }
                 } else {
-                    pump();
+                    try {
+                        pump();
+                    } catch (IOException e) {
+                        return;
+                    }
                 }
             }
         }
 
-        private void pump() {
+        private void pump() throws IOException {
             PCMDataBlock block = backend.read();
 
             synchronized (buffer) {
@@ -51,7 +55,7 @@ public class AudioBuffer implements PCMDataSource {
             }
         }
 
-        PCMDataBlock getBlock() {
+        PCMDataBlock getBlock() throws IOException {
             synchronized (buffer) {
                 if (buffer.size() == 0) {
                     pump();
@@ -61,7 +65,7 @@ public class AudioBuffer implements PCMDataSource {
             }
         }
 
-        PCMDataBlock element() {
+        PCMDataBlock element() throws IOException {
             synchronized (buffer) {
                 if (buffer.size() == 0) {
                     pump();
@@ -91,12 +95,12 @@ public class AudioBuffer implements PCMDataSource {
         return ret;
     }
 
-    public PCMDataBlock element() {
+    public PCMDataBlock element() throws IOException {
         return thread.element();
     }
 
     @Override
-    public PCMDataBlock read() {
+    public PCMDataBlock read() throws IOException {
         return thread.getBlock();
     }
 

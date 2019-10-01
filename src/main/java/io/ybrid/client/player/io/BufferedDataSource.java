@@ -33,7 +33,7 @@ public class BufferedDataSource implements DataSource {
     }
 
     @Override
-    public DataBlock read() {
+    public DataBlock read() throws IOException {
         DataBlock ret = null;
 
         if (outputBuffer != null) {
