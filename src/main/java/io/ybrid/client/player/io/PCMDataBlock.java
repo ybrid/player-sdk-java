@@ -20,4 +20,8 @@ public interface PCMDataBlock extends DataBlock {
     short[] getData();
     int getSampleRate();
     int getNumberOfChannels();
+
+    default double getBlockLength() {
+        return (double)getData().length / (double)(getSampleRate() * getNumberOfChannels());
+    }
 }
