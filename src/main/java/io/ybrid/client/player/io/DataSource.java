@@ -21,4 +21,7 @@ import java.io.Closeable;
 public interface DataSource extends Closeable {
     DataBlock read();
     String getContentType();
+    void mark();
+    void reset();
+    boolean isValid();
 }
