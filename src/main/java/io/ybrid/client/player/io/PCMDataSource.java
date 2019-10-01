@@ -16,6 +16,8 @@
 
 package io.ybrid.client.player.io;
 
+import java.io.IOException;
+
 public interface PCMDataSource extends DataSource {
-    PCMDataBlock read();
+    PCMDataBlock read() throws IOException;
 }

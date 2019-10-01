@@ -17,9 +17,10 @@
 package io.ybrid.client.player.io;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 public interface DataSource extends Closeable {
-    DataBlock read();
+    DataBlock read() throws IOException;
     String getContentType();
 
     default void mark() {

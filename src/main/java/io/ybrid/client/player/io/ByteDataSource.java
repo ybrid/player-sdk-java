@@ -16,6 +16,8 @@
 
 package io.ybrid.client.player.io;
 
+import java.io.IOException;
+
 public interface ByteDataSource extends DataSource {
-    ByteDataBlock read();
+    ByteDataBlock read() throws IOException;
 }
