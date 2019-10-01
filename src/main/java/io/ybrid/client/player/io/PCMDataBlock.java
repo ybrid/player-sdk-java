@@ -18,4 +18,6 @@ package io.ybrid.client.player.io;
 
 public interface PCMDataBlock extends DataBlock {
     short[] getData();
+    int getSampleRate();
+    int getNumberOfChannels();
 }
