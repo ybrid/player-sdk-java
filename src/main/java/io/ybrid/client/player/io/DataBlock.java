@@ -18,6 +18,14 @@ package io.ybrid.client.player.io;
 
 import io.ybrid.client.control.Metadata;
 
-public interface DataBlock {
-    Metadata getMetadata();
+public class DataBlock {
+    protected Metadata metadata;
+
+    protected DataBlock(Metadata metadata) {
+        this.metadata = metadata;
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
 }

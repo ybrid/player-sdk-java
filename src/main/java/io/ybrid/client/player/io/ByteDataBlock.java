@@ -16,6 +16,35 @@
 
 package io.ybrid.client.player.io;
 
-public interface ByteDataBlock extends DataBlock {
-    byte[] getData();
+import io.ybrid.client.control.Metadata;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class ByteDataBlock extends DataBlock {
+    protected byte[] data;
+
+    public ByteDataBlock(Metadata metadata, byte[] data) {
+        super(metadata);
+        this.data = data;
+    }
+
+    public ByteDataBlock(Metadata metadata, InputStream inputStream, int length) throws IOException {
+        super(metadata);
+        data = new byte[1024];
+        int ret = inputStream.read(data);
+        if (ret < 1)
+            throw new EOFException();
+
+        if (ret != data.length) {
+            byte[] newBuffer = new byte[ret];
+            System.arraycopy(data, 0, newBuffer, 0, ret);
+            data = newBuffer;
+        }
+    }
+
+    public byte[] getData() {
+        return data;
+    }
 }

@@ -16,12 +16,33 @@
 
 package io.ybrid.client.player.io;
 
-public interface PCMDataBlock extends DataBlock {
-    short[] getData();
-    int getSampleRate();
-    int getNumberOfChannels();
+import io.ybrid.client.control.Metadata;
 
-    default double getBlockLength() {
+public class PCMDataBlock extends DataBlock {
+    protected short[] data;
+    protected int sampleRate;
+    protected int numberOfChannels;
+
+    public PCMDataBlock(Metadata metadata, short[] data, int sampleRate, int numberOfChannels) {
+        super(metadata);
+        this.data = data;
+        this.sampleRate = sampleRate;
+        this.numberOfChannels = numberOfChannels;
+    }
+
+    public short[] getData() {
+        return data;
+    }
+
+    public int getSampleRate() {
+        return sampleRate;
+    }
+
+    public int getNumberOfChannels() {
+        return numberOfChannels;
+    }
+
+    public double getBlockLength() {
         return (double)getData().length / (double)(getSampleRate() * getNumberOfChannels());
     }
 }
