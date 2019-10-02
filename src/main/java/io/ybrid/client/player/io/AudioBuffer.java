@@ -50,6 +50,9 @@ public class AudioBuffer implements PCMDataSource {
         private void pump() throws IOException {
             PCMDataBlock block = backend.read();
 
+            if (block == null)
+                return;
+
             synchronized (buffer) {
                 buffer.add(block);
             }
