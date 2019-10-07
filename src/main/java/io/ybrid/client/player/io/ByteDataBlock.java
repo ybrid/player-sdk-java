@@ -47,4 +47,12 @@ public class ByteDataBlock extends DataBlock {
     public byte[] getData() {
         return data;
     }
+
+    @Override
+    public String toString() {
+        return "ByteDataBlock{" +
+                "data.length=" + data.length +
+                ", metadata=" + metadata +
+                '}';
+    }
 }
