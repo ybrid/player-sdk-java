@@ -19,10 +19,11 @@ package io.ybrid.client.player;
 import io.ybrid.client.player.io.PCMDataBlock;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 public interface AudioBackend extends Closeable {
-    void prepare(PCMDataBlock block);
+    void prepare(PCMDataBlock block) throws IOException;
     void play();
     void pause();
-    void write(PCMDataBlock block);
+    void write(PCMDataBlock block) throws IOException;
 }

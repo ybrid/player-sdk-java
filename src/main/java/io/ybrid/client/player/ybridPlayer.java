@@ -53,10 +53,10 @@ public class ybridPlayer implements Player {
                 PCMDataBlock block = null;
                 try {
                     block = audioSource.read();
+                    audioBackend.write(block);
                 } catch (IOException e) {
                     break;
                 }
-                audioBackend.write(block);
 
                 newMetadata = block.getMetadata();
 
