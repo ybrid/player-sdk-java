@@ -18,6 +18,7 @@ package io.ybrid.client.player.io;
 
 import io.ybrid.client.control.Metadata;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -59,16 +60,24 @@ public class MetadataInputStream extends InputStream {
         if (buffer != null)
             return;
 
-        block = source.read();
+        try {
+            block = source.read();
 
-        buffer = block.getData();
-        nextMetadata = block.getMetadata();
+            buffer = block.getData();
+            nextMetadata = block.getMetadata();
+        } catch (EOFException ignored) {
+            buffer = null;
+            nextMetadata = null;
+        }
     }
 
     private int pump(byte[] b, int off, int len) throws IOException {
         int todo;
 
         fillBuffer();
+
+        if (buffer == null)
+            return 0;
 
         todo = buffer.length - offset;
         if (todo > len)
@@ -94,6 +103,7 @@ public class MetadataInputStream extends InputStream {
 
             off += res;
             len -= res;
+            ret += res;
         }
 
         if (nextMetadata != null)
