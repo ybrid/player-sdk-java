@@ -16,7 +16,7 @@
 
 package io.ybrid.client.player.io;
 
-import io.ybrid.client.control.Session;
+import io.ybrid.api.Session;
 
 import java.io.IOException;
 import java.io.InputStream;

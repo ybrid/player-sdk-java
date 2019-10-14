@@ -16,7 +16,7 @@
 
 package io.ybrid.client.player;
 
-import io.ybrid.client.control.*;
+import io.ybrid.api.*;
 import io.ybrid.client.player.io.*;
 
 import java.io.Closeable;

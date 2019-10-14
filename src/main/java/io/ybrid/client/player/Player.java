@@ -16,7 +16,7 @@
 
 package io.ybrid.client.player;
 
-import io.ybrid.client.control.SessionClient;
+import io.ybrid.api.SessionClient;
 
 import java.io.Closeable;
 import java.io.IOException;

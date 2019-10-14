@@ -16,7 +16,7 @@
 
 package io.ybrid.client.player.io;
 
-import io.ybrid.client.control.Metadata;
+import io.ybrid.api.Metadata;
 
 import java.io.EOFException;
 import java.io.IOException;

@@ -16,7 +16,7 @@
 
 package io.ybrid.client.player;
 
-import io.ybrid.client.control.Metadata;
+import io.ybrid.api.Metadata;
 
 public interface MetadataConsumer {
     void onMetadataChange(Metadata metadata);
