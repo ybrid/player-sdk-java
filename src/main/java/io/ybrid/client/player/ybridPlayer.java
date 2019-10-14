@@ -21,6 +21,7 @@ import io.ybrid.client.player.io.*;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Instant;
 
 public class ybridPlayer implements Player {
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
@@ -117,6 +118,31 @@ public class ybridPlayer implements Player {
     @Override
     public Bouquet getBouquet() {
         return session.getBouquet();
+    }
+
+    @Override
+    public void windToLive() throws IOException {
+        session.windToLive();
+    }
+
+    @Override
+    public void WindTo(Instant timestamp) throws IOException {
+        session.WindTo(timestamp);
+    }
+
+    @Override
+    public void Wind(long duration) throws IOException {
+        session.Wind(duration);
+    }
+
+    @Override
+    public void skipForwards(ItemType itemType) throws IOException {
+        session.skipForwards(itemType);
+    }
+
+    @Override
+    public void skipBackwards(ItemType itemType) throws IOException {
+        session.skipBackwards(itemType);
     }
 
     @Override
