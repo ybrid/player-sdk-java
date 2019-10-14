@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player.io;
+package io.ybrid.player.io;
 
 import java.io.IOException;
 import java.util.LinkedList;

@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player.io;
+package io.ybrid.player.io;
 
-import io.ybrid.api.Metadata;
+import java.io.IOException;
 
-public class DataBlock {
-    protected Metadata metadata;
-
-    protected DataBlock(Metadata metadata) {
-        this.metadata = metadata;
-    }
-
-    public Metadata getMetadata() {
-        return metadata;
-    }
+public interface ByteDataSource extends DataSource {
+    ByteDataBlock read() throws IOException;
+    String getContentType();
 }

@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player;
+package io.ybrid.player;
 
-import io.ybrid.api.Metadata;
-
-public interface MetadataConsumer {
-    void onMetadataChange(Metadata metadata);
+public interface MetadataProvider {
+    void setMetadataConsumer(MetadataConsumer metadataConsumer);
 }

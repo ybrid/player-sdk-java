@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player;
+package io.ybrid.player;
 
-public interface AudioBackendFactory {
-    AudioBackend getAudioBackend();
+import io.ybrid.player.io.PCMDataBlock;
+
+import java.io.Closeable;
+import java.io.IOException;
+
+public interface AudioBackend extends Closeable {
+    void prepare(PCMDataBlock block) throws IOException;
+    void play();
+    void pause();
+    void write(PCMDataBlock block) throws IOException;
 }

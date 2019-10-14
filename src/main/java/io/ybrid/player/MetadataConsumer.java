@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player.io;
+package io.ybrid.player;
 
-import java.io.Closeable;
-import java.io.IOException;
+import io.ybrid.api.Metadata;
 
-public interface DataSource extends Closeable {
-    DataBlock read() throws IOException;
-
-    default void mark() {
-        throw new UnsupportedOperationException();
-    }
-
-    default void reset() {
-        throw new UnsupportedOperationException();
-    }
-
-    boolean isValid();
+public interface MetadataConsumer {
+    void onMetadataChange(Metadata metadata);
 }

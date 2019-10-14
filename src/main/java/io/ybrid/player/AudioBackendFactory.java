@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player;
+package io.ybrid.player;
 
-import io.ybrid.client.player.io.PCMDataSource;
-
-public interface Decoder extends PCMDataSource {
+public interface AudioBackendFactory {
+    AudioBackend getAudioBackend();
 }

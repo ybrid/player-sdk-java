@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player.io;
+package io.ybrid.player;
 
-import java.io.IOException;
+import io.ybrid.player.io.PCMDataSource;
 
-public interface ByteDataSource extends DataSource {
-    ByteDataBlock read() throws IOException;
-    String getContentType();
+public interface Decoder extends PCMDataSource {
 }

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player;
+package io.ybrid.player;
 
-import io.ybrid.client.player.io.DataSource;
+import io.ybrid.player.io.DataSource;
 
 public interface DecoderFactory {
     Decoder getDecoder(DataSource dataSource);

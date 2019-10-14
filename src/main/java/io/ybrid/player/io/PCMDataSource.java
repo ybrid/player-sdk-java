@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player;
+package io.ybrid.player.io;
 
-import io.ybrid.api.SessionClient;
-
-import java.io.Closeable;
 import java.io.IOException;
 
-public interface Player extends MetadataProvider, SessionClient, Closeable {
-    void prepare() throws IOException;
-    void play() throws IOException;
-    void stop() throws IOException;
+public interface PCMDataSource extends DataSource {
+    PCMDataBlock read() throws IOException;
 }

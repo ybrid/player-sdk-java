@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.ybrid.client.player;
+package io.ybrid.player;
 
 import io.ybrid.api.*;
-import io.ybrid.client.player.io.*;
+import io.ybrid.player.io.*;
 
 import java.io.Closeable;
 import java.io.IOException;
