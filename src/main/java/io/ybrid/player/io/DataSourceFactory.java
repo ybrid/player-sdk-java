@@ -41,7 +41,7 @@ public class DataSourceFactory {
 
         @Override
         public ByteDataBlock read() throws IOException {
-            return new ByteDataBlock(null, inputStream, 1024);
+            return new ByteDataBlock(null, inputStream, 1024*2);
         }
 
         @Override
