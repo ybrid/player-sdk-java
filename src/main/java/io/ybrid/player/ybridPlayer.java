@@ -32,8 +32,9 @@ public class ybridPlayer implements Player {
     private AudioBackendFactory audioBackendFactory;
     private Decoder decoder;
     private AudioBackend audioBackend;
-    private AudioBuffer audioSource;
+    private PCMDataSource audioSource;
     private PlaybackThread thread;
+    private PCMDataBlock initialAudioBlock;
 
     private class PlaybackThread extends Thread {
         public PlaybackThread(String name) {
@@ -55,9 +56,13 @@ public class ybridPlayer implements Player {
             audioBackend.play();
 
             while (!isInterrupted()) {
-                PCMDataBlock block = null;
+                PCMDataBlock block = initialAudioBlock;
                 try {
-                    block = audioSource.read();
+                    if (block == null) {
+                        block = audioSource.read();
+                    } else {
+                        initialAudioBlock = null;
+                    }
                     audioBackend.write(block);
                 } catch (IOException e) {
                     break;
@@ -100,10 +105,11 @@ public class ybridPlayer implements Player {
     public void prepare() throws IOException {
         DataSource streamSource = new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session));
         decoder = decoderFactory.getDecoder(streamSource);
-        audioSource = new AudioBuffer(AUDIO_BUFFER_TARGET, decoder);
+        audioSource = decoder;
 
         audioBackend = audioBackendFactory.getAudioBackend();
-        audioBackend.prepare(audioSource.element());
+        initialAudioBlock = audioSource.read();
+        audioBackend.prepare(initialAudioBlock);
 
         thread = new PlaybackThread("ybridPlayer Playback Thread");
     }
