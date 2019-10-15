@@ -36,6 +36,10 @@ public class ybridPlayer implements Player {
     private PlaybackThread thread;
 
     private class PlaybackThread extends Thread {
+        public PlaybackThread(String name) {
+            super(name);
+        }
+
         private void close(Closeable obj) {
             try {
                 obj.close();
@@ -101,7 +105,7 @@ public class ybridPlayer implements Player {
         audioBackend = audioBackendFactory.getAudioBackend();
         audioBackend.prepare(audioSource.element());
 
-        thread = new PlaybackThread();
+        thread = new PlaybackThread("ybridPlayer Playback Thread");
     }
 
     @Override

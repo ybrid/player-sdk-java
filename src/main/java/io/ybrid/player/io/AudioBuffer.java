@@ -25,9 +25,13 @@ public class AudioBuffer implements PCMDataSource {
     private final LinkedList<PCMDataBlock> buffer = new LinkedList<>();
     private double target;
     private PCMDataSource backend;
-    private BufferThread thread = new BufferThread();
+    private BufferThread thread = new BufferThread("AudioBuffer Buffer Thread");
 
     private class BufferThread extends Thread {
+        public BufferThread(String name) {
+            super(name);
+        }
+
         @Override
         public void run() {
             while (!isInterrupted()) {
