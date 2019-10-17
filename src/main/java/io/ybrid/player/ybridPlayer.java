@@ -71,6 +71,12 @@ public class ybridPlayer implements Player {
                 newMetadata = block.getMetadata();
 
                 if (newMetadata != null) {
+                    if (!newMetadata.isValid()) {
+                        try {
+                            newMetadata = session.getMetadata();
+                        } catch (IOException ignored) {
+                        }
+                    }
                     if (oldMetadata == null) {
                         metadataConsumer.onMetadataChange(newMetadata);
                     } else if (!newMetadata.equals(oldMetadata)) {
