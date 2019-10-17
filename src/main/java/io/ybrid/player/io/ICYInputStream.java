@@ -230,6 +230,14 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
     @Override
     public String getContentType() {
+        try {
+            connect();
+        } catch (IOException ignored) {
+        }
+
+        if (replyHeaders == null)
+            return null;
+
         return replyHeaders.get("content-type");
     }
 }
