@@ -122,10 +122,19 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private void receiveReply() throws IOException {
         InputStream inputStream = new BufferedInputStream(socket.getInputStream());
         String header = getHeader(inputStream);
+        String metaInt;
+
         replyHeaders = parseHeader(header);
-        metadataInterval = Integer.parseInt(replyHeaders.get("icy-metaint"));
-        if (metadataInterval < 0 || metadataInterval > (128*1024))
-            throw new IOException("Invalid metadata interval");
+
+        metaInt = replyHeaders.get("icy-metaint");
+        if (metaInt == null) {
+            metadataInterval = -1;
+        } else {
+            metadataInterval = Integer.parseInt(metaInt);
+            if (metadataInterval < 0 || metadataInterval > (128*1024))
+                throw new IOException("Invalid metadata interval");
+        }
+
         this.inputStream = inputStream;
     }
 
@@ -200,7 +209,11 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
         connect();
 
-        todo = metadataInterval - pos;
+        if (metadataInterval > 0) {
+            todo = metadataInterval - pos;
+        } else {
+            todo = MAX_READ_LENGTH;
+        }
 
         if (todo > MAX_READ_LENGTH)
             todo = MAX_READ_LENGTH;
@@ -215,7 +228,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (blockMetadata != null)
             metadataUpdated = false;
 
-        if (pos == metadataInterval) {
+        if (metadataInterval > 0 && pos == metadataInterval) {
             pos = 0;
             readMetadata();
         }
