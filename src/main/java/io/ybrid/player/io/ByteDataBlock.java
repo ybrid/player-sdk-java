@@ -32,7 +32,7 @@ public class ByteDataBlock extends DataBlock {
 
     public ByteDataBlock(Metadata metadata, InputStream inputStream, int length) throws IOException {
         super(metadata);
-        data = new byte[1024];
+        data = new byte[length];
         int ret = inputStream.read(data);
         if (ret < 1)
             throw new EOFException();
