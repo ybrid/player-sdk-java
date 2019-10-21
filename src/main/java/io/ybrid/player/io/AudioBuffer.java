@@ -19,6 +19,11 @@ package io.ybrid.player.io;
 import java.io.IOException;
 import java.util.LinkedList;
 
+/**
+ * This implements a buffered {@link PCMDataSource} based on another such source.
+ *
+ * The purpose of this class is to provide a buffer for audio.
+ */
 public class AudioBuffer implements PCMDataSource {
     private static final int SLEEP_TIME = 371; /* [ms] */
 
@@ -83,6 +88,12 @@ public class AudioBuffer implements PCMDataSource {
         }
     }
 
+    /**
+     * Create an instance.
+     *
+     * @param target The amount of audio to be buffered in [s].
+     * @param backend The backend to use.
+     */
     public AudioBuffer(double target, PCMDataSource backend) {
         this.target = target;
         this.backend = backend;
@@ -90,6 +101,10 @@ public class AudioBuffer implements PCMDataSource {
         thread.start();
     }
 
+    /**
+     * Returns the fullness of the buffer.
+     * @return The fullness in [s].
+     */
     public double getBufferLength() {
         double ret = 0;
 
@@ -102,6 +117,12 @@ public class AudioBuffer implements PCMDataSource {
         return ret;
     }
 
+    /**
+     * Get the next {@link PCMDataBlock} without removing it from the buffer.
+     *
+     * @return The next {@link PCMDataBlock}.
+     * @throws IOException I/O-Errors as thrown by the backend.
+     */
     public PCMDataBlock element() throws IOException {
         return thread.element();
     }

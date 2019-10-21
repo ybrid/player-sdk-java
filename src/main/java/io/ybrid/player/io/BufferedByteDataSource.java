@@ -20,6 +20,12 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+/**
+ * This implements a ByteDataSource that buffers blocks in order to implements {@link #mark()} and {@link #reset()}.
+ *
+ * This allows up to an implementation specific limits blocks to be buffered.
+ *
+ */
 public class BufferedByteDataSource implements ByteDataSource {
     static private final int MAX_BUFFER = 4;
 
@@ -28,6 +34,10 @@ public class BufferedByteDataSource implements ByteDataSource {
     private LinkedList<ByteDataBlock> outputBuffer;
     private boolean valid = true;
 
+    /**
+     * Creates an instance.
+     * @param backend The backend object to use.
+     */
     public BufferedByteDataSource(ByteDataSource backend) {
         this.backend = backend;
     }

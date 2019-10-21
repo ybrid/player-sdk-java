@@ -23,6 +23,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+/**
+ * This factory is used to build {@link DataSource DataSources}.
+ */
 public class DataSourceFactory {
     private static class URLSource implements ByteDataSource {
         private InputStream inputStream;
@@ -59,6 +62,14 @@ public class DataSourceFactory {
             inputStream.close();
         }
     }
+
+    /**
+     * This builds a {@link ByteDataSource} for the audio stream of a {@link Session}.
+     *
+     * @param session The {@link Session} to use.
+     * @return The {@link ByteDataSource} for the stream.
+     * @throws IOException I/O-Errors as thrown by the used backends.
+     */
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
         // TODO.
         return new URLSource(session.getStreamURL());

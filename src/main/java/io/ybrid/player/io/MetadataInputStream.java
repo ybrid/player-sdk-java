@@ -22,6 +22,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * This implements a {@link InputStream} that adds support of {@link Metadata}.
+ */
 public class MetadataInputStream extends InputStream {
     private ByteDataSource source;
     private Metadata metadata;
@@ -29,10 +32,22 @@ public class MetadataInputStream extends InputStream {
     private byte[] buffer;
     private int offset;
 
+    /**
+     * This creates an instace using a {@link ByteDataSource}.
+     * @param source The backend to use.
+     */
     public MetadataInputStream(ByteDataSource source) {
         this.source = source;
     }
 
+    /**
+     * This returns the {@link Metadata} for an the next byte that can be read.
+     *
+     * This may re-fill internal buffers.
+     *
+     * @return The {@link Metadata} for the next byte or null.
+     * @throws IOException I/O-Errors as thrown by the backend.
+     */
     public Metadata getMetadata() throws IOException {
         fillBuffer();
         if (metadata == null)
