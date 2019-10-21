@@ -21,8 +21,34 @@ import io.ybrid.api.SessionClient;
 import java.io.Closeable;
 import java.io.IOException;
 
+/**
+ * This interface is implemented by ybrid capable players.
+ */
 public interface Player extends MetadataProvider, SessionClient, Closeable {
+    /**
+     * Prepare the player for playback.
+     *
+     * This call may do I/O-operation and may block.
+     *
+     * @throws IOException Thrown when there is any problem with the I/O.
+     */
     void prepare() throws IOException;
+
+    /**
+     * Starts playback.
+     *
+     * If not called before this heaves as if it would call {@link #prepare()} before being called.
+     *
+     * @throws IOException Thrown when there is any problem with the I/O.
+     */
     void play() throws IOException;
+
+    /**
+     * Stops the playback.
+     *
+     * After stop the player instance must not be reused.
+     *
+     * @throws IOException Thrown when there is any problem with the I/O.
+     */
     void stop() throws IOException;
 }

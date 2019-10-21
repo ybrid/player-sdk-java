@@ -16,6 +16,14 @@
 
 package io.ybrid.player;
 
+/**
+ * This interface is implemented by factory classes that allow to build a {@link AudioBackend}.
+ */
 public interface AudioBackendFactory {
+    /**
+     * Build a new {@link AudioBackend}.
+     *
+     * @return The new {@link AudioBackend}.
+     */
     AudioBackend getAudioBackend();
 }

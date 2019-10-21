@@ -16,6 +16,13 @@
 
 package io.ybrid.player;
 
+/**
+ * This interface is implemented by classes that can provide ybrid {@link io.ybrid.api.Metadata}.
+ */
 public interface MetadataProvider {
+    /**
+     * Sets the consumer for the {@link io.ybrid.api.Metadata}.
+     * @param metadataConsumer The consumer to send the {@link io.ybrid.api.Metadata} to,
+     */
     void setMetadataConsumer(MetadataConsumer metadataConsumer);
 }

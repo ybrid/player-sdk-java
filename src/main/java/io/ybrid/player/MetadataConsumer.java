@@ -18,6 +18,15 @@ package io.ybrid.player;
 
 import io.ybrid.api.Metadata;
 
+/**
+ * This interface is implemented by classes that can consume ybrid {@link Metadata}.
+ */
 public interface MetadataConsumer {
+    /**
+     * This function is called by the {@link MetadataProvider} when there is no {@link Metadata}
+     * to be consumed.
+     *
+     * @param metadata The {@link Metadata} to consume.
+     */
     void onMetadataChange(Metadata metadata);
 }

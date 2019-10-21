@@ -23,6 +23,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.time.Instant;
 
+/**
+ * This implements a ybrid capable {@link Player}.
+ *
+ * See also {@link SessionClient}.
+ */
 public class ybridPlayer implements Player {
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
 
@@ -96,6 +101,13 @@ public class ybridPlayer implements Player {
         }
     }
 
+    /**
+     * Creates a new instance of the player.
+     *
+     * @param session The {@link Session} to use for retrieval and interaction with the stream.
+     * @param decoderFactory The {@link DecoderFactory} used to create a {@link Decoder} for the stream.
+     * @param audioBackendFactory The {@link AudioBackendFactory} used to create a {@link AudioBackend} to interact with the host audio output.
+     */
     public ybridPlayer(Session session, DecoderFactory decoderFactory, AudioBackendFactory audioBackendFactory) {
         this.session = session;
         this.decoderFactory = decoderFactory;

@@ -18,5 +18,9 @@ package io.ybrid.player;
 
 import io.ybrid.player.io.PCMDataSource;
 
+/**
+ * This interface is implemented by classes used to decode data into PCM data.
+ * Instances of this interface are normally created using a {@link DecoderFactory}.
+ */
 public interface Decoder extends PCMDataSource {
 }

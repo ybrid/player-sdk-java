@@ -18,6 +18,17 @@ package io.ybrid.player;
 
 import io.ybrid.player.io.DataSource;
 
+/**
+ * This interface is implemented by factory classes that build {@link Decoder} instances.
+ */
 public interface DecoderFactory {
+    /**
+     * Build a new {@link Decoder} based on the dataSource provided.
+     *
+     * This must not call {@link DataSource#read()} on the provided {@link DataSource}.
+     *
+     * @param dataSource The {@link DataSource} used to read data from.
+     * @return The {@link Decoder} that has been build.
+     */
     Decoder getDecoder(DataSource dataSource);
 }
