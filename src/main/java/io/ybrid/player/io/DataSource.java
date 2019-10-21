@@ -19,16 +19,40 @@ package io.ybrid.player.io;
 import java.io.Closeable;
 import java.io.IOException;
 
+/**
+ * This interface is implemented by classes that allow reading data in a block-wise fashion.
+ */
 public interface DataSource extends Closeable {
+    /**
+     * Read a block of data.
+     * @return The block read.
+     * @throws IOException Any I/O-Error that happened during the read.
+     */
     DataBlock read() throws IOException;
 
+    /**
+     * Mark the current position in the stream to return to later.
+     * To return {@link #reset()} must be called.
+     *
+     * This may not be supported by all sources.
+     */
     default void mark() {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Return to a position as marked by {@link #mark()}.
+     *
+     * See {@link #mark()} for details.
+     */
     default void reset() {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Returns whether the state of this source is still valid.
+     *
+     * @return Whether this source is still valid.
+     */
     boolean isValid();
 }

@@ -18,7 +18,24 @@ package io.ybrid.player.io;
 
 import java.io.IOException;
 
+/**
+ * This interface is implemented by classes that allow reading {@link ByteDataBlock ByteDataBlocks}.
+ */
 public interface ByteDataSource extends DataSource {
+    /**
+     * Read a block.
+     *
+     * @return The block that has been read.
+     * @throws IOException And I/O-Errors occurred while reading the block.
+     */
     ByteDataBlock read() throws IOException;
+
+    /**
+     * Return the content-type of the current stream.
+     *
+     * Calling this may connect if this source is {@link io.ybrid.api.Connectable}.
+     *
+     * @return The content-type or null.
+     */
     String getContentType();
 }

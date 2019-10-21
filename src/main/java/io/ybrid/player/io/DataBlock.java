@@ -18,6 +18,9 @@ package io.ybrid.player.io;
 
 import io.ybrid.api.Metadata;
 
+/**
+ * This class represents generic blocks of data. Instances also store {@link Metadata} for each block.
+ */
 public class DataBlock {
     protected Metadata metadata;
 
@@ -25,6 +28,11 @@ public class DataBlock {
         this.metadata = metadata;
     }
 
+    /**
+     * gets the {@link Metadata} of the block.
+     *
+     * @return The {@link Metadata} of the block.
+     */
     public Metadata getMetadata() {
         return metadata;
     }

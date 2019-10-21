@@ -22,14 +22,31 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * This class implements a {@link DataBlock} containing raw bytes.
+ */
 public class ByteDataBlock extends DataBlock {
     protected byte[] data;
 
+    /**
+     * Create an instance using {@link Metadata} and an array of bytes.
+     *
+     * @param metadata The {@link Metadata} to use.
+     * @param data The bytes to use.
+     */
     public ByteDataBlock(Metadata metadata, byte[] data) {
         super(metadata);
         this.data = data;
     }
 
+    /**
+     * This creates a block by reading bytes off an {@link InputStream}.
+     *
+     * @param metadata The {@link Metadata} to use.
+     * @param inputStream The {@link InputStream} to read the data from.
+     * @param length The amount of bytes to read.
+     * @throws IOException Thrown in case of I/O-Error.
+     */
     public ByteDataBlock(Metadata metadata, InputStream inputStream, int length) throws IOException {
         super(metadata);
         data = new byte[length];
@@ -44,6 +61,11 @@ public class ByteDataBlock extends DataBlock {
         }
     }
 
+    /**
+     * Gets the stored data.
+     *
+     * @return Returns the bytes stored by this block.
+     */
     public byte[] getData() {
         return data;
     }

@@ -18,6 +18,15 @@ package io.ybrid.player.io;
 
 import java.io.IOException;
 
+/**
+ * This interface is implemented by classes that allow reading PCM data as {@link PCMDataBlock}.
+ */
 public interface PCMDataSource extends DataSource {
+    /**
+     * Read a {@link PCMDataBlock}.
+     *
+     * @return The block that has been read.
+     * @throws IOException And I/O-Errors occurred while reading the block.
+     */
     PCMDataBlock read() throws IOException;
 }
