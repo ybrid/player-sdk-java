@@ -37,6 +37,21 @@
 
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>addradio-public-mvn-repo</id>
+            <name>AddRadio Public Maven Repository</name>
+            <url>http://mvn-repo.dev.addradio.net/mvn-repo/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>
