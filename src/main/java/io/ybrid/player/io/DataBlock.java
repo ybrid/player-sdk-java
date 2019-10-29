@@ -36,4 +36,12 @@ public class DataBlock {
     public Metadata getMetadata() {
         return metadata;
     }
+
+    /**
+     * Sets the {@link Metadata} of the block.
+     * @param metadata The {@link Metadata} to set.
+     */
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
+    }
 }
