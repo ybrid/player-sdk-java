@@ -23,7 +23,9 @@ import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +50,29 @@ class ICYInputStream implements Closeable, ByteDataSource {
         this.port = port;
         this.path = path;
         this.secure = secure;
+    }
+
+    public ICYInputStream(URL url) throws MalformedURLException {
+        switch (url.getProtocol()) {
+            case "icyx":
+                secure = false;
+                break;
+                /* Workarounds */
+            case "http":
+                secure = false;
+                break;
+            case "https":
+                secure = true;
+                break;
+            default:
+                throw new MalformedURLException("Invalid protocol: " + url.getProtocol());
+        }
+
+        host = url.getHost();
+        port = url.getPort();
+        if (port < 1)
+            port = url.getDefaultPort();
+        path = url.getFile();
     }
 
     private void sendRequest() throws IOException {
