@@ -18,6 +18,7 @@ package io.ybrid.player.io;
 
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.function.Consumer;
 
 /**
  * This implements a buffered {@link PCMDataSource} based on another such source.
@@ -30,6 +31,7 @@ public class AudioBuffer implements PCMDataSource {
     private final LinkedList<PCMDataBlock> buffer = new LinkedList<>();
     private double target;
     private PCMDataSource backend;
+    private Consumer<PCMDataBlock> inputConsumer;
     private BufferThread thread = new BufferThread("AudioBuffer Buffer Thread");
 
     private class BufferThread extends Thread {
@@ -62,6 +64,9 @@ public class AudioBuffer implements PCMDataSource {
             if (block == null)
                 return;
 
+            if (inputConsumer != null)
+                inputConsumer.accept(block);
+
             synchronized (buffer) {
                 buffer.add(block);
             }
@@ -93,10 +98,12 @@ public class AudioBuffer implements PCMDataSource {
      *
      * @param target The amount of audio to be buffered in [s].
      * @param backend The backend to use.
+     * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
-    public AudioBuffer(double target, PCMDataSource backend) {
+    public AudioBuffer(double target, PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
         this.target = target;
         this.backend = backend;
+        this.inputConsumer = inputConsumer;
 
         thread.start();
     }
