@@ -18,6 +18,7 @@ package io.ybrid.player.io;
 
 import io.ybrid.api.Metadata;
 
+import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.IOException;
@@ -33,6 +34,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private String host;
     private int port;
     private String path;
+    private boolean secure;
     private Socket socket;
     private InputStream inputStream;
     private HashMap<String, String> replyHeaders;
@@ -41,10 +43,11 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private ICYMetadata metadata;
     private boolean metadataUpdated = false;
 
-    ICYInputStream(String host, int port, String path) {
+    ICYInputStream(String host, int port, String path, boolean secure) {
         this.host = host;
         this.port = port;
         this.path = path;
+        this.secure = secure;
     }
 
     private void sendRequest() throws IOException {
@@ -142,7 +145,11 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (inputStream != null)
             return;
 
-        socket = new Socket(host, port);
+        if (secure) {
+            socket = SSLSocketFactory.getDefault().createSocket(host, port);
+        } else {
+            socket = new Socket(host, port);
+        }
         sendRequest();
         receiveReply();
     }
