@@ -126,7 +126,6 @@ public class ybridPlayer implements Player {
 
                     if (metadata != null && !metadata.isValid()) {
                         try {
-                            System.out.println("MetadataThread.run");
                             metadata = session.getMetadata();
                         } catch (IOException ignored) {
                         }
