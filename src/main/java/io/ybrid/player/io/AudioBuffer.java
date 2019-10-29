@@ -69,7 +69,7 @@ public class AudioBuffer implements PCMDataSource {
 
         PCMDataBlock getBlock() throws IOException {
             synchronized (buffer) {
-                if (buffer.size() == 0) {
+                if (buffer.isEmpty()) {
                     pump();
                 }
 
@@ -79,7 +79,7 @@ public class AudioBuffer implements PCMDataSource {
 
         PCMDataBlock element() throws IOException {
             synchronized (buffer) {
-                if (buffer.size() == 0) {
+                if (buffer.isEmpty()) {
                     pump();
                 }
 
