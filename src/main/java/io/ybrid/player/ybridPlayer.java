@@ -22,6 +22,8 @@ import io.ybrid.player.io.*;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This implements a ybrid capable {@link Player}.
@@ -30,6 +32,7 @@ import java.time.Instant;
  */
 public class ybridPlayer implements Player {
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
+    private static final int METADATA_BLOCK_QUEUE_SIZE = 32;
 
     private Session session;
     private MetadataConsumer metadataConsumer = null;
@@ -38,8 +41,10 @@ public class ybridPlayer implements Player {
     private Decoder decoder;
     private AudioBackend audioBackend;
     private PCMDataSource audioSource;
-    private PlaybackThread thread;
+    private PlaybackThread playbackThread;
     private PCMDataBlock initialAudioBlock;
+    private MetadataThread metadataThread;
+    private BlockingQueue<PCMDataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
 
     private class PlaybackThread extends Thread {
         public PlaybackThread(String name) {
@@ -68,6 +73,7 @@ public class ybridPlayer implements Player {
                     } else {
                         initialAudioBlock = null;
                     }
+                    metadataBlockQueue.add(block);
                     audioBackend.write(block);
                 } catch (IOException e) {
                     break;
@@ -76,16 +82,12 @@ public class ybridPlayer implements Player {
                 newMetadata = block.getMetadata();
 
                 if (newMetadata != null) {
-                    if (!newMetadata.isValid()) {
-                        try {
-                            newMetadata = session.getMetadata();
-                        } catch (IOException ignored) {
+                    if (newMetadata.isValid()) {
+                        if (oldMetadata == null) {
+                            metadataConsumer.onMetadataChange(newMetadata);
+                        } else if (!newMetadata.equals(oldMetadata)) {
+                            metadataConsumer.onMetadataChange(newMetadata);
                         }
-                    }
-                    if (oldMetadata == null) {
-                        metadataConsumer.onMetadataChange(newMetadata);
-                    } else if (!newMetadata.equals(oldMetadata)) {
-                        metadataConsumer.onMetadataChange(newMetadata);
                     }
 
                     oldMetadata = newMetadata;
@@ -98,6 +100,43 @@ public class ybridPlayer implements Player {
             audioSource = null;
             close(decoder);
             decoder = null;
+        }
+    }
+
+    private class MetadataThread extends Thread {
+        public MetadataThread(String name) {
+            super(name);
+        }
+
+        @Override
+        public void run() {
+            Metadata metadata = null;
+            Metadata oldMetadata = null;
+
+            while (!isInterrupted()) {
+
+                try {
+                    PCMDataBlock block = metadataBlockQueue.take();
+                    Metadata newMetdata = block.getMetadata();
+
+                    if (newMetdata != null && newMetdata != oldMetadata) {
+                        metadata = newMetdata;
+                        oldMetadata = newMetdata;
+                    }
+
+                    if (metadata != null && !metadata.isValid()) {
+                        try {
+                            System.out.println("MetadataThread.run");
+                            metadata = session.getMetadata();
+                        } catch (IOException ignored) {
+                        }
+                    }
+
+                    block.setMetadata(metadata);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
         }
     }
 
@@ -129,18 +168,21 @@ public class ybridPlayer implements Player {
         initialAudioBlock = audioSource.read();
         audioBackend.prepare(initialAudioBlock);
 
-        thread = new PlaybackThread("ybridPlayer Playback Thread");
+        playbackThread = new PlaybackThread("ybridPlayer Playback Thread");
+        metadataThread = new MetadataThread("ybridPlayer Metadata Thread");
     }
 
     @Override
     public void play() throws IOException {
         assertPrepared();
-        thread.start();
+        playbackThread.start();
+        metadataThread.start();
     }
 
     @Override
     public void stop() throws IOException {
-        thread.interrupt();
+        playbackThread.interrupt();
+        metadataThread.interrupt();
     }
 
     @Override
