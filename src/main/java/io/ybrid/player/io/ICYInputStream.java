@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 class ICYInputStream implements Closeable, ByteDataSource {
     private static final int MAX_READ_LENGTH = 4*1024;
@@ -199,7 +200,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         try {
             ICYMetadata oldMetadata = metadata;
             readMetadataInner();
-            if (!metadata.equals(oldMetadata))
+            if (!Objects.equals(metadata, oldMetadata))
                 metadataUpdated = true;
         } catch (IOException e) {
             throw new IOException("Error reading Metadata. VERY BAD. Stream closed.", e);
