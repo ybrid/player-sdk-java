@@ -65,8 +65,12 @@ public class AudioBuffer implements PCMDataSource {
             if (block == null)
                 return;
 
-            if (inputConsumer != null)
-                inputConsumer.accept(block);
+            try {
+                if (inputConsumer != null)
+                    inputConsumer.accept(block);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             buffer.put(block);
         }
