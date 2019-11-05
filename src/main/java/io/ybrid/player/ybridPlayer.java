@@ -141,7 +141,13 @@ public class ybridPlayer implements Player {
 
         @Override
         public void accept(PCMDataBlock pcmDataBlock) {
-            metadataBlockQueue.add(pcmDataBlock);
+            try {
+                metadataBlockQueue.add(pcmDataBlock);
+            } catch (IllegalStateException e) {
+                /* If the queue is full we fall behind. clear it and try again. */
+                metadataBlockQueue.clear();
+                metadataBlockQueue.add(pcmDataBlock);
+            }
         }
     }
 
