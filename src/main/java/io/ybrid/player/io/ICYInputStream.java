@@ -45,13 +45,6 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private ICYMetadata metadata;
     private boolean metadataUpdated = false;
 
-    ICYInputStream(String host, int port, String path, boolean secure) {
-        this.host = host;
-        this.port = port;
-        this.path = path;
-        this.secure = secure;
-    }
-
     public ICYInputStream(URL url) throws MalformedURLException {
         switch (url.getProtocol()) {
             case "icyx":
