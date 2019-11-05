@@ -20,6 +20,7 @@ import io.ybrid.api.Session;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -71,7 +72,13 @@ public class DataSourceFactory {
      * @throws IOException I/O-Errors as thrown by the used backends.
      */
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
-        // TODO.
-        return new URLSource(session.getStreamURL());
+        URL url = session.getStreamURL();
+
+        try {
+            return new ICYInputStream(url);
+        } catch (MalformedURLException ignored) {
+        }
+
+        return new URLSource(url);
     }
 }
