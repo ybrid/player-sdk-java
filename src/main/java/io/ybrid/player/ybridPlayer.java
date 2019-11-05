@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 /**
  * This implements a ybrid capable {@link Player}.
@@ -44,7 +45,6 @@ public class ybridPlayer implements Player {
     private PlaybackThread playbackThread;
     private PCMDataBlock initialAudioBlock;
     private MetadataThread metadataThread;
-    private BlockingQueue<PCMDataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
 
     private class PlaybackThread extends Thread {
         public PlaybackThread(String name) {
@@ -102,8 +102,10 @@ public class ybridPlayer implements Player {
         }
     }
 
-    private class MetadataThread extends Thread {
-        public MetadataThread(String name) {
+    private class MetadataThread extends Thread implements Consumer<PCMDataBlock> {
+        private BlockingQueue<PCMDataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
+
+        MetadataThread(String name) {
             super(name);
         }
 
@@ -136,6 +138,11 @@ public class ybridPlayer implements Player {
                 }
             }
         }
+
+        @Override
+        public void accept(PCMDataBlock pcmDataBlock) {
+            metadataBlockQueue.add(pcmDataBlock);
+        }
     }
 
     /**
@@ -158,16 +165,15 @@ public class ybridPlayer implements Player {
 
     @Override
     public void prepare() throws IOException {
-        DataSource streamSource = new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session));
-        decoder = decoderFactory.getDecoder(streamSource);
-        audioSource = new AudioBuffer(AUDIO_BUFFER_TARGET, decoder, b -> metadataBlockQueue.add(b));
+        playbackThread = new PlaybackThread("ybridPlayer Playback Thread");
+        metadataThread = new MetadataThread("ybridPlayer Metadata Thread");
+
+        decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
+        audioSource = new AudioBuffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);
 
         audioBackend = audioBackendFactory.getAudioBackend();
         initialAudioBlock = audioSource.read();
         audioBackend.prepare(initialAudioBlock);
-
-        playbackThread = new PlaybackThread("ybridPlayer Playback Thread");
-        metadataThread = new MetadataThread("ybridPlayer Metadata Thread");
     }
 
     @Override
