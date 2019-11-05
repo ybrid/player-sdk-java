@@ -17,7 +17,8 @@
 package io.ybrid.player.io;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 /**
@@ -28,7 +29,7 @@ import java.util.function.Consumer;
 public class AudioBuffer implements PCMDataSource {
     private static final int SLEEP_TIME = 371; /* [ms] */
 
-    private final LinkedList<PCMDataBlock> buffer = new LinkedList<>();
+    private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
     private double target;
     private PCMDataSource backend;
     private Consumer<PCMDataBlock> inputConsumer;
@@ -51,14 +52,14 @@ public class AudioBuffer implements PCMDataSource {
                 } else {
                     try {
                         pump();
-                    } catch (IOException e) {
+                    } catch (IOException | InterruptedException e) {
                         return;
                     }
                 }
             }
         }
 
-        private void pump() throws IOException {
+        private void pump() throws IOException, InterruptedException {
             PCMDataBlock block = backend.read();
 
             if (block == null)
@@ -67,29 +68,23 @@ public class AudioBuffer implements PCMDataSource {
             if (inputConsumer != null)
                 inputConsumer.accept(block);
 
-            synchronized (buffer) {
-                buffer.add(block);
-            }
+            buffer.put(block);
         }
 
         PCMDataBlock getBlock() throws IOException {
-            synchronized (buffer) {
-                if (buffer.isEmpty()) {
-                    pump();
-                }
-
-                return buffer.remove();
+            try {
+                return buffer.take();
+            } catch (InterruptedException e) {
+                throw new IOException(e);
             }
         }
 
-        PCMDataBlock element() throws IOException {
-            synchronized (buffer) {
-                if (buffer.isEmpty()) {
-                    pump();
-                }
-
-                return buffer.element();
+        PCMDataBlock element() throws IOException, InterruptedException {
+            if (buffer.isEmpty()) {
+                pump();
             }
+
+            return buffer.element();
         }
     }
 
@@ -130,7 +125,7 @@ public class AudioBuffer implements PCMDataSource {
      * @return The next {@link PCMDataBlock}.
      * @throws IOException I/O-Errors as thrown by the backend.
      */
-    public PCMDataBlock element() throws IOException {
+    public PCMDataBlock element() throws IOException, InterruptedException {
         return thread.element();
     }
 
