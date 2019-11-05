@@ -102,10 +102,8 @@ public class AudioBuffer implements PCMDataSource {
     public double getBufferLength() {
         double ret = 0;
 
-        synchronized (buffer) {
-            for (PCMDataBlock block : buffer) {
-                ret += block.getBlockLength();
-            }
+        for (PCMDataBlock block : buffer) {
+            ret += block.getBlockLength();
         }
 
         return ret;
