@@ -73,7 +73,6 @@ public class ybridPlayer implements Player {
                     } else {
                         initialAudioBlock = null;
                     }
-                    metadataBlockQueue.add(block);
                     audioBackend.write(block);
                 } catch (IOException e) {
                     break;
@@ -161,7 +160,7 @@ public class ybridPlayer implements Player {
     public void prepare() throws IOException {
         DataSource streamSource = new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session));
         decoder = decoderFactory.getDecoder(streamSource);
-        audioSource = decoder;
+        audioSource = new AudioBuffer(AUDIO_BUFFER_TARGET, decoder, b -> metadataBlockQueue.add(b));
 
         audioBackend = audioBackendFactory.getAudioBackend();
         initialAudioBlock = audioSource.read();
