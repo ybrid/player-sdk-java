@@ -78,14 +78,6 @@ public class AudioBuffer implements PCMDataSource {
                 throw new IOException(e);
             }
         }
-
-        PCMDataBlock element() throws IOException, InterruptedException {
-            if (buffer.isEmpty()) {
-                pump();
-            }
-
-            return buffer.element();
-        }
     }
 
     /**
@@ -117,16 +109,6 @@ public class AudioBuffer implements PCMDataSource {
         }
 
         return ret;
-    }
-
-    /**
-     * Get the next {@link PCMDataBlock} without removing it from the buffer.
-     *
-     * @return The next {@link PCMDataBlock}.
-     * @throws IOException I/O-Errors as thrown by the backend.
-     */
-    public PCMDataBlock element() throws IOException, InterruptedException {
-        return thread.element();
     }
 
     @Override
