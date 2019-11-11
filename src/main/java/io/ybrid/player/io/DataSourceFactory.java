@@ -74,6 +74,8 @@ public class DataSourceFactory {
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
         URL url = session.getStreamURL();
 
+        //url = new URL("http://mustafejen.se:8000/verket.opus");
+
         try {
             return new ICYInputStream(url);
         } catch (MalformedURLException ignored) {

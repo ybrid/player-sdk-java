@@ -29,4 +29,10 @@ public interface MetadataConsumer {
      * @param metadata The {@link Metadata} to consume.
      */
     void onMetadataChange(Metadata metadata);
+
+    /**
+     * This function is called by the {@link MetadataProvider} when the state of the player changed.
+     * @param playerState The new state of the player.
+     */
+    void onPlayerStateChange(PlayerState playerState);
 }

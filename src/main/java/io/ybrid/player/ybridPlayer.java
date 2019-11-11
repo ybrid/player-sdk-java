@@ -46,6 +46,7 @@ public class ybridPlayer implements Player {
     private PlaybackThread playbackThread;
     private PCMDataBlock initialAudioBlock;
     private MetadataThread metadataThread;
+    private PlayerState playerState = PlayerState.STOPPED;
 
     private class PlaybackThread extends Thread {
         public PlaybackThread(String name) {
@@ -64,6 +65,7 @@ public class ybridPlayer implements Player {
             Metadata oldMetadata = null;
             Metadata newMetadata;
 
+            playerStateChange(PlayerState.BUFFERING);
             while (!isInterrupted() && audioSource.getBufferLength() < AUDIO_BUFFER_PREBUFFER) {
                 double diff = AUDIO_BUFFER_PREBUFFER - audioSource.getBufferLength();
                 if (diff > 0.3) {
@@ -79,6 +81,7 @@ public class ybridPlayer implements Player {
                 }
             }
 
+            playerStateChange(PlayerState.PLAYING);
             audioBackend.play();
 
             while (!isInterrupted()) {
@@ -91,6 +94,7 @@ public class ybridPlayer implements Player {
                     }
                     audioBackend.write(block);
                 } catch (IOException e) {
+                    playerStateChange(PlayerState.ERROR);
                     break;
                 }
 
@@ -115,6 +119,8 @@ public class ybridPlayer implements Player {
             audioSource = null;
             close(decoder);
             decoder = null;
+
+            playerStateChange(PlayerState.STOPPED);
         }
     }
 
@@ -185,8 +191,17 @@ public class ybridPlayer implements Player {
             prepare();
     }
 
+    private void playerStateChange(PlayerState playerState) {
+        if (this.playerState == PlayerState.ERROR)
+            return;
+        this.playerState = playerState;
+        metadataConsumer.onPlayerStateChange(playerState);
+    }
+
     @Override
     public void prepare() throws IOException {
+        playerStateChange(PlayerState.PREPARING);
+
         playbackThread = new PlaybackThread("ybridPlayer Playback Thread");
         metadataThread = new MetadataThread("ybridPlayer Metadata Thread");
 
