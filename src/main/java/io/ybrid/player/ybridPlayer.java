@@ -33,6 +33,7 @@ import java.util.function.Consumer;
  */
 public class ybridPlayer implements Player {
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
+    private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
     private static final int METADATA_BLOCK_QUEUE_SIZE = 32;
 
     private Session session;
@@ -41,7 +42,7 @@ public class ybridPlayer implements Player {
     private AudioBackendFactory audioBackendFactory;
     private Decoder decoder;
     private AudioBackend audioBackend;
-    private PCMDataSource audioSource;
+    private AudioBuffer audioSource;
     private PlaybackThread playbackThread;
     private PCMDataBlock initialAudioBlock;
     private MetadataThread metadataThread;
@@ -62,6 +63,21 @@ public class ybridPlayer implements Player {
         public void run() {
             Metadata oldMetadata = null;
             Metadata newMetadata;
+
+            while (!isInterrupted() && audioSource.getBufferLength() < AUDIO_BUFFER_PREBUFFER) {
+                double diff = AUDIO_BUFFER_PREBUFFER - audioSource.getBufferLength();
+                if (diff > 0.3) {
+                    diff = 0.3;
+                } else if (diff < 0.) {
+                    break;
+                }
+
+                try {
+                    sleep((long) (diff*1000));
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
 
             audioBackend.play();
 
