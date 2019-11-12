@@ -83,4 +83,4 @@ class myPlayer {
 ```
 
 ## Copyright
-Copyright (c) 2019 nacamar GmbH, Germany. See [Apache License 2.0](LICENSE) for details.
+Copyright (c) 2019 nacamar GmbH, Germany. See [MIT License](LICENSE) for details.
