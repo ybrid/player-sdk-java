@@ -188,6 +188,7 @@ public class ybridPlayer implements Player {
         this.session = session;
         this.decoderFactory = decoderFactory;
         this.audioBackendFactory = audioBackendFactory;
+        setMetadataConsumer(null);
     }
 
     private void assertPrepared() throws IOException {
@@ -282,6 +283,8 @@ public class ybridPlayer implements Player {
 
     @Override
     public void setMetadataConsumer(MetadataConsumer metadataConsumer) {
+        if (metadataConsumer == null)
+            metadataConsumer = NullMetadataConsumer.getInstance();
         this.metadataConsumer = metadataConsumer;
     }
 
