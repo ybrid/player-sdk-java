@@ -60,13 +60,9 @@ public class ybridPlayer implements Player {
             }
         }
 
-        @Override
-        public void run() {
-            Metadata oldMetadata = null;
-            Metadata newMetadata;
-
+        private void buffer(PlayerState nextState) {
             playerStateChange(PlayerState.BUFFERING);
-            while (!isInterrupted() && audioSource.getBufferLength() < AUDIO_BUFFER_PREBUFFER) {
+            while (!isInterrupted() && audioSource.isValid() && audioSource.getBufferLength() < AUDIO_BUFFER_PREBUFFER) {
                 double diff = AUDIO_BUFFER_PREBUFFER - audioSource.getBufferLength();
                 if (diff > 0.3) {
                     diff = 0.3;
@@ -80,8 +76,16 @@ public class ybridPlayer implements Player {
                     break;
                 }
             }
+            playerStateChange(nextState);
+        }
 
-            playerStateChange(PlayerState.PLAYING);
+        @Override
+        public void run() {
+            Metadata oldMetadata = null;
+            Metadata newMetadata;
+
+            buffer(PlayerState.PLAYING);
+
             audioBackend.play();
 
             while (!isInterrupted()) {
