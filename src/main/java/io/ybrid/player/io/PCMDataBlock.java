@@ -22,8 +22,17 @@ import io.ybrid.api.Metadata;
  * This implements a {@link DataBlock} that holds PCM samples.
  */
 public class PCMDataBlock extends DataBlock {
+    /**
+     * Internal storage for PCM data.
+     */
     protected short[] data;
+    /**
+     * Internal storage for sample rate of the block.
+     */
     protected int sampleRate;
+    /**
+     * Internal storage for the number of channels represented this block.
+     */
     protected int numberOfChannels;
 
     /**

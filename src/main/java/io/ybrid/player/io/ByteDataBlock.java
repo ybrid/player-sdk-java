@@ -26,6 +26,9 @@ import java.io.InputStream;
  * This class implements a {@link DataBlock} containing raw bytes.
  */
 public class ByteDataBlock extends DataBlock {
+    /**
+     * Internal array to store bytes in.
+     */
     protected byte[] data;
 
     /**

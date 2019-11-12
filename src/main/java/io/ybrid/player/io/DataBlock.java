@@ -22,8 +22,16 @@ import io.ybrid.api.Metadata;
  * This class represents generic blocks of data. Instances also store {@link Metadata} for each block.
  */
 public class DataBlock {
+    /**
+     * Internal storage for the {@link Metadata} hold by the object.
+     */
     protected Metadata metadata;
 
+    /**
+     * Create a new DataBlock.
+     *
+     * @param metadata The {@link Metadata} to use for the new DataBlock.
+     */
     protected DataBlock(Metadata metadata) {
         this.metadata = metadata;
     }

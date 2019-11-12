@@ -23,7 +23,7 @@ import io.ybrid.api.Metadata;
  */
 public interface MetadataConsumer {
     /**
-     * This function is called by the {@link MetadataProvider} when there is no {@link Metadata}
+     * This function is called by the {@link MetadataProvider} when there is new {@link Metadata}
      * to be consumed.
      *
      * @param metadata The {@link Metadata} to consume.
