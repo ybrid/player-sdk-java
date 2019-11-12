@@ -19,6 +19,7 @@ package io.ybrid.player.io;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -35,27 +36,26 @@ public class AudioBuffer implements PCMDataSource {
     private Consumer<PCMDataBlock> inputConsumer;
     private BufferThread thread = new BufferThread("AudioBuffer Buffer Thread");
 
-    private class BufferThread extends Thread {
+    private class BufferThread extends Thread implements DataSource {
+        private static final long POLL_TIMEOUT = 123; /* [ms] */
+        private Exception exception = null;
+
         public BufferThread(String name) {
             super(name);
         }
 
         @Override
         public void run() {
-            while (!isInterrupted()) {
-                if (getBufferLength() > target) {
-                    try {
+            try {
+                while (!isInterrupted()) {
+                    if (getBufferLength() > target) {
                         sleep(SLEEP_TIME);
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                } else {
-                    try {
+                    } else {
                         pump();
-                    } catch (IOException | InterruptedException e) {
-                        return;
                     }
                 }
+            } catch (InterruptedException | IOException e) {
+                exception = e;
             }
         }
 
@@ -75,12 +75,42 @@ public class AudioBuffer implements PCMDataSource {
             buffer.put(block);
         }
 
-        PCMDataBlock getBlock() throws IOException {
+        private IOException toIOException(Exception e) {
+            if (e instanceof IOException)
+                return (IOException)e;
+
+            return new IOException(e);
+        }
+
+        @Override
+        public PCMDataBlock read() throws IOException {
             try {
-                return buffer.take();
+                PCMDataBlock block = buffer.poll();
+
+                if (block != null)
+                    return block;
+
+                do {
+                    if (exception != null) {
+                        throw toIOException(exception);
+                    }
+                    block = buffer.poll(POLL_TIMEOUT, TimeUnit.MILLISECONDS);
+                } while (block == null);
+
+                return block;
             } catch (InterruptedException e) {
-                throw new IOException(e);
+                throw toIOException(e);
             }
+        }
+
+        @Override
+        public boolean isValid() {
+            return exception == null;
+        }
+
+        @Override
+        public void close() throws IOException {
+            interrupt();
         }
     }
 
@@ -115,17 +145,17 @@ public class AudioBuffer implements PCMDataSource {
 
     @Override
     public PCMDataBlock read() throws IOException {
-        return thread.getBlock();
+        return thread.read();
     }
 
     @Override
     public boolean isValid() {
-        return thread != null;
+        return thread != null && thread.isValid();
     }
 
     @Override
     public void close() throws IOException {
-        thread.interrupt();
+        thread.close();
         thread = null;
         backend.close();
     }
