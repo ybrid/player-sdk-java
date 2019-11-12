@@ -37,7 +37,46 @@ Then you also need to add the following dependency:
 ... TODO ...
 
 ```java
-/* ... TODO ... */
+import io.ybrid.api.Alias;
+import io.ybrid.api.Session;
+import io.ybrid.player.Player;
+import io.ybrid.player.ybridPlayer;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.logging.Logger;
+
+class myPlayer {
+    private void run() throws IOException {
+        /* First create a Alias object and a Session. */
+        Alias alias = new Alias(Logger.getLogger(Logger.GLOBAL_LOGGER_NAME), new URL("http://.../..."));
+        Session session = alias.createSession();
+
+        /* We create a player using the Decoder and AudioBackend we provide */
+        Player player = new ybridPlayer(session, myDecoderFactory.getInstance(), myAudioBackendFactory.getInstance());
+
+        /* We set the sink for the Metadata. This could be the user interface. */
+        player.setMetadataConsumer(myMetadataConsumer);
+
+        /* Before we can start playback we must signal the player to prepare. */
+        player.prepare();
+
+        /* After the player is prepared we can start playback.
+         * If the player is not yet ready it will delay the playback until it is ready.
+         */
+        player.play();
+
+        /* Now we can care of our own business */
+
+        /* When we finish we stop the player. */
+        player.stop();
+
+        /* Closing the player is required and will free all resources
+        * After close() returned the player must not be reused.
+        */
+        player.close();
+    }
+}
 ```
 
 ## Copyright
