@@ -191,7 +191,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         metadata = new byte[length];
         ret = inputStream.read(metadata);
         if (ret != length)
-            throw new IOException("Can not read body");
+            throw new IOException("Can not read body: length = " + length + ", ret = " + ret);
 
         this.metadata = new ICYMetadata(metadata);
     }
