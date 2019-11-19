@@ -34,7 +34,6 @@ import java.io.InputStream;
 public class MetadataInputStream extends InputStream {
     private ByteDataSource source;
     private Metadata metadata;
-    private Metadata nextMetadata;
     private byte[] buffer;
     private int offset;
 
@@ -56,8 +55,6 @@ public class MetadataInputStream extends InputStream {
      */
     public Metadata getMetadata() throws IOException {
         fillBuffer();
-        if (metadata == null)
-            metadata = nextMetadata;
         return metadata;
     }
 
@@ -85,10 +82,10 @@ public class MetadataInputStream extends InputStream {
             block = source.read();
 
             buffer = block.getData();
-            nextMetadata = block.getMetadata();
+            metadata = block.getMetadata();
         } catch (EOFException ignored) {
             buffer = null;
-            nextMetadata = null;
+            metadata = null;
         }
     }
 
@@ -126,9 +123,6 @@ public class MetadataInputStream extends InputStream {
             len -= res;
             ret += res;
         }
-
-        if (nextMetadata != null)
-            metadata = nextMetadata;
 
         return ret;
     }
