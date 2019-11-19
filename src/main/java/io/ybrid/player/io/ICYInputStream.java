@@ -36,7 +36,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 class ICYInputStream implements Closeable, ByteDataSource {
     private static final int MAX_READ_LENGTH = 4*1024;
@@ -51,6 +50,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private int pos = 0;
     private ICYMetadata metadata;
     private boolean metadataUpdated = false;
+    private Metadata blockMetadata = null;
 
     public ICYInputStream(URL url) throws MalformedURLException {
         switch (url.getProtocol()) {
@@ -200,14 +200,12 @@ class ICYInputStream implements Closeable, ByteDataSource {
             throw new IOException("Can not read body: length = " + length + ", ret = " + ret);
 
         this.metadata = new ICYMetadata(metadata);
+        metadataUpdated = true;
     }
 
     private void readMetadata() throws IOException {
         try {
-            ICYMetadata oldMetadata = metadata;
             readMetadataInner();
-            if (!Objects.equals(metadata, oldMetadata))
-                metadataUpdated = true;
         } catch (IOException e) {
             throw new IOException("Error reading Metadata. VERY BAD. Stream closed.", e);
         }
@@ -236,7 +234,6 @@ class ICYInputStream implements Closeable, ByteDataSource {
     @Override
     public ByteDataBlock read() throws IOException {
         ByteDataBlock block;
-        Metadata blockMetadata = null;
         int todo;
 
         connect();
