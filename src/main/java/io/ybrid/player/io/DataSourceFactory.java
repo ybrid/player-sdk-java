@@ -33,7 +33,7 @@ import java.net.URLConnection;
 /**
  * This factory is used to build {@link DataSource DataSources}.
  */
-public class DataSourceFactory {
+public final class DataSourceFactory {
     private static class URLSource implements ByteDataSource {
         private InputStream inputStream;
         private String contentType;
