@@ -57,8 +57,11 @@ public class YbridPlayer implements Player {
     private class PlaybackThread extends Thread {
         public static final double MAX_BUFFER_SLEEP = 0.3;
 
-        public PlaybackThread(String name) {
+        private double bufferGoal;
+
+        public PlaybackThread(String name, double bufferGoal) {
             super(name);
+            this.bufferGoal = bufferGoal;
         }
 
         private void close(Closeable obj) {
@@ -70,8 +73,8 @@ public class YbridPlayer implements Player {
 
         private void buffer(PlayerState nextState) {
             playerStateChange(PlayerState.BUFFERING);
-            while (!isInterrupted() && audioSource.isValid() && audioSource.getBufferLength() < AUDIO_BUFFER_PREBUFFER) {
-                double diff = AUDIO_BUFFER_PREBUFFER - audioSource.getBufferLength();
+            while (!isInterrupted() && audioSource.isValid() && audioSource.getBufferLength() < bufferGoal) {
+                double diff = bufferGoal - audioSource.getBufferLength();
                 if (diff > MAX_BUFFER_SLEEP) {
                     diff = MAX_BUFFER_SLEEP;
                 } else if (diff < 0.) {
@@ -217,7 +220,7 @@ public class YbridPlayer implements Player {
     public void prepare() throws IOException {
         playerStateChange(PlayerState.PREPARING);
 
-        playbackThread = new PlaybackThread("YbridPlayer Playback Thread");
+        playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER);
         metadataThread = new MetadataThread("YbridPlayer Metadata Thread", session);
 
         decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
