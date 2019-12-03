@@ -84,7 +84,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         req += "Icy-MetaData: 1\r\n";
         req += "\r\n";
 
-        socket.getOutputStream().write(req.getBytes());
+        socket.getOutputStream().write(req.getBytes(StandardCharsets.US_ASCII));
     }
 
     private String getHeader(InputStream inputStream) throws IOException {
