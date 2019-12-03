@@ -209,6 +209,7 @@ public class YbridPlayer implements Player {
             prepare();
     }
 
+    @SuppressWarnings("ParameterHidesMemberVariable")
     private void playerStateChange(PlayerState playerState) {
         if (this.playerState == PlayerState.ERROR)
             return;
