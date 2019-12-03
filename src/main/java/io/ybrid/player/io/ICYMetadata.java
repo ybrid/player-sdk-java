@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class ICYMetadata {
-    private byte[] raw;
+    private final byte[] raw;
     private byte[] reduced;
     private Map<String, String> values = new HashMap<>();
 

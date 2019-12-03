@@ -42,10 +42,10 @@ public class YbridPlayer implements Player {
     private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
     private static final int METADATA_BLOCK_QUEUE_SIZE = 32;
 
-    private Session session;
+    private final Session session;
     private MetadataConsumer metadataConsumer = null;
-    private DecoderFactory decoderFactory;
-    private AudioBackendFactory audioBackendFactory;
+    private final DecoderFactory decoderFactory;
+    private final AudioBackendFactory audioBackendFactory;
     private Decoder decoder;
     private AudioBackend audioBackend;
     private AudioBuffer audioSource;

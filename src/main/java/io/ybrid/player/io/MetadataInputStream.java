@@ -32,7 +32,7 @@ import java.io.InputStream;
  * This implements a {@link InputStream} that adds support of {@link Metadata}.
  */
 public class MetadataInputStream extends InputStream {
-    private ByteDataSource source;
+    private final ByteDataSource source;
     private Metadata metadata;
     private byte[] buffer;
     private int offset;

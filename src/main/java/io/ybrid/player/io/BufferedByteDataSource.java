@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
 public class BufferedByteDataSource implements ByteDataSource {
     static private final int MAX_BUFFER = 4;
 
-    private ByteDataSource backend;
+    private final ByteDataSource backend;
     private LinkedList<ByteDataBlock> inputBuffer;
     private LinkedList<ByteDataBlock> outputBuffer;
     private boolean valid = true;

@@ -31,15 +31,15 @@ public class PCMDataBlock extends DataBlock {
     /**
      * Internal storage for PCM data.
      */
-    protected short[] data;
+    protected final short[] data;
     /**
      * Internal storage for sample rate of the block.
      */
-    protected int sampleRate;
+    protected final int sampleRate;
     /**
      * Internal storage for the number of channels represented this block.
      */
-    protected int numberOfChannels;
+    protected final int numberOfChannels;
 
     /**
      * Create a block from an array if samples.
