@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - YBRID®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,11 +33,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 /**
- * This implements a ybrid capable {@link Player}.
+ * This implements a Ybrid capable {@link Player}.
  *
  * See also {@link SessionClient}.
  */
-public class ybridPlayer implements Player {
+public class YbridPlayer implements Player {
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
     private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
     private static final int METADATA_BLOCK_QUEUE_SIZE = 32;
@@ -190,7 +190,7 @@ public class ybridPlayer implements Player {
      * @param decoderFactory The {@link DecoderFactory} used to create a {@link Decoder} for the stream.
      * @param audioBackendFactory The {@link AudioBackendFactory} used to create a {@link AudioBackend} to interact with the host audio output.
      */
-    public ybridPlayer(Session session, DecoderFactory decoderFactory, AudioBackendFactory audioBackendFactory) {
+    public YbridPlayer(Session session, DecoderFactory decoderFactory, AudioBackendFactory audioBackendFactory) {
         this.session = session;
         this.decoderFactory = decoderFactory;
         this.audioBackendFactory = audioBackendFactory;
@@ -213,8 +213,8 @@ public class ybridPlayer implements Player {
     public void prepare() throws IOException {
         playerStateChange(PlayerState.PREPARING);
 
-        playbackThread = new PlaybackThread("ybridPlayer Playback Thread");
-        metadataThread = new MetadataThread("ybridPlayer Metadata Thread");
+        playbackThread = new PlaybackThread("YbridPlayer Playback Thread");
+        metadataThread = new MetadataThread("YbridPlayer Metadata Thread");
 
         decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
         audioSource = new AudioBuffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);

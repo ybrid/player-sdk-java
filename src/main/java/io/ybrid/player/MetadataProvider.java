@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - YBRID®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 package io.ybrid.player;
 
 /**
- * This interface is implemented by classes that can provide ybrid {@link io.ybrid.api.Metadata}.
+ * This interface is implemented by classes that can provide Ybrid {@link io.ybrid.api.Metadata}.
  */
 public interface MetadataProvider {
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - YBRID®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * This interface is implemented by ybrid capable players.
+ * This interface is implemented by Ybrid capable players.
  */
 public interface Player extends MetadataProvider, SessionClient, Closeable {
     /**

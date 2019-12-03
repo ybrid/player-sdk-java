@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - YBRID®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -80,7 +80,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
         req += "Host: " + host + "\r\n";
         req += "Connection: close\r\n";
-        req += "User-Agent: ybrid Player\r\n";
+        req += "User-Agent: Ybrid Player\r\n";
         req += "Icy-MetaData: 1\r\n";
         req += "\r\n";
 

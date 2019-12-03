@@ -43,7 +43,7 @@ The player implements the full protocol and can then be controlled using it's AP
 import io.ybrid.api.Alias;
 import io.ybrid.api.Session;
 import io.ybrid.player.Player;
-import io.ybrid.player.ybridPlayer;
+import io.ybrid.player.YbridPlayer;
 
 import java.io.IOException;
 import java.net.URL;
@@ -56,7 +56,7 @@ class myPlayer {
         Session session = alias.createSession();
 
         /* We create a player using the Decoder and AudioBackend we provide */
-        Player player = new ybridPlayer(session, myDecoderFactory.getInstance(), myAudioBackendFactory.getInstance());
+        Player player = new YbridPlayer(session, myDecoderFactory.getInstance(), myAudioBackendFactory.getInstance());
 
         /* We set the sink for the Metadata. This could be the user interface. */
         player.setMetadataConsumer(myMetadataConsumer);
