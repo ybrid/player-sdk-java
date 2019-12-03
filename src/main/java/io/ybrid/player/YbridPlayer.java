@@ -55,6 +55,8 @@ public class YbridPlayer implements Player {
     private PlayerState playerState = PlayerState.STOPPED;
 
     private class PlaybackThread extends Thread {
+        public static final double MAX_BUFFER_SLEEP = 0.3;
+
         public PlaybackThread(String name) {
             super(name);
         }
@@ -70,8 +72,8 @@ public class YbridPlayer implements Player {
             playerStateChange(PlayerState.BUFFERING);
             while (!isInterrupted() && audioSource.isValid() && audioSource.getBufferLength() < AUDIO_BUFFER_PREBUFFER) {
                 double diff = AUDIO_BUFFER_PREBUFFER - audioSource.getBufferLength();
-                if (diff > 0.3) {
-                    diff = 0.3;
+                if (diff > MAX_BUFFER_SLEEP) {
+                    diff = MAX_BUFFER_SLEEP;
                 } else if (diff < 0.) {
                     break;
                 }
