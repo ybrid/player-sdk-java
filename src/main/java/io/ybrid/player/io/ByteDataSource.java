@@ -34,6 +34,7 @@ public interface ByteDataSource extends DataSource {
      * @return The block that has been read.
      * @throws IOException And I/O-Errors occurred while reading the block.
      */
+    @Override
     ByteDataBlock read() throws IOException;
 
     /**
