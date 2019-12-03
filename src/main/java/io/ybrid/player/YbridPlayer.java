@@ -134,11 +134,13 @@ public class YbridPlayer implements Player {
         }
     }
 
-    private class MetadataThread extends Thread implements Consumer<PCMDataBlock> {
+    private static class MetadataThread extends Thread implements Consumer<PCMDataBlock> {
         private BlockingQueue<PCMDataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
+        private final Session session;
 
-        MetadataThread(String name) {
+        MetadataThread(String name, Session session) {
             super(name);
+            this.session = session;
         }
 
         @Override
@@ -214,7 +216,7 @@ public class YbridPlayer implements Player {
         playerStateChange(PlayerState.PREPARING);
 
         playbackThread = new PlaybackThread("YbridPlayer Playback Thread");
-        metadataThread = new MetadataThread("YbridPlayer Metadata Thread");
+        metadataThread = new MetadataThread("YbridPlayer Metadata Thread", session);
 
         decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
         audioSource = new AudioBuffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);
