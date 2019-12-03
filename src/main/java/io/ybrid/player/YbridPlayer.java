@@ -220,8 +220,8 @@ public class YbridPlayer implements Player {
     public void prepare() throws IOException {
         playerStateChange(PlayerState.PREPARING);
 
-        playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER);
-        metadataThread = new MetadataThread("YbridPlayer Metadata Thread", session);
+        playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER); //NON-NLS
+        metadataThread = new MetadataThread("YbridPlayer Metadata Thread", session); //NON-NLS
 
         decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
         audioSource = new AudioBuffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);

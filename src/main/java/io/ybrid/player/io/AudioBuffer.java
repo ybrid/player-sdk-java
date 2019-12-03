@@ -38,7 +38,7 @@ public class AudioBuffer implements PCMDataSource {
     private double target;
     private PCMDataSource backend;
     private Consumer<PCMDataBlock> inputConsumer;
-    private BufferThread thread = new BufferThread("AudioBuffer Buffer Thread");
+    private BufferThread thread = new BufferThread("AudioBuffer Buffer Thread"); //NON-NLS
 
     private class BufferThread extends Thread implements DataSource {
         private static final long POLL_TIMEOUT = 123; /* [ms] */

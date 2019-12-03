@@ -38,6 +38,7 @@ class ICYMetadata {
         parse();
     }
 
+    @SuppressWarnings("MagicCharacter")
     private int parseKeyValue(byte[] input, int offset) {
         String key = null;
         String value = null;

@@ -52,6 +52,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private boolean metadataUpdated = false;
     private Metadata blockMetadata = null;
 
+    @SuppressWarnings("HardCodedStringLiteral")
     public ICYInputStream(URL url) throws MalformedURLException {
         switch (url.getProtocol()) {
             case "icyx":
@@ -75,6 +76,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         path = url.getFile();
     }
 
+    @SuppressWarnings("HardCodedStringLiteral")
     private void sendRequest() throws IOException {
         String req = "GET " + path + " HTTP/1.0\r\n";
 
@@ -87,6 +89,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         socket.getOutputStream().write(req.getBytes(StandardCharsets.US_ASCII));
     }
 
+    @SuppressWarnings("MagicCharacter")
     private String getHeader(InputStream inputStream) throws IOException {
         int nextLength = 2048;
         byte[] buffer;
