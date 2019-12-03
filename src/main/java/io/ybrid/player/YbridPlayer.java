@@ -151,7 +151,7 @@ public class YbridPlayer implements Player {
             while (!isInterrupted()) {
 
                 try {
-                    PCMDataBlock block = metadataBlockQueue.take();
+                    final PCMDataBlock block = metadataBlockQueue.take();
                     Metadata newMetdata = block.getMetadata();
 
                     if (newMetdata != null && newMetdata != oldMetadata) {
