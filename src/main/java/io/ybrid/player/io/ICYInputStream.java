@@ -38,7 +38,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 class ICYInputStream implements Closeable, ByteDataSource {
+    private static final String HEADER_CONTENT_TYPE = "content-type"; //NON-NLS
+    private static final String HEADER_ICY_METAINT = "icy-metaint"; //NON-NLS
     private static final int MAX_READ_LENGTH = 4*1024;
+    private static final int MAX_METATDATA_INTERVAL = 128*1024;
     private String host;
     private int port;
     private String path;
@@ -157,12 +160,12 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
         replyHeaders = parseHeader(header);
 
-        metaInt = replyHeaders.get("icy-metaint");
+        metaInt = replyHeaders.get(HEADER_ICY_METAINT);
         if (metaInt == null) {
             metadataInterval = -1;
         } else {
             metadataInterval = Integer.parseInt(metaInt);
-            if (metadataInterval < 0 || metadataInterval > (128*1024))
+            if (metadataInterval < 0 || metadataInterval > MAX_METATDATA_INTERVAL)
                 throw new IOException("Invalid metadata interval");
         }
 
@@ -283,6 +286,6 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (replyHeaders == null)
             return null;
 
-        return replyHeaders.get("content-type");
+        return replyHeaders.get(HEADER_CONTENT_TYPE);
     }
 }
