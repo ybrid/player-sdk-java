@@ -38,7 +38,7 @@ public class MetadataInputStream extends InputStream {
     private int offset;
 
     /**
-     * This creates an instace using a {@link ByteDataSource}.
+     * This creates an instance using a {@link ByteDataSource}.
      * @param source The backend to use.
      */
     public MetadataInputStream(ByteDataSource source) {

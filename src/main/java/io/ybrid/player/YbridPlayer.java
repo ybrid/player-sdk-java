@@ -157,11 +157,11 @@ public class YbridPlayer implements Player {
 
                 try {
                     final PCMDataBlock block = metadataBlockQueue.take();
-                    Metadata newMetdata = block.getMetadata();
+                    Metadata newMetadata = block.getMetadata();
 
-                    if (newMetdata != null && newMetdata != oldMetadata) {
-                        metadata = newMetdata;
-                        oldMetadata = newMetdata;
+                    if (newMetadata != null && newMetadata != oldMetadata) {
+                        metadata = newMetadata;
+                        oldMetadata = newMetadata;
                     }
 
                     if (metadata != null && !metadata.isValid()) {
