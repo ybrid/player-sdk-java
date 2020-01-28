@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.logging.Level;
 
 /**
  * This factory is used to build {@link DataSource DataSources}.
@@ -79,6 +80,8 @@ public final class DataSourceFactory {
      */
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
         URL url = session.getStreamURL();
+
+        session.getServer().getLogger().log(Level.INFO, "getSourceBySession(session="+session+"): url=" + url);
 
         try {
             return new ICYInputStream(url);
