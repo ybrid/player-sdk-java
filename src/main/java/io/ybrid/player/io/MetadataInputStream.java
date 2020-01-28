@@ -126,4 +126,10 @@ public class MetadataInputStream extends InputStream {
 
         return ret;
     }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+        source.close();
+    }
 }
