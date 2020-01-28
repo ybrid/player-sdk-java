@@ -248,6 +248,13 @@ public class YbridPlayer implements Player {
         metadataThread.interrupt();
     }
 
+
+    @Override
+    public io.ybrid.api.CapabilitySet getCapabilities() {
+        return session.getCapabilities().makePlayerSet();
+    }
+
+
     @Override
     public Bouquet getBouquet() {
         return session.getBouquet();
