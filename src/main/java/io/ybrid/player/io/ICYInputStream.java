@@ -154,7 +154,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     }
 
     private void receiveReply() throws IOException {
-        InputStream inputStream = new BufferedInputStream(socket.getInputStream());
+        InputStream inputStream = new RealBlockingInputStream(new BufferedInputStream(socket.getInputStream()));
         String header = getHeader(inputStream);
         String metaInt;
 
