@@ -22,6 +22,7 @@
 
 package io.ybrid.player;
 
+import io.ybrid.api.CapabilitySet;
 import io.ybrid.api.Metadata;
 
 /**
@@ -41,4 +42,6 @@ public interface MetadataConsumer {
      * @param playerState The new state of the player.
      */
     void onPlayerStateChange(PlayerState playerState);
+
+    void onCapabilitiesChange(CapabilitySet capabilities);
 }

@@ -122,8 +122,10 @@ public class YbridPlayer implements Player {
                     if (newMetadata.isValid()) {
                         if (oldMetadata == null) {
                             metadataConsumer.onMetadataChange(newMetadata);
+                            capabilitiesChange();
                         } else if (!newMetadata.equals(oldMetadata)) {
                             metadataConsumer.onMetadataChange(newMetadata);
+                            capabilitiesChange();
                         }
                     }
 
@@ -218,6 +220,12 @@ public class YbridPlayer implements Player {
             return;
         this.playerState = playerState;
         metadataConsumer.onPlayerStateChange(playerState);
+        capabilitiesChange();
+    }
+
+    private void capabilitiesChange() {
+        if (session.haveCapabilitiesChanged())
+            metadataConsumer.onCapabilitiesChange(session.getCapabilities().makePlayerSet());
     }
 
     @Override
@@ -252,6 +260,11 @@ public class YbridPlayer implements Player {
     @Override
     public io.ybrid.api.CapabilitySet getCapabilities() {
         return session.getCapabilities().makePlayerSet();
+    }
+
+    @Override
+    public boolean haveCapabilitiesChanged() {
+        return session.haveCapabilitiesChanged();
     }
 
 

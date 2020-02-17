@@ -22,6 +22,7 @@
 
 package io.ybrid.player;
 
+import io.ybrid.api.CapabilitySet;
 import io.ybrid.api.Metadata;
 
 final class NullMetadataConsumer implements MetadataConsumer {
@@ -41,6 +42,11 @@ final class NullMetadataConsumer implements MetadataConsumer {
 
     @Override
     public void onPlayerStateChange(PlayerState playerState) {
+        /* no-op */
+    }
+
+    @Override
+    public void onCapabilitiesChange(CapabilitySet capabilities) {
         /* no-op */
     }
 }
