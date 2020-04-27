@@ -83,7 +83,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private void sendRequest() throws IOException {
         String req = "GET " + path + " HTTP/1.0\r\n";
 
-        req += "Host: " + host + "\r\n";
+        req += "Host: " + host + ":" + port + "\r\n";
         req += "Connection: close\r\n";
         req += "User-Agent: Ybrid Player\r\n";
         req += "Icy-MetaData: 1\r\n";
