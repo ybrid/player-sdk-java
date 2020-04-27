@@ -269,7 +269,7 @@ public class YbridPlayer implements Player {
 
 
     @Override
-    public Bouquet getBouquet() {
+    public Bouquet getBouquet() throws IOException {
         return session.getBouquet();
     }
 
