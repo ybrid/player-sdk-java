@@ -39,6 +39,7 @@ final class InvalidMetadata implements Metadata {
     }
 
     @Override
+    @Deprecated
     public int getCurrentBitRate() {
         return -1;
     }
@@ -49,11 +50,13 @@ final class InvalidMetadata implements Metadata {
     }
 
     @Override
+    @Deprecated
     public SwapInfo getSwapInfo() {
         return null;
     }
 
     @Override
+    @Deprecated
     public long getTimeToNextItem() {
         return -1;
     }

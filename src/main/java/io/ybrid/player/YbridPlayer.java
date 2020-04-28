@@ -30,6 +30,7 @@ import io.ybrid.player.io.PCMDataBlock;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -279,13 +280,13 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public void WindTo(Instant timestamp) throws IOException {
-        session.WindTo(timestamp);
+    public void windTo(Instant timestamp) throws IOException {
+        session.windTo(timestamp);
     }
 
     @Override
-    public void Wind(long duration) throws IOException {
-        session.Wind(duration);
+    public void wind(Duration duration) throws IOException {
+        session.wind(duration);
     }
 
     @Override
@@ -304,13 +305,18 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public void swapService(Service service) {
+    public void swapService(Service service) throws IOException {
         session.swapService(service);
     }
 
     @Override
     public Metadata getMetadata() throws IOException {
         return session.getMetadata();
+    }
+
+    @Override
+    public PlayoutInfo getPlayoutInfo() throws IOException {
+        return session.getPlayoutInfo();
     }
 
     @Override
