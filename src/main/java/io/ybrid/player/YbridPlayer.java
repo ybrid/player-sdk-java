@@ -310,6 +310,11 @@ public class YbridPlayer implements Player {
     }
 
     @Override
+    public void swapToMain() throws IOException {
+        session.swapToMain();
+    }
+
+    @Override
     public Metadata getMetadata() throws IOException {
         return session.getMetadata();
     }
