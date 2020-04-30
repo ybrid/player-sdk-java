@@ -22,12 +22,11 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.player.Consumer;
-
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * This implements a buffered {@link PCMDataSource} based on another such source.

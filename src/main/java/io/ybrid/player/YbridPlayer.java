@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 /**
  * This implements a Ybrid capable {@link Player}.
