@@ -23,7 +23,7 @@
 package io.ybrid.player;
 
 import io.ybrid.api.*;
-import io.ybrid.player.io.AudioBuffer;
+import io.ybrid.player.io.audio.Buffer;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
@@ -52,7 +52,7 @@ public class YbridPlayer implements Player {
     private final AudioBackendFactory audioBackendFactory;
     private Decoder decoder;
     private AudioBackend audioBackend;
-    private AudioBuffer audioSource;
+    private Buffer audioSource;
     private PlaybackThread playbackThread;
     private PCMDataBlock initialAudioBlock;
     private MetadataThread metadataThread;
@@ -237,7 +237,7 @@ public class YbridPlayer implements Player {
         metadataThread = new MetadataThread("YbridPlayer Metadata Thread", session); //NON-NLS
 
         decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
-        audioSource = new AudioBuffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);
+        audioSource = new Buffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);
 
         audioBackend = audioBackendFactory.getAudioBackend();
         initialAudioBlock = audioSource.read();

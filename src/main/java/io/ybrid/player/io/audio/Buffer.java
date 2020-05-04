@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2020 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,11 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player.io;
+package io.ybrid.player.io.audio;
+
+import io.ybrid.player.io.DataSource;
+import io.ybrid.player.io.PCMDataBlock;
+import io.ybrid.player.io.PCMDataSource;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
@@ -33,12 +37,12 @@ import java.util.function.Consumer;
  *
  * The purpose of this class is to provide a buffer for audio.
  */
-public class AudioBuffer implements PCMDataSource {
+public class Buffer implements PCMDataSource {
     private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
     private double target;
     private PCMDataSource backend;
     private Consumer<PCMDataBlock> inputConsumer;
-    private BufferThread thread = new BufferThread("AudioBuffer Buffer Thread"); //NON-NLS
+    private BufferThread thread = new BufferThread("Audio Buffer Thread"); //NON-NLS
 
     private class BufferThread extends Thread implements DataSource {
         private static final long POLL_TIMEOUT = 123; /* [ms] */
@@ -126,7 +130,7 @@ public class AudioBuffer implements PCMDataSource {
      * @param backend The backend to use.
      * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
-    public AudioBuffer(double target, PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
+    public Buffer(double target, PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
         this.target = target;
         this.backend = backend;
         this.inputConsumer = inputConsumer;
