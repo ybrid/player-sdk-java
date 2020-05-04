@@ -22,6 +22,8 @@
 
 package io.ybrid.player.io.audio;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * This interface is implemented by classes providing states of a audio Buffer
  * such as {@link Buffer}.
@@ -31,11 +33,11 @@ public interface BufferStatusProvider {
      * This method registers a {@link BufferStatusConsumer} with the provider.
      * @param consumer The consumer to register.
      */
-    void addBufferStatusConsumer(BufferStatusConsumer consumer);
+    void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer);
 
     /**
      * This method un-registers a {@link BufferStatusConsumer} with the provider.
      * @param consumer The consuder to remove.
      */
-    void removeBufferStatusConsumer(BufferStatusConsumer consumer);
+    void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer);
 }

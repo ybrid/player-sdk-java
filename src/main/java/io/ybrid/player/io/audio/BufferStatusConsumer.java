@@ -22,6 +22,9 @@
 
 package io.ybrid.player.io.audio;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +37,7 @@ public interface BufferStatusConsumer {
      * Called when the buffer state is updated.
      * @param status Current buffer state.
      */
-    void onBufferStatusUpdate(BufferStatus status);
+    void onBufferStatusUpdate(@NotNull BufferStatus status);
 
     /**
      * Builds a adapter to log buffer state updates.
@@ -44,7 +47,9 @@ public interface BufferStatusConsumer {
      * @param level The loglevel to use.
      * @return The newly constructed consumer.
      */
-    static BufferStatusConsumer buildLoggerAdapter(Logger logger, Level level) {
+    @Contract(pure = true, value = "_, _ -> new")
+    @NotNull
+    static BufferStatusConsumer buildLoggerAdapter(@NotNull Logger logger, @NotNull Level level) {
         //noinspection HardCodedStringLiteral
         return status -> logger.log(level, "Buffer Status: " +
                 "Current = " + status.getCurrent() + "[" + status.getCurrentTimestamp() + "]" +

@@ -118,7 +118,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         }
 
         @Override
-        public void addBufferStatusConsumer(BufferStatusConsumer consumer) {
+        public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
             if (!consumers.contains(consumer)) {
                 consumers.add(consumer);
                 lastAnnounce = null; // force next announce
@@ -126,7 +126,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         }
 
         @Override
-        public void removeBufferStatusConsumer(BufferStatusConsumer consumer) {
+        public void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
             consumers.remove(consumer);
         }
     }

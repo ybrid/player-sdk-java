@@ -22,6 +22,8 @@
 
 package io.ybrid.player.io.audio;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.time.Instant;
 
 /**
@@ -40,10 +42,10 @@ public class BufferStatus {
     private final Instant currentTimestamp;
 
     BufferStatus(long underruns, Instant underrunTimestamp,
-                 long overruns, Instant overrunTimestmap,
-                 double max, Instant maxTimestamp,
-                 double minAfterMax, Instant minAfterMaxTimestamp,
-                 double current, Instant currentTimestamp) {
+                 long overruns, @Nullable Instant overrunTimestmap,
+                 double max, @Nullable Instant maxTimestamp,
+                 double minAfterMax, @Nullable Instant minAfterMaxTimestamp,
+                 double current, @Nullable Instant currentTimestamp) {
         this.underruns = underruns;
         this.underrunTimestamp = underrunTimestamp;
         this.overruns = overruns;
@@ -68,6 +70,7 @@ public class BufferStatus {
      * Get time of last underrun.
      * @return Time of last underrun or null if none.
      */
+    @Nullable
     public Instant getUnderrunTimestamp() {
         return underrunTimestamp;
     }
@@ -84,6 +87,7 @@ public class BufferStatus {
      * Get time of last overrun.
      * @return Time of last overrun or null if none.
      */
+    @Nullable
     public Instant getOverrunTimestmap() {
         return overrunTimestmap;
     }
@@ -100,6 +104,7 @@ public class BufferStatus {
      * Get time of maximum buffer fill.
      * @return Time of maximum buffer fill or none if never filled.
      */
+    @Nullable
     public Instant getMaxTimestamp() {
         return maxTimestamp;
     }
@@ -116,6 +121,7 @@ public class BufferStatus {
      * Get time of minimum buffer fill. This is always later or equal to {@link #getMaxTimestamp()}.
      * @return Time of last minimum buffer fill or null if never set.
      */
+    @Nullable
     public Instant getMinAfterMaxTimestamp() {
         return minAfterMaxTimestamp;
     }
@@ -133,6 +139,7 @@ public class BufferStatus {
      * Get time of when current buffer fill was recorded.
      * @return Time of record or null if buffer was never filled.
      */
+    @Nullable
     public Instant getCurrentTimestamp() {
         return currentTimestamp;
     }
