@@ -22,6 +22,14 @@
 
 package io.ybrid.player.io.audio;
 
+/**
+ * This interface is implemented by classes accepting updates of state information
+ * from the {@link Buffer}.
+ */
 public interface BufferStatusConsumer {
+    /**
+     * Called when the buffer state is updated.
+     * @param status Current buffer state.
+     */
     void onBufferStatusUpdate(BufferStatus status);
 }

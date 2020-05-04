@@ -24,6 +24,9 @@ package io.ybrid.player.io.audio;
 
 import java.time.Instant;
 
+/**
+ * This class is used to hold a state of the {@link Buffer}.
+ */
 public class BufferStatus {
     private final long underruns;
     private final Instant underrunTimestamp;
@@ -53,42 +56,83 @@ public class BufferStatus {
         this.currentTimestamp = currentTimestamp;
     }
 
+    /**
+     * Get number total of underruns.
+     * @return Number of underruns.
+     */
     public long getUnderruns() {
         return underruns;
     }
 
+    /**
+     * Get time of last underrun.
+     * @return Time of last underrun or null if none.
+     */
     public Instant getUnderrunTimestamp() {
         return underrunTimestamp;
     }
 
+    /**
+     * Get number of total overruns.
+     * @return Number of overruns.
+     */
     public long getOverruns() {
         return overruns;
     }
 
+    /**
+     * Get time of last overrun.
+     * @return Time of last overrun or null if none.
+     */
     public Instant getOverrunTimestmap() {
         return overrunTimestmap;
     }
 
+    /**
+     * Get maximum buffer fill ever reached.
+     * @return Maximum buffer fill.
+     */
     public double getMax() {
         return max;
     }
 
+    /**
+     * Get time of maximum buffer fill.
+     * @return Time of maximum buffer fill or none if never filled.
+     */
     public Instant getMaxTimestamp() {
         return maxTimestamp;
     }
 
+    /**
+     * Get minimum buffer fill since last time max was reached.
+     * @return Mimimum buffer fill.
+     */
     public double getMinAfterMax() {
         return minAfterMax;
     }
 
+    /**
+     * Get time of minimum buffer fill. This is always later or equal to {@link #getMaxTimestamp()}.
+     * @return Time of last minimum buffer fill or null if never set.
+     */
     public Instant getMinAfterMaxTimestamp() {
         return minAfterMaxTimestamp;
     }
 
+    /**
+     * Get the current buffer fill.
+     * This value is recorded at {@link #getCurrentTimestamp()}.
+     * @return The current buffer fill.
+     */
     public double getCurrent() {
         return current;
     }
 
+    /**
+     * Get time of when current buffer fill was recorded.
+     * @return Time of record or null if buffer was never filled.
+     */
     public Instant getCurrentTimestamp() {
         return currentTimestamp;
     }
