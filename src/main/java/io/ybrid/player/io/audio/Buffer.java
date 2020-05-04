@@ -106,7 +106,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             if (consumers.isEmpty())
                 return;
 
-            if (!force && lastAnnounce != null && !lastAnnounce.plus(MINIMUM_BETWEEN_ANNOUNCE).isAfter(now))
+            if (!force && lastAnnounce != null && lastAnnounce.plus(MINIMUM_BETWEEN_ANNOUNCE).isAfter(now))
                 return;
 
             status = new BufferStatus(underruns, underrunTimestamp, overruns, overrunTimestmap, max, maxTimestamp, minAfterMax, minAfterMaxTimestamp, current, currentTimestamp);
