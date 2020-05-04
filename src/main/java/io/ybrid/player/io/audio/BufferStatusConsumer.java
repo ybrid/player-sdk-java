@@ -22,6 +22,9 @@
 
 package io.ybrid.player.io.audio;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * This interface is implemented by classes accepting updates of state information
  * from the {@link Buffer}.
@@ -32,4 +35,23 @@ public interface BufferStatusConsumer {
      * @param status Current buffer state.
      */
     void onBufferStatusUpdate(BufferStatus status);
+
+    /**
+     * Builds a adapter to log buffer state updates.
+     * This is for debugging prurposes only.
+     *
+     * @param logger The logger to use.
+     * @param level The loglevel to use.
+     * @return The newly constructed consumer.
+     */
+    static BufferStatusConsumer buildLoggerAdapter(Logger logger, Level level) {
+        //noinspection HardCodedStringLiteral
+        return status -> logger.log(level, "Buffer Status: " +
+                "Current = " + status.getCurrent() + "[" + status.getCurrentTimestamp() + "]" +
+                ", Max = " + status.getMax() + "[" + status.getMaxTimestamp() + "]" +
+                ", MinAfterMax = " + status.getMinAfterMax() + "[" + status.getMinAfterMaxTimestamp() + "]" +
+                ", Overruns = " + status.getOverruns() + "[" + status.getOverrunTimestmap() + "]" +
+                ", Underruns = " + status.getUnderruns() + "[" + status.getUnderrunTimestamp() + "]"
+        );
+    }
 }
