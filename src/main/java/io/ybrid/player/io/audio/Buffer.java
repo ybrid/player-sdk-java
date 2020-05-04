@@ -25,8 +25,13 @@ package io.ybrid.player.io.audio;
 import io.ybrid.player.io.DataSource;
 import io.ybrid.player.io.PCMDataBlock;
 import io.ybrid.player.io.PCMDataSource;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -37,12 +42,94 @@ import java.util.function.Consumer;
  *
  * The purpose of this class is to provide a buffer for audio.
  */
-public class Buffer implements PCMDataSource {
+public class Buffer implements PCMDataSource, BufferStatusProvider {
     private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
     private double target;
     private PCMDataSource backend;
     private Consumer<PCMDataBlock> inputConsumer;
     private BufferThread thread = new BufferThread("Audio Buffer Thread"); //NON-NLS
+    private Status state = new Status();
+
+    private static class Status implements BufferStatusProvider {
+        private static final Duration MINIMUM_BETWEEN_ANNOUNCE = Duration.ofMillis(1000);
+
+        List<BufferStatusConsumer> consumers = new ArrayList<>();
+        private Instant lastAnnounce = null;
+        private long underruns = 0;
+        private Instant underrunTimestamp = null;
+        private long overruns = 0;
+        private Instant overrunTimestmap = null;
+        private double max = 0;
+        private Instant maxTimestamp = null;
+        private double minAfterMax = 0;
+        private Instant minAfterMaxTimestamp = null;
+        private double current = 0;
+        private Instant currentTimestamp = null;
+
+        private void underrun() {
+            underruns++;
+            underrunTimestamp = Instant.now();
+            announce(true, underrunTimestamp);
+        }
+
+        private void overrun() {
+            overruns++;
+            overrunTimestmap = Instant.now();
+            announce(true, overrunTimestmap);
+        }
+
+        private void update(double current) {
+            Instant now = Instant.now();
+            boolean forceAnnounce = false;
+
+            this.current = current;
+            currentTimestamp = now;
+
+            if (current > max) {
+                max = current;
+                maxTimestamp = now;
+                minAfterMax = current;
+                minAfterMaxTimestamp = now;
+                forceAnnounce = true;
+            } else if (current < minAfterMax) {
+                minAfterMax = current;
+                minAfterMaxTimestamp = now;
+                forceAnnounce = true;
+            }
+
+            announce(forceAnnounce, now);
+        }
+
+        private void announce(boolean force, @NotNull final Instant now) {
+            final BufferStatus status;
+
+            if (consumers.isEmpty())
+                return;
+
+            if (!force && lastAnnounce != null && !lastAnnounce.plus(MINIMUM_BETWEEN_ANNOUNCE).isAfter(now))
+                return;
+
+            status = new BufferStatus(underruns, underrunTimestamp, overruns, overrunTimestmap, max, maxTimestamp, minAfterMax, minAfterMaxTimestamp, current, currentTimestamp);
+
+            for (BufferStatusConsumer consumer : consumers)
+                consumer.onBufferStatusUpdate(status);
+
+            lastAnnounce = now;
+        }
+
+        @Override
+        public void addBufferStatusConsumer(BufferStatusConsumer consumer) {
+            if (!consumers.contains(consumer)) {
+                consumers.add(consumer);
+                lastAnnounce = null; // force next announce
+            }
+        }
+
+        @Override
+        public void removeBufferStatusConsumer(BufferStatusConsumer consumer) {
+            consumers.remove(consumer);
+        }
+    }
 
     private class BufferThread extends Thread implements DataSource {
         private static final long POLL_TIMEOUT = 123; /* [ms] */
@@ -59,6 +146,7 @@ public class Buffer implements PCMDataSource {
             try {
                 while (!isInterrupted()) {
                     if (getBufferLength() > target) {
+                        state.overrun();
                         sleep(SLEEP_TIME);
                     } else {
                         pump();
@@ -99,6 +187,8 @@ public class Buffer implements PCMDataSource {
                 if (block != null)
                     return block;
 
+                state.underrun();
+
                 do {
                     if (exception != null) {
                         throw toIOException(exception);
@@ -106,10 +196,27 @@ public class Buffer implements PCMDataSource {
                     block = buffer.poll(POLL_TIMEOUT, TimeUnit.MILLISECONDS);
                 } while (block == null);
 
+                getBufferLength(); // Update state.
                 return block;
             } catch (InterruptedException e) {
                 throw toIOException(e);
             }
+        }
+
+        /**
+         * Returns the fullness of the buffer.
+         * @return The fullness in [s].
+         */
+        public double getBufferLength() {
+            double ret = 0;
+
+            for (PCMDataBlock block : buffer) {
+                ret += block.getBlockLength();
+            }
+
+            state.update(ret);
+
+            return ret;
         }
 
         @Override
@@ -141,15 +248,11 @@ public class Buffer implements PCMDataSource {
     /**
      * Returns the fullness of the buffer.
      * @return The fullness in [s].
+     * @deprecated Use {@link #addBufferStatusConsumer(BufferStatusConsumer)} to subscribe to buffer state changes
      */
+    @Deprecated
     public double getBufferLength() {
-        double ret = 0;
-
-        for (PCMDataBlock block : buffer) {
-            ret += block.getBlockLength();
-        }
-
-        return ret;
+        return thread.getBufferLength();
     }
 
     @Override
@@ -160,6 +263,16 @@ public class Buffer implements PCMDataSource {
     @Override
     public boolean isValid() {
         return thread != null && thread.isValid();
+    }
+
+    @Override
+    public void addBufferStatusConsumer(BufferStatusConsumer consumer) {
+        state.addBufferStatusConsumer(consumer);
+    }
+
+    @Override
+    public void removeBufferStatusConsumer(BufferStatusConsumer consumer) {
+        state.removeBufferStatusConsumer(consumer);
     }
 
     @Override
