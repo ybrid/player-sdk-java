@@ -27,6 +27,8 @@ import io.ybrid.player.io.audio.Buffer;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
+import io.ybrid.player.io.audio.BufferStatus;
+import io.ybrid.player.io.audio.BufferStatusConsumer;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -76,21 +78,21 @@ public class YbridPlayer implements Player {
         }
 
         private void buffer(PlayerState nextState) {
-            playerStateChange(PlayerState.BUFFERING);
-            while (!isInterrupted() && audioSource.isValid() && audioSource.getBufferLength() < bufferGoal) {
-                double diff = bufferGoal - audioSource.getBufferLength();
-                if (diff > MAX_BUFFER_SLEEP) {
-                    diff = MAX_BUFFER_SLEEP;
-                } else if (diff < 0.) {
-                    break;
-                }
+            final BlockingQueue<BufferStatus> queue = new LinkedBlockingQueue<>();
+            // We need to store this in a variable so add and remove gets the same one:
+            final BufferStatusConsumer consumer = queue::offer;
 
-                try {
-                    sleep((long) (diff*1000));
-                } catch (InterruptedException e) {
-                    break;
+            playerStateChange(PlayerState.BUFFERING);
+            audioSource.addBufferStatusConsumer(consumer);
+            try {
+                while (!isInterrupted() && audioSource.isValid()) {
+                    if (queue.take().getCurrent() > bufferGoal) {
+                        break;
+                    }
                 }
+            } catch (InterruptedException ignored) {
             }
+            audioSource.removeBufferStatusConsumer(consumer);
             playerStateChange(nextState);
         }
 
