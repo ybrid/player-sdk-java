@@ -245,16 +245,6 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         thread.start();
     }
 
-    /**
-     * Returns the fullness of the buffer.
-     * @return The fullness in [s].
-     * @deprecated Use {@link #addBufferStatusConsumer(BufferStatusConsumer)} to subscribe to buffer state changes
-     */
-    @Deprecated
-    public double getBufferLength() {
-        return thread.getBufferLength();
-    }
-
     @Override
     public PCMDataBlock read() throws IOException {
         return thread.read();
