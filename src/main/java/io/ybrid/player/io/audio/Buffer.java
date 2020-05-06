@@ -234,7 +234,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             interrupt();
         }
     }

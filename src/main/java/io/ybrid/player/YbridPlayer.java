@@ -262,7 +262,7 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public void stop() throws IOException {
+    public void stop() {
         playbackThread.interrupt();
         metadataThread.interrupt();
     }
@@ -364,7 +364,7 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         stop();
     }
 }
