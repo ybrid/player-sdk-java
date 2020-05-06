@@ -191,8 +191,10 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             try {
                 PCMDataBlock block = buffer.poll();
 
-                if (block != null)
+                if (block != null) {
+                    getBufferLength(); // Update state.
                     return block;
+                }
 
                 state.underrun();
 
