@@ -24,6 +24,7 @@ package io.ybrid.player;
 
 import io.ybrid.api.CapabilitySet;
 import io.ybrid.api.Metadata;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This interface is implemented by classes that can consume Ybrid {@link Metadata}.
@@ -35,13 +36,13 @@ public interface MetadataConsumer {
      *
      * @param metadata The {@link Metadata} to consume.
      */
-    void onMetadataChange(Metadata metadata);
+    void onMetadataChange(@NotNull Metadata metadata);
 
     /**
      * This function is called by the {@link MetadataProvider} when the state of the player changed.
      * @param playerState The new state of the player.
      */
-    void onPlayerStateChange(PlayerState playerState);
+    void onPlayerStateChange(@NotNull PlayerState playerState);
 
-    void onCapabilitiesChange(CapabilitySet capabilities);
+    void onCapabilitiesChange(@NotNull CapabilitySet capabilities);
 }

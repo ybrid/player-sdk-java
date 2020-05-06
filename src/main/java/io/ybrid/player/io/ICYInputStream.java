@@ -42,10 +42,10 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private static final String HEADER_ICY_METAINT = "icy-metaint"; //NON-NLS
     private static final int MAX_READ_LENGTH = 4*1024;
     private static final int MAX_METATDATA_INTERVAL = 128*1024;
-    private String host;
+    private final String host;
     private int port;
-    private String path;
-    private boolean secure;
+    private final String path;
+    private final boolean secure;
     private Socket socket;
     private InputStream inputStream;
     private HashMap<String, String> replyHeaders;

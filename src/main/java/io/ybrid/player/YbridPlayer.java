@@ -68,7 +68,7 @@ public class YbridPlayer implements Player {
     private class PlaybackThread extends Thread {
         public static final double MAX_BUFFER_SLEEP = 0.3;
 
-        private double bufferGoal;
+        private final double bufferGoal;
 
         public PlaybackThread(String name, double bufferGoal) {
             super(name);
@@ -153,7 +153,7 @@ public class YbridPlayer implements Player {
     }
 
     private static class MetadataThread extends Thread implements Consumer<PCMDataBlock> {
-        private BlockingQueue<PCMDataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
+        private final BlockingQueue<PCMDataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
         private final Session session;
 
         MetadataThread(String name, Session session) {

@@ -45,10 +45,10 @@ import java.util.function.Consumer;
 public class Buffer implements PCMDataSource, BufferStatusProvider {
     private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
     private double target;
-    private PCMDataSource backend;
-    private Consumer<PCMDataBlock> inputConsumer;
+    @NotNull private final PCMDataSource backend;
+    private final Consumer<PCMDataBlock> inputConsumer;
     private BufferThread thread = new BufferThread("Audio Buffer Thread"); //NON-NLS
-    private Status state = new Status();
+    private final Status state = new Status();
 
     private static class Status implements BufferStatusProvider {
         private static final Duration MINIMUM_BETWEEN_ANNOUNCE = Duration.ofMillis(1000);
@@ -246,7 +246,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
      * @param backend The backend to use.
      * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
-    public Buffer(double target, PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
+    public Buffer(double target, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
         this.target = target;
         this.backend = backend;
         this.inputConsumer = inputConsumer;
@@ -265,12 +265,12 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
     }
 
     @Override
-    public void addBufferStatusConsumer(BufferStatusConsumer consumer) {
+    public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
         state.addBufferStatusConsumer(consumer);
     }
 
     @Override
-    public void removeBufferStatusConsumer(BufferStatusConsumer consumer) {
+    public void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
         state.removeBufferStatusConsumer(consumer);
     }
 

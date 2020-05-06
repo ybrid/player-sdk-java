@@ -23,6 +23,7 @@
 package io.ybrid.player;
 
 import io.ybrid.player.io.PCMDataBlock;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -45,7 +46,7 @@ public interface AudioBackend extends Closeable {
      * @param block A block of PCM data used to obtain initial audio configuration. This block must not be played.
      * @throws IOException Thrown on backend related I/O-Error.
      */
-    void prepare(PCMDataBlock block) throws IOException;
+    void prepare(@NotNull PCMDataBlock block) throws IOException;
 
     /**
      * Start playback mode of the backend.
@@ -65,5 +66,5 @@ public interface AudioBackend extends Closeable {
      * @param block The block to write to the backend.
      * @throws IOException Thrown on backend related I/O-Error.
      */
-    void write(PCMDataBlock block) throws IOException;
+    void write(@NotNull PCMDataBlock block) throws IOException;
 }

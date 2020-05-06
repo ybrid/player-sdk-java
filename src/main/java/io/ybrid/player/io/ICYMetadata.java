@@ -31,7 +31,7 @@ import java.util.Map;
 class ICYMetadata {
     private final byte[] raw;
     private byte[] reduced;
-    private Map<String, String> values = new HashMap<>();
+    private final Map<String, String> values = new HashMap<>();
 
     ICYMetadata(byte[] raw) {
         this.raw = raw;

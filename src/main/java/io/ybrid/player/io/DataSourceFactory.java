@@ -36,8 +36,8 @@ import java.util.logging.Level;
  */
 public final class DataSourceFactory {
     private static class URLSource implements ByteDataSource {
-        private InputStream inputStream;
-        private String contentType;
+        private final InputStream inputStream;
+        private final String contentType;
 
         public URLSource(URL url) throws IOException {
             URLConnection connection = url.openConnection();

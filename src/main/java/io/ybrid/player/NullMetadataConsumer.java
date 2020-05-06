@@ -24,6 +24,7 @@ package io.ybrid.player;
 
 import io.ybrid.api.CapabilitySet;
 import io.ybrid.api.Metadata;
+import org.jetbrains.annotations.NotNull;
 
 final class NullMetadataConsumer implements MetadataConsumer {
     private static final MetadataConsumer instance = new NullMetadataConsumer();
@@ -36,17 +37,17 @@ final class NullMetadataConsumer implements MetadataConsumer {
     }
 
     @Override
-    public void onMetadataChange(Metadata metadata) {
+    public void onMetadataChange(@NotNull Metadata metadata) {
         /* no-op */
     }
 
     @Override
-    public void onPlayerStateChange(PlayerState playerState) {
+    public void onPlayerStateChange(@NotNull PlayerState playerState) {
         /* no-op */
     }
 
     @Override
-    public void onCapabilitiesChange(CapabilitySet capabilities) {
+    public void onCapabilitiesChange(@NotNull CapabilitySet capabilities) {
         /* no-op */
     }
 }

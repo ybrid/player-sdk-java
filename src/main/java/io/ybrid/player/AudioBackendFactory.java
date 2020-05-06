@@ -22,6 +22,8 @@
 
 package io.ybrid.player;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * This interface is implemented by factory classes that allow to build a {@link AudioBackend}.
  */
@@ -31,5 +33,6 @@ public interface AudioBackendFactory {
      *
      * @return The new {@link AudioBackend}.
      */
+    @NotNull
     AudioBackend getAudioBackend();
 }

@@ -23,6 +23,7 @@
 package io.ybrid.player;
 
 import io.ybrid.player.io.DataSource;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This interface is implemented by factory classes that build {@link Decoder} instances.
@@ -36,5 +37,5 @@ public interface DecoderFactory {
      * @param dataSource The {@link DataSource} used to read data from.
      * @return The {@link Decoder} that has been build.
      */
-    Decoder getDecoder(DataSource dataSource);
+    Decoder getDecoder(@NotNull DataSource dataSource);
 }

@@ -22,6 +22,8 @@
 
 package io.ybrid.player.io;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 
 /**
@@ -44,5 +46,6 @@ public interface ByteDataSource extends DataSource {
      *
      * @return The content-type or null.
      */
+    @Nullable
     String getContentType();
 }
