@@ -53,7 +53,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
     private static class Status implements BufferStatusProvider {
         private static final Duration MINIMUM_BETWEEN_ANNOUNCE = Duration.ofMillis(1000);
 
-        List<BufferStatusConsumer> consumers = new ArrayList<>();
+        final List<BufferStatusConsumer> consumers = new ArrayList<>();
         private Instant lastAnnounce = null;
         private long underruns = 0;
         private Instant underrunTimestamp = null;
@@ -111,23 +111,29 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
 
             status = new BufferStatus(underruns, underrunTimestamp, overruns, overrunTimestmap, max, maxTimestamp, minAfterMax, minAfterMaxTimestamp, current, currentTimestamp);
 
-            for (BufferStatusConsumer consumer : consumers)
-                consumer.onBufferStatusUpdate(status);
+            synchronized (consumers) {
+                for (BufferStatusConsumer consumer : consumers)
+                    consumer.onBufferStatusUpdate(status);
+            }
 
             lastAnnounce = now;
         }
 
         @Override
         public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
-            if (!consumers.contains(consumer)) {
-                consumers.add(consumer);
-                lastAnnounce = null; // force next announce
+            synchronized (consumers) {
+                if (!consumers.contains(consumer)) {
+                    consumers.add(consumer);
+                    lastAnnounce = null; // force next announce
+                }
             }
         }
 
         @Override
         public void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
-            consumers.remove(consumer);
+            synchronized (consumers) {
+                consumers.remove(consumer);
+            }
         }
     }
 
