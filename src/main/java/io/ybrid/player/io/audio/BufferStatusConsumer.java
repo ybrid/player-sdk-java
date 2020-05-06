@@ -50,13 +50,6 @@ public interface BufferStatusConsumer {
     @Contract(pure = true, value = "_, _ -> new")
     @NotNull
     static BufferStatusConsumer buildLoggerAdapter(@NotNull Logger logger, @NotNull Level level) {
-        //noinspection HardCodedStringLiteral
-        return status -> logger.log(level, "Buffer Status: " +
-                "Current = " + status.getCurrent() + "[" + status.getCurrentTimestamp() + "]" +
-                ", Max = " + status.getMax() + "[" + status.getMaxTimestamp() + "]" +
-                ", MinAfterMax = " + status.getMinAfterMax() + "[" + status.getMinAfterMaxTimestamp() + "]" +
-                ", Overruns = " + status.getOverruns() + "[" + status.getOverrunTimestamp() + "]" +
-                ", Underruns = " + status.getUnderruns() + "[" + status.getUnderrunTimestamp() + "]"
-        );
+        return status -> logger.log(level, status.toString());
     }
 }

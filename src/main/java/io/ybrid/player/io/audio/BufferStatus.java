@@ -22,6 +22,7 @@
 
 package io.ybrid.player.io.audio;
 
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -145,5 +146,17 @@ final public class BufferStatus implements Serializable {
     @Nullable
     public Instant getCurrentTimestamp() {
         return currentTimestamp;
+    }
+
+    @NonNls
+    @Override
+    public String toString() {
+        return "BufferStatus{" +
+                "Current = " + current + "[" + currentTimestamp + "]" +
+                ", Max = " + max + "[" + maxTimestamp + "]" +
+                ", MinAfterMax = " + minAfterMax + "[" + minAfterMaxTimestamp + "]" +
+                ", Overruns = " + overruns + "[" + overrunTimestamp + "]" +
+                ", Underruns = " + underruns + "[" + underrunTimestamp + "]" +
+                '}';
     }
 }
