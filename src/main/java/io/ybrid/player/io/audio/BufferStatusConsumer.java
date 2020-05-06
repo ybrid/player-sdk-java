@@ -55,7 +55,7 @@ public interface BufferStatusConsumer {
                 "Current = " + status.getCurrent() + "[" + status.getCurrentTimestamp() + "]" +
                 ", Max = " + status.getMax() + "[" + status.getMaxTimestamp() + "]" +
                 ", MinAfterMax = " + status.getMinAfterMax() + "[" + status.getMinAfterMaxTimestamp() + "]" +
-                ", Overruns = " + status.getOverruns() + "[" + status.getOverrunTimestmap() + "]" +
+                ", Overruns = " + status.getOverruns() + "[" + status.getOverrunTimestamp() + "]" +
                 ", Underruns = " + status.getUnderruns() + "[" + status.getUnderrunTimestamp() + "]"
         );
     }

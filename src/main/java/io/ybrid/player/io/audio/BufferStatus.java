@@ -36,7 +36,7 @@ final public class BufferStatus implements Serializable {
     private final long underruns;
     private final Instant underrunTimestamp;
     private final long overruns;
-    private final Instant overrunTimestmap;
+    private final Instant overrunTimestamp;
     private final double max;
     private final Instant maxTimestamp;
     private final double minAfterMax;
@@ -45,14 +45,14 @@ final public class BufferStatus implements Serializable {
     private final Instant currentTimestamp;
 
     BufferStatus(long underruns, Instant underrunTimestamp,
-                 long overruns, @Nullable Instant overrunTimestmap,
+                 long overruns, @Nullable Instant overrunTimestamp,
                  double max, @Nullable Instant maxTimestamp,
                  double minAfterMax, @Nullable Instant minAfterMaxTimestamp,
                  double current, @Nullable Instant currentTimestamp) {
         this.underruns = underruns;
         this.underrunTimestamp = underrunTimestamp;
         this.overruns = overruns;
-        this.overrunTimestmap = overrunTimestmap;
+        this.overrunTimestamp = overrunTimestamp;
         this.max = max;
         this.maxTimestamp = maxTimestamp;
         this.minAfterMax = minAfterMax;
@@ -91,8 +91,8 @@ final public class BufferStatus implements Serializable {
      * @return Time of last overrun or null if none.
      */
     @Nullable
-    public Instant getOverrunTimestmap() {
-        return overrunTimestmap;
+    public Instant getOverrunTimestamp() {
+        return overrunTimestamp;
     }
 
     /**
