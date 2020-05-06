@@ -100,7 +100,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             announce(forceAnnounce, now);
         }
 
-        private void announce(boolean force, @NotNull final Instant now) {
+        private synchronized void announce(boolean force, @NotNull final Instant now) {
             final BufferStatus status;
 
             if (consumers.isEmpty())
