@@ -24,12 +24,15 @@ package io.ybrid.player.io.audio;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 /**
  * This class is used to hold a state of the {@link Buffer}.
  */
-public class BufferStatus {
+final public class BufferStatus implements Serializable {
+    private static final long serialVersionUID = -3172756405966691712L;
+
     private final long underruns;
     private final Instant underrunTimestamp;
     private final long overruns;
