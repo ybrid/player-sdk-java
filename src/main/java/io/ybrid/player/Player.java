@@ -23,6 +23,7 @@
 package io.ybrid.player;
 
 import io.ybrid.api.SessionClient;
+import io.ybrid.player.io.audio.BufferStatusProvider;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -30,7 +31,7 @@ import java.io.IOException;
 /**
  * This interface is implemented by Ybrid capable players.
  */
-public interface Player extends MetadataProvider, SessionClient, Closeable {
+public interface Player extends MetadataProvider, SessionClient, Closeable, BufferStatusProvider {
     /**
      * Prepare the player for playback.
      *

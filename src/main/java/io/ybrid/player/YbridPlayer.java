@@ -23,17 +23,20 @@
 package io.ybrid.player;
 
 import io.ybrid.api.*;
-import io.ybrid.player.io.audio.Buffer;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
+import io.ybrid.player.io.audio.Buffer;
 import io.ybrid.player.io.audio.BufferStatus;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
@@ -48,6 +51,8 @@ public class YbridPlayer implements Player {
     private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
     private static final int METADATA_BLOCK_QUEUE_SIZE = 32;
 
+    // Proxy list, used to store BufferStatusConsumers when in non-prepared state.
+    List<BufferStatusConsumer> bufferStatusConsumers = new ArrayList<>();
     private final Session session;
     private MetadataConsumer metadataConsumer = null;
     private final DecoderFactory decoderFactory;
@@ -241,6 +246,9 @@ public class YbridPlayer implements Player {
         decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
         audioSource = new Buffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);
 
+        for (BufferStatusConsumer consumer : bufferStatusConsumers)
+            audioSource.addBufferStatusConsumer(consumer);
+
         audioBackend = audioBackendFactory.getAudioBackend();
         initialAudioBlock = audioSource.read();
         audioBackend.prepare(initialAudioBlock);
@@ -336,6 +344,23 @@ public class YbridPlayer implements Player {
         if (metadataConsumer == null)
             metadataConsumer = NullMetadataConsumer.getInstance();
         this.metadataConsumer = metadataConsumer;
+    }
+
+    @Override
+    public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
+        if (!bufferStatusConsumers.contains(consumer))
+            bufferStatusConsumers.add(consumer);
+
+        if (audioSource != null)
+            audioSource.addBufferStatusConsumer(consumer);
+    }
+
+    @Override
+    public void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
+        bufferStatusConsumers.remove(consumer);
+
+        if (audioSource != null)
+            audioSource.removeBufferStatusConsumer(consumer);
     }
 
     @Override
