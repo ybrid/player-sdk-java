@@ -147,6 +147,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
                 while (!isInterrupted()) {
                     if (getBufferLength() > target) {
                         state.overrun();
+                        //noinspection BusyWait
                         sleep(SLEEP_TIME);
                     } else {
                         pump();
