@@ -335,7 +335,7 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public Service getCurrentService() {
+    public Service getCurrentService() throws IOException {
         return session.getCurrentService();
     }
 
