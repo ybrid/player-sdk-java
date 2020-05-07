@@ -36,6 +36,7 @@ public class MetadataInputStream extends InputStream {
     private Metadata metadata;
     private byte[] buffer;
     private int offset;
+    private int readLimit = 0;
 
     /**
      * This creates an instance using a {@link ByteDataSource}.
@@ -114,6 +115,9 @@ public class MetadataInputStream extends InputStream {
         int ret = 0;
         int res;
 
+        if (readLimit > 0 && len > readLimit)
+            len = readLimit;
+
         while (len > 0) {
             res = pump(b, off, len);
             if (res <= 0)
@@ -125,6 +129,29 @@ public class MetadataInputStream extends InputStream {
         }
 
         return ret;
+    }
+
+    /**
+     * Gets the maximum amount of bytes a call to {@link #read(byte[], int, int)} or
+     * {@link #read(byte[])} will return.
+     * @return The read limit in [byte].
+     */
+    public int getReadLimit() {
+        return readLimit;
+    }
+
+    /**
+     * Sets the maximum amount of bytes a call to {@link #read(byte[], int, int)} or
+     * {@link #read(byte[])} can return. If {@code len} or {@code b.length} is bigger than
+     * the read limit they are replaced by the read limit.
+     *
+     * @param readLimit The read limit in [byte] or 0 for no limit.
+     * @throws IllegalArgumentException thrown if {@code readLimit} is negative.
+     */
+    public void setReadLimit(int readLimit) throws IllegalArgumentException {
+        if (readLimit < 0)
+            throw new IllegalArgumentException("readLimit must be > 0 but was given as " + readLimit);
+        this.readLimit = readLimit;
     }
 
     @Override
