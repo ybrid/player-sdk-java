@@ -36,8 +36,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 class ICYInputStream implements Closeable, ByteDataSource {
+    static final Logger LOGGER = Logger.getLogger(ICYInputStream.class.getName());
     private static final String HEADER_CONTENT_TYPE = "content-type"; //NON-NLS
     private static final String HEADER_ICY_METAINT = "icy-metaint"; //NON-NLS
     private static final int MAX_READ_LENGTH = 4*1024;
@@ -206,6 +208,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
             throw new IOException("Can not read body: length = " + length + ", ret = " + ret);
 
         metadata = new ICYMetadata(rawMetadata);
+        LOGGER.info("Got fresh metadata: " + metadata); //NON-NLS
         metadataUpdated = true;
     }
 
