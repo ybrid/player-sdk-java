@@ -23,12 +23,16 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.Session;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -39,11 +43,31 @@ public final class DataSourceFactory {
         private final InputStream inputStream;
         private final String contentType;
 
-        public URLSource(URL url) throws IOException {
-            URLConnection connection = url.openConnection();
+        private static void acceptListToHeader(@NotNull URLConnection connection, @NonNls @NotNull String header, @Nullable Map<String, Double> list) {
+            @NonNls StringBuilder ret = new StringBuilder();
+
+            if (list == null || list.isEmpty())
+                return;
+
+            for (Map.Entry<String, Double> entry : list.entrySet()) {
+                if (ret.length() > 0)
+                    ret.append(", ");
+                ret.append(entry.getKey()).append("; q=").append(entry.getValue());
+            }
+
+            connection.setRequestProperty(header, ret.toString());
+        }
+
+        public URLSource(Session session) throws IOException {
+            @NonNls URLConnection connection = session.getStreamURL().openConnection();
 
             connection.setDoInput(true);
             connection.setDoOutput(false);
+
+            acceptListToHeader(connection, "Accept", session.getAcceptedMediaFormats());
+            acceptListToHeader(connection, "Accept-Language", session.getAcceptedLanguages());
+            connection.setRequestProperty("Accept-Charset", "utf-8, *; q=0");
+
             connection.connect();
 
             inputStream = connection.getInputStream();
@@ -84,10 +108,10 @@ public final class DataSourceFactory {
         session.getServer().getLogger().log(Level.INFO, "getSourceBySession(session="+session+"): url=" + url);
 
         try {
-            return new ICYInputStream(url);
+            return new ICYInputStream(session);
         } catch (MalformedURLException ignored) {
         }
 
-        return new URLSource(url);
+        return new URLSource(session);
     }
 }

@@ -25,6 +25,8 @@ package io.ybrid.player;
 import io.ybrid.player.io.DataSource;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 /**
  * This interface is implemented by factory classes that build {@link Decoder} instances.
  */
@@ -38,4 +40,11 @@ public interface DecoderFactory {
      * @return The {@link Decoder} that has been build.
      */
     Decoder getDecoder(@NotNull DataSource dataSource);
+
+    /**
+     * Query formats supported by the decoder and their corresponding weights.
+     *
+     * @return The list of supported formats.
+     */
+    @NotNull Map<String, Double> getSupportedFormats();
 }

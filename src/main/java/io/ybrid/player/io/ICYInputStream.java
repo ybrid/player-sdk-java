@@ -23,6 +23,10 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.Metadata;
+import io.ybrid.api.Session;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedInputStream;
@@ -44,6 +48,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private static final String HEADER_ICY_METAINT = "icy-metaint"; //NON-NLS
     private static final int MAX_READ_LENGTH = 4*1024;
     private static final int MAX_METATDATA_INTERVAL = 128*1024;
+    private final Session session;
     private final String host;
     private int port;
     private final String path;
@@ -58,7 +63,11 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private Metadata blockMetadata = null;
 
     @SuppressWarnings("HardCodedStringLiteral")
-    public ICYInputStream(URL url) throws MalformedURLException {
+    public ICYInputStream(Session session) throws MalformedURLException {
+        URL url = session.getStreamURL();
+
+        this.session = session;
+
         switch (url.getProtocol()) {
             case "icyx":
                 secure = false;
@@ -81,6 +90,20 @@ class ICYInputStream implements Closeable, ByteDataSource {
         path = url.getFile();
     }
 
+    private static String acceptListToHeader(@NotNull String header, @Nullable Map<String, Double> list) {
+        @NonNls StringBuilder ret = new StringBuilder();
+
+        if (list == null || list.isEmpty())
+            return "";
+
+        for (Map.Entry<String, Double> entry : list.entrySet()) {
+            if (ret.length() > 0)
+                ret.append(", ");
+            ret.append(entry.getKey()).append("; q=").append(entry.getValue());
+        }
+        return header + ": " + ret + "\r\n";
+    }
+
     @SuppressWarnings("HardCodedStringLiteral")
     private void sendRequest() throws IOException {
         String req = "GET " + path + " HTTP/1.0\r\n";
@@ -88,6 +111,10 @@ class ICYInputStream implements Closeable, ByteDataSource {
         req += "Host: " + host + ":" + port + "\r\n";
         req += "Connection: close\r\n";
         req += "User-Agent: Ybrid Player\r\n";
+        req += acceptListToHeader("Accept", session.getAcceptedMediaFormats());
+        req += acceptListToHeader("Accept-Language", session.getAcceptedLanguages());
+        req += "Accept-Charset: utf-8, *; q=0\r\n";
+        req += "Accept-Encoding: identity, *; q=0\r\n";
         req += "Icy-MetaData: 1\r\n";
         req += "\r\n";
 

@@ -243,6 +243,7 @@ public class YbridPlayer implements Player {
         playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER); //NON-NLS
         metadataThread = new MetadataThread("YbridPlayer Metadata Thread", session); //NON-NLS
 
+        session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
         decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
         audioSource = new Buffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);
 
