@@ -40,12 +40,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
 class ICYInputStream implements Closeable, ByteDataSource {
     static final Logger LOGGER = Logger.getLogger(ICYInputStream.class.getName());
-    private static final String HEADER_CONTENT_TYPE = "content-type"; //NON-NLS
     private static final String HEADER_ICY_METAINT = "icy-metaint"; //NON-NLS
     private static final int MAX_READ_LENGTH = 4*1024;
     private static final int MAX_METATDATA_INTERVAL = 128*1024;
@@ -114,8 +114,8 @@ class ICYInputStream implements Closeable, ByteDataSource {
         req += "Host: " + host + ":" + port + "\r\n";
         req += "Connection: close\r\n";
         req += "User-Agent: Ybrid Player\r\n";
-        req += acceptListToHeader("Accept", session.getAcceptedMediaFormats());
-        req += acceptListToHeader("Accept-Language", session.getAcceptedLanguages());
+        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT, session.getAcceptedMediaFormats());
+        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT_LANGUAGE, session.getAcceptedLanguages());
         req += "Accept-Charset: utf-8, *; q=0\r\n";
         req += "Accept-Encoding: identity, *; q=0\r\n";
         req += "Icy-MetaData: 1\r\n";
@@ -320,6 +320,6 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (replyHeaders == null)
             return null;
 
-        return replyHeaders.get(HEADER_CONTENT_TYPE);
+        return replyHeaders.get(HttpHelper.HEADER_CONTENT_TYPE.toLowerCase(Locale.ROOT));
     }
 }

@@ -64,8 +64,8 @@ public final class DataSourceFactory {
             connection.setDoInput(true);
             connection.setDoOutput(false);
 
-            acceptListToHeader(connection, "Accept", session.getAcceptedMediaFormats());
-            acceptListToHeader(connection, "Accept-Language", session.getAcceptedLanguages());
+            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, session.getAcceptedMediaFormats());
+            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, session.getAcceptedLanguages());
             connection.setRequestProperty("Accept-Charset", "utf-8, *; q=0");
 
             connection.connect();
