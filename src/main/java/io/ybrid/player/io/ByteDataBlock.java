@@ -81,9 +81,10 @@ public class ByteDataBlock extends DataBlock {
 
     @Override
     public String toString() {
+        //noinspection HardCodedStringLiteral
         return "ByteDataBlock{" +
                 "data.length=" + data.length +
                 ", metadata=" + metadata +
-                '}';
+                "}";
     }
 }

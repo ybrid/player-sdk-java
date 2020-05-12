@@ -24,6 +24,7 @@ package io.ybrid.player.io;
 
 import io.ybrid.api.Metadata;
 import io.ybrid.api.Session;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +49,8 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private static final String HEADER_ICY_METAINT = "icy-metaint"; //NON-NLS
     private static final int MAX_READ_LENGTH = 4*1024;
     private static final int MAX_METATDATA_INTERVAL = 128*1024;
+    private static final int READ_BUFFER_LENGTH = 2048;
+    private static final int ICY_METADATA_BLOCK_MULTIPLAYER = 16;
     private final Session session;
     private final String host;
     private int port;
@@ -121,9 +124,10 @@ class ICYInputStream implements Closeable, ByteDataSource {
         socket.getOutputStream().write(req.getBytes(StandardCharsets.US_ASCII));
     }
 
+    @Contract("_ -> new")
     @SuppressWarnings("MagicCharacter")
-    private String getHeader(InputStream inputStream) throws IOException {
-        int nextLength = 2048;
+    private static @NotNull String getHeader(@NotNull InputStream inputStream) throws IOException {
+        int nextLength = READ_BUFFER_LENGTH;
         byte[] buffer;
         int ret;
 
@@ -153,7 +157,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
                 }
             }
 
-            nextLength += 2048;
+            nextLength += READ_BUFFER_LENGTH;
         }
 
         inputStream.reset();
@@ -228,7 +232,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (length == 0)
             return;
 
-        length *= 16;
+        length *= ICY_METADATA_BLOCK_MULTIPLAYER;
         rawMetadata = new byte[length];
         ret = inputStream.read(rawMetadata);
         if (ret != length)

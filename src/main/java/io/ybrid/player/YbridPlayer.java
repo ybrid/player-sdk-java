@@ -52,7 +52,7 @@ public class YbridPlayer implements Player {
     private static final int METADATA_BLOCK_QUEUE_SIZE = 32;
 
     // Proxy list, used to store BufferStatusConsumers when in non-prepared state.
-    List<BufferStatusConsumer> bufferStatusConsumers = new ArrayList<>();
+    final List<BufferStatusConsumer> bufferStatusConsumers = new ArrayList<>();
     private final Session session;
     private MetadataConsumer metadataConsumer = null;
     private final DecoderFactory decoderFactory;
@@ -270,7 +270,7 @@ public class YbridPlayer implements Player {
 
 
     @Override
-    public io.ybrid.api.CapabilitySet getCapabilities() {
+    public io.ybrid.api.@NotNull CapabilitySet getCapabilities() {
         return session.getCapabilities().makePlayerSet();
     }
 
@@ -281,7 +281,7 @@ public class YbridPlayer implements Player {
 
 
     @Override
-    public Bouquet getBouquet() throws IOException {
+    public @NotNull Bouquet getBouquet() throws IOException {
         return session.getBouquet();
     }
 
@@ -291,12 +291,12 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public void windTo(Instant timestamp) throws IOException {
+    public void windTo(@NotNull Instant timestamp) throws IOException {
         session.windTo(timestamp);
     }
 
     @Override
-    public void wind(Duration duration) throws IOException {
+    public void wind(@NotNull Duration duration) throws IOException {
         session.wind(duration);
     }
 
@@ -316,7 +316,7 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public void swapService(Service service) throws IOException {
+    public void swapService(@NotNull Service service) throws IOException {
         session.swapService(service);
     }
 
@@ -326,17 +326,17 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public Metadata getMetadata() throws IOException {
+    public @NotNull Metadata getMetadata() throws IOException {
         return session.getMetadata();
     }
 
     @Override
-    public PlayoutInfo getPlayoutInfo() throws IOException {
+    public @NotNull PlayoutInfo getPlayoutInfo() throws IOException {
         return session.getPlayoutInfo();
     }
 
     @Override
-    public Service getCurrentService() throws IOException {
+    public @NotNull Service getCurrentService() throws IOException {
         return session.getCurrentService();
     }
 

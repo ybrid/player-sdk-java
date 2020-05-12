@@ -41,7 +41,6 @@ class ICYMetadata {
     @SuppressWarnings("MagicCharacter")
     private int parseKeyValue(byte[] input, int offset) {
         String key = null;
-        String value = null;
         byte lookingFor = '=';
         int valueStart = -1;
 
@@ -61,7 +60,7 @@ class ICYMetadata {
                 }
                 valueStart = i + 1;
             } else {
-                value = new String(input, valueStart, (i - valueStart), StandardCharsets.UTF_8);
+                String value = new String(input, valueStart, (i - valueStart), StandardCharsets.UTF_8);
 
                 if (input[i] != ';')
                     i++;
@@ -106,12 +105,13 @@ class ICYMetadata {
 
     @Override
     public String toString() {
+        //noinspection HardCodedStringLiteral
         return "ICYMetadata{" +
                 "raw.length=" + raw.length +
-                ", new String(reduced)=" + new String(reduced) +
+                ", new String(reduced)=" + new String(reduced, StandardCharsets.UTF_8) +
                 ", reduced=" + Arrays.toString(reduced) +
                 ", values=" + values +
-                '}';
+                "}";
     }
 
     @Override

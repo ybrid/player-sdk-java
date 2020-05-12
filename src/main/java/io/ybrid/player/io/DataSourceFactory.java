@@ -76,6 +76,7 @@ public final class DataSourceFactory {
 
         @Override
         public ByteDataBlock read() throws IOException {
+            //noinspection MagicNumber
             return new ByteDataBlock(null, inputStream, 1024*2);
         }
 
@@ -105,7 +106,7 @@ public final class DataSourceFactory {
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
         URL url = session.getStreamURL();
 
-        session.getServer().getLogger().log(Level.INFO, "getSourceBySession(session="+session+"): url=" + url);
+        session.getServer().getLogger().log(Level.INFO, "getSourceBySession(session="+session+"): url=" + url); //NON-NLS
 
         try {
             return new ICYInputStream(session);
