@@ -26,6 +26,10 @@ import io.ybrid.api.Item;
 import io.ybrid.api.Metadata;
 import io.ybrid.api.Service;
 import io.ybrid.api.SwapInfo;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.net.URL;
 
 final class InvalidMetadata implements Metadata {
     @Override
@@ -45,8 +49,28 @@ final class InvalidMetadata implements Metadata {
     }
 
     @Override
-    public Service getService() {
-        return null;
+    public @NotNull Service getService() {
+        return new Service() {
+            @Override
+            public @Nullable URL getIcon() {
+                return null;
+            }
+
+            @Override
+            public @Nullable String getGenre() {
+                return null;
+            }
+
+            @Override
+            public String getDisplayName() {
+                return null;
+            }
+
+            @Override
+            public @NotNull String getIdentifier() {
+                return "<invalid>"; //NON-NLS
+            }
+        };
     }
 
     @Override
