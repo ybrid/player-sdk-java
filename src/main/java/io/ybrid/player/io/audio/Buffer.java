@@ -58,7 +58,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         private long underruns = 0;
         private Instant underrunTimestamp = null;
         private long overruns = 0;
-        private Instant overrunTimestmap = null;
+        private Instant overrunTimestamp = null;
         private double max = 0;
         private Instant maxTimestamp = null;
         private double minAfterMax = 0;
@@ -74,8 +74,8 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
 
         private void overrun() {
             overruns++;
-            overrunTimestmap = Instant.now();
-            announce(true, overrunTimestmap);
+            overrunTimestamp = Instant.now();
+            announce(true, overrunTimestamp);
         }
 
         private void update(double current) {
@@ -109,7 +109,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             if (!force && lastAnnounce != null && lastAnnounce.plus(MINIMUM_BETWEEN_ANNOUNCE).isAfter(now))
                 return;
 
-            status = new BufferStatus(underruns, underrunTimestamp, overruns, overrunTimestmap, max, maxTimestamp, minAfterMax, minAfterMaxTimestamp, current, currentTimestamp);
+            status = new BufferStatus(underruns, underrunTimestamp, overruns, overrunTimestamp, max, maxTimestamp, minAfterMax, minAfterMaxTimestamp, current, currentTimestamp);
 
             synchronized (consumers) {
                 for (BufferStatusConsumer consumer : consumers)

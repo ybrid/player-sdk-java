@@ -41,7 +41,7 @@ public interface BufferStatusConsumer {
 
     /**
      * Builds a adapter to log buffer state updates.
-     * This is for debugging prurposes only.
+     * This is for debugging purpose only.
      *
      * @param logger The logger to use.
      * @param level The loglevel to use.

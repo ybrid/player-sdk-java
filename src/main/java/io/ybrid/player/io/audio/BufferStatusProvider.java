@@ -37,7 +37,7 @@ public interface BufferStatusProvider {
 
     /**
      * This method un-registers a {@link BufferStatusConsumer} with the provider.
-     * @param consumer The consuder to remove.
+     * @param consumer The consumer to remove.
      */
     void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer);
 }

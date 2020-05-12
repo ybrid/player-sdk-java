@@ -115,7 +115,7 @@ final public class BufferStatus implements Serializable {
 
     /**
      * Get minimum buffer fill since last time max was reached.
-     * @return Mimimum buffer fill.
+     * @return Minimum buffer fill.
      */
     public double getMinAfterMax() {
         return minAfterMax;

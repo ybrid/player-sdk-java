@@ -36,8 +36,8 @@ Then you also need to add the following dependency:
 ## Getting started
 This package implements a basic player. It is based on Sessions handled by the API SDK.
 
-Once a session is created a player can be created using a decoder factory and a audio backend factory.
-The player implements the full protocol and can then be controlled using it's API.
+Once a session was created a player can be created using a decoder factory and an audio backend factory.
+The player implements the full protocol and can then be controlled using its API.
 
 ```java
 import io.ybrid.api.Alias;
