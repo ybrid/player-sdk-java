@@ -22,6 +22,8 @@
 
 package io.ybrid.player.io;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 
 /**
@@ -35,5 +37,6 @@ public interface PCMDataSource extends DataSource {
      * @throws IOException And I/O-Errors occurred while reading the block.
      */
     @Override
+    @NotNull
     PCMDataBlock read() throws IOException;
 }

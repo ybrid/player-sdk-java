@@ -22,6 +22,8 @@
 
 package io.ybrid.player.io;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -34,7 +36,7 @@ public interface DataSource extends Closeable {
      * @return The block read.
      * @throws IOException Any I/O-Error that happened during the read.
      */
-    DataBlock read() throws IOException;
+    @NotNull DataBlock read() throws IOException;
 
     /**
      * Mark the current position in the stream to return to later.

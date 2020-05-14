@@ -22,6 +22,8 @@
 
 package io.ybrid.player.io;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -49,7 +51,7 @@ public class BufferedByteDataSource implements ByteDataSource {
     }
 
     @Override
-    public ByteDataBlock read() throws IOException {
+    public @NotNull ByteDataBlock read() throws IOException {
         ByteDataBlock ret = null;
 
         if (outputBuffer != null) {

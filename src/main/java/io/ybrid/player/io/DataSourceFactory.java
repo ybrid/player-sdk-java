@@ -75,7 +75,7 @@ public final class DataSourceFactory {
         }
 
         @Override
-        public ByteDataBlock read() throws IOException {
+        public @NotNull ByteDataBlock read() throws IOException {
             //noinspection MagicNumber
             return new ByteDataBlock(null, inputStream, 1024*2);
         }

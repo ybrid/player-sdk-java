@@ -167,9 +167,6 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         private void pump() throws IOException, InterruptedException {
             PCMDataBlock block = backend.read();
 
-            if (block == null)
-                return;
-
             try {
                 if (inputConsumer != null)
                     inputConsumer.accept(block);
@@ -187,7 +184,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         }
 
         @Override
-        public PCMDataBlock read() throws IOException {
+        public @NotNull PCMDataBlock read() throws IOException {
             try {
                 PCMDataBlock block = buffer.poll();
 
@@ -255,7 +252,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
     }
 
     @Override
-    public PCMDataBlock read() throws IOException {
+    public @NotNull PCMDataBlock read() throws IOException {
         return thread.read();
     }
 
