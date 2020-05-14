@@ -67,7 +67,11 @@ public class YbridPlayer implements Player {
 
     private class PlaybackThread extends Thread {
         public static final double MAX_BUFFER_SLEEP = 0.3;
+        private static final double AUDIO_BUFFER_MAX_BEFORE_REBUFFER = 0.01; // [s]. Must be > 0.
 
+        final BlockingQueue<BufferStatus> bufferStateQueue = new LinkedBlockingQueue<>();
+        // We need to store this in a variable so add and remove gets the same one:
+        final BufferStatusConsumer bufferStatusConsumer = bufferStateQueue::offer;
         private final double bufferGoal;
 
         public PlaybackThread(String name, double bufferGoal) {
@@ -83,21 +87,15 @@ public class YbridPlayer implements Player {
         }
 
         private void buffer(PlayerState nextState) {
-            final BlockingQueue<BufferStatus> queue = new LinkedBlockingQueue<>();
-            // We need to store this in a variable so add and remove gets the same one:
-            final BufferStatusConsumer consumer = queue::offer;
-
             playerStateChange(PlayerState.BUFFERING);
-            audioSource.addBufferStatusConsumer(consumer);
             try {
                 while (!isInterrupted() && audioSource.isValid()) {
-                    if (queue.take().getCurrent() > bufferGoal) {
+                    if (bufferStateQueue.take().getCurrent() > bufferGoal) {
                         break;
                     }
                 }
             } catch (InterruptedException ignored) {
             }
-            audioSource.removeBufferStatusConsumer(consumer);
             playerStateChange(nextState);
         }
 
@@ -106,12 +104,15 @@ public class YbridPlayer implements Player {
             Metadata oldMetadata = null;
             Metadata newMetadata;
 
+            audioSource.addBufferStatusConsumer(bufferStatusConsumer);
             buffer(PlayerState.PLAYING);
 
             audioBackend.play();
 
             while (!isInterrupted()) {
+                final BufferStatus status;
                 PCMDataBlock block = initialAudioBlock;
+
                 try {
                     if (block == null) {
                         block = audioSource.read();
@@ -139,7 +140,20 @@ public class YbridPlayer implements Player {
 
                     oldMetadata = newMetadata;
                 }
+
+                /* empty queue but for the last entry. */
+                while (bufferStateQueue.size() > 1)
+                    bufferStateQueue.poll();
+
+                status = bufferStateQueue.poll();
+                if (status != null) {
+                    if (status.getCurrent() < AUDIO_BUFFER_MAX_BEFORE_REBUFFER) {
+                        buffer(playerState);
+                    }
+                }
             }
+
+            audioSource.removeBufferStatusConsumer(bufferStatusConsumer);
 
             close(audioBackend);
             audioBackend = null;
