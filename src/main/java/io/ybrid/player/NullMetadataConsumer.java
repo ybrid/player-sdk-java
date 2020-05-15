@@ -22,8 +22,10 @@
 
 package io.ybrid.player;
 
+import io.ybrid.api.Bouquet;
 import io.ybrid.api.CapabilitySet;
 import io.ybrid.api.Metadata;
+import io.ybrid.api.PlayoutInfo;
 import org.jetbrains.annotations.NotNull;
 
 final class NullMetadataConsumer implements MetadataConsumer {
@@ -48,6 +50,16 @@ final class NullMetadataConsumer implements MetadataConsumer {
 
     @Override
     public void onCapabilitiesChange(@NotNull CapabilitySet capabilities) {
+        /* no-op */
+    }
+
+    @Override
+    public void onPlayoutInfoChange(@NotNull PlayoutInfo playoutInfo) {
+        /* no-op */
+    }
+
+    @Override
+    public void onBouquetChange(@NotNull Bouquet bouquet) {
         /* no-op */
     }
 }
