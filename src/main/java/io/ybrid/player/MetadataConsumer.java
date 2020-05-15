@@ -46,9 +46,21 @@ public interface MetadataConsumer {
      */
     void onPlayerStateChange(@NotNull PlayerState playerState);
 
+    /**
+     * This function is called by the {@link MetadataProvider} when the set of the player's capabilities changed.
+     * @param capabilities The new set of capabilities.
+     */
     void onCapabilitiesChange(@NotNull CapabilitySet capabilities);
 
+    /**
+     * This function is called by the {@link MetadataProvider} when the playout information of the session changed.
+     * @param playoutInfo The new playout information of the session.
+     */
     void onPlayoutInfoChange(@NotNull PlayoutInfo playoutInfo);
 
+    /**
+     * This function is called by the {@link MetadataProvider} when the available bouquet changed.
+     * @param bouquet The new bouquet.
+     */
     void onBouquetChange(@NotNull Bouquet bouquet);
 }
