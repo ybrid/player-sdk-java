@@ -22,12 +22,6 @@
 
 package io.ybrid.player;
 
-import io.ybrid.api.Bouquet;
-import io.ybrid.api.CapabilitySet;
-import io.ybrid.api.Metadata;
-import io.ybrid.api.PlayoutInfo;
-import org.jetbrains.annotations.NotNull;
-
 final class NullMetadataConsumer implements MetadataConsumer {
     private static final MetadataConsumer instance = new NullMetadataConsumer();
 
@@ -36,30 +30,5 @@ final class NullMetadataConsumer implements MetadataConsumer {
 
     public static MetadataConsumer getInstance() {
         return instance;
-    }
-
-    @Override
-    public void onMetadataChange(@NotNull Metadata metadata) {
-        /* no-op */
-    }
-
-    @Override
-    public void onPlayerStateChange(@NotNull PlayerState playerState) {
-        /* no-op */
-    }
-
-    @Override
-    public void onCapabilitiesChange(@NotNull CapabilitySet capabilities) {
-        /* no-op */
-    }
-
-    @Override
-    public void onPlayoutInfoChange(@NotNull PlayoutInfo playoutInfo) {
-        /* no-op */
-    }
-
-    @Override
-    public void onBouquetChange(@NotNull Bouquet bouquet) {
-        /* no-op */
     }
 }
