@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 class myPlayer {
     private void run() throws IOException {
         /* First create a Alias object and a Session. */
-        Alias alias = new Alias(Logger.getLogger(Logger.GLOBAL_LOGGER_NAME), new URL("http://.../..."));
+        Alias alias = new Alias(Logger.getLogger(new URL("http://.../...")));
         Session session = alias.createSession();
 
         /* We create a player using the Decoder and AudioBackend we provide */

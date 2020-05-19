@@ -34,11 +34,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This factory is used to build {@link DataSource DataSources}.
  */
 public final class DataSourceFactory {
+    static final Logger LOGGER = Logger.getLogger(DataSourceFactory.class.getName());
+
     private static class URLSource implements ByteDataSource {
         private final InputStream inputStream;
         private final String contentType;
@@ -106,7 +109,7 @@ public final class DataSourceFactory {
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
         URL url = session.getStreamURL();
 
-        session.getServer().getLogger().log(Level.INFO, "getSourceBySession(session="+session+"): url=" + url); //NON-NLS
+        LOGGER.log(Level.INFO, "getSourceBySession(session="+session+"): url=" + url); //NON-NLS
 
         try {
             return new ICYInputStream(session);
