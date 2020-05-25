@@ -43,7 +43,7 @@ public class DataBlock {
     }
 
     /**
-     * gets the {@link Metadata} of the block.
+     * Gets the {@link Metadata} of the block.
      *
      * @return The {@link Metadata} of the block.
      */
