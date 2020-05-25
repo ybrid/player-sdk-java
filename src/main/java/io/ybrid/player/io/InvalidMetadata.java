@@ -25,7 +25,6 @@ package io.ybrid.player.io;
 import io.ybrid.api.Item;
 import io.ybrid.api.Metadata;
 import io.ybrid.api.Service;
-import io.ybrid.api.SwapInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,12 +39,6 @@ final class InvalidMetadata implements Metadata {
     @Override
     public Item getNextItem() {
         return null;
-    }
-
-    @Override
-    @Deprecated
-    public int getCurrentBitRate() {
-        return -1;
     }
 
     @Override
@@ -71,12 +64,6 @@ final class InvalidMetadata implements Metadata {
                 return "<invalid>"; //NON-NLS
             }
         };
-    }
-
-    @Override
-    @Deprecated
-    public SwapInfo getSwapInfo() {
-        return null;
     }
 
     @Override
