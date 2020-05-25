@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -190,6 +191,7 @@ public class YbridPlayer implements Player {
 
                     if (metadata != null && !metadata.isValid()) {
                         try {
+                            session.refresh(SubInfo.METADATA);
                             metadata = session.getMetadata();
                         } catch (IOException ignored) {
                         }
@@ -291,8 +293,18 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public @NotNull Bouquet getBouquet() throws IOException {
+    public @NotNull Bouquet getBouquet() {
         return session.getBouquet();
+    }
+
+    @Override
+    public void refresh(@NotNull SubInfo what) throws IOException {
+        session.refresh(what);
+    }
+
+    @Override
+    public void refresh(@NotNull EnumSet<SubInfo> what) throws IOException {
+        session.refresh(what);
     }
 
     @Override
@@ -341,17 +353,17 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public @NotNull Metadata getMetadata() throws IOException {
+    public @NotNull Metadata getMetadata() {
         return session.getMetadata();
     }
 
     @Override
-    public @NotNull PlayoutInfo getPlayoutInfo() throws IOException {
+    public @NotNull PlayoutInfo getPlayoutInfo() {
         return session.getPlayoutInfo();
     }
 
     @Override
-    public @NotNull Service getCurrentService() throws IOException {
+    public @NotNull Service getCurrentService() {
         return session.getCurrentService();
     }
 
