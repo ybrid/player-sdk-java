@@ -129,11 +129,9 @@ public class YbridPlayer implements Player {
                 if (newMetadata != null) {
                     if (newMetadata.isValid()) {
                         if (oldMetadata == null) {
-                            metadataConsumer.onMetadataChange(newMetadata);
-                            capabilitiesChange();
+                            distributeMetadata(newMetadata);
                         } else if (!newMetadata.equals(oldMetadata)) {
-                            metadataConsumer.onMetadataChange(newMetadata);
-                            capabilitiesChange();
+                            distributeMetadata(newMetadata);
                         }
                     }
 
@@ -235,6 +233,11 @@ public class YbridPlayer implements Player {
             prepare();
     }
 
+    private void distributeMetadata(Metadata metadata) {
+        metadataConsumer.onMetadataChange(metadata);
+        capabilitiesChange();
+    }
+
     @SuppressWarnings("ParameterHidesMemberVariable")
     private void playerStateChange(PlayerState playerState) {
         if (this.playerState == PlayerState.ERROR)
@@ -245,7 +248,7 @@ public class YbridPlayer implements Player {
     }
 
     private void capabilitiesChange() {
-        if (session.haveCapabilitiesChanged())
+        if (session.hasChanged(SubInfo.CAPABILITIES))
             metadataConsumer.onCapabilitiesChange(session.getCapabilities().makePlayerSet());
     }
 
@@ -286,12 +289,6 @@ public class YbridPlayer implements Player {
     public io.ybrid.api.@NotNull CapabilitySet getCapabilities() {
         return session.getCapabilities().makePlayerSet();
     }
-
-    @Override
-    public boolean haveCapabilitiesChanged() {
-        return session.haveCapabilitiesChanged();
-    }
-
 
     @Override
     public @NotNull Bouquet getBouquet() throws IOException {
@@ -336,6 +333,11 @@ public class YbridPlayer implements Player {
     @Override
     public void swapToMain() throws IOException {
         session.swapToMain();
+    }
+
+    @Override
+    public boolean hasChanged(@NotNull SubInfo what) {
+        return session.hasChanged(what);
     }
 
     @Override
