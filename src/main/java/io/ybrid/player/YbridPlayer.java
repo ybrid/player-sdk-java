@@ -66,7 +66,6 @@ public class YbridPlayer implements Player {
     private PlayerState playerState = PlayerState.STOPPED;
 
     private class PlaybackThread extends Thread {
-        public static final double MAX_BUFFER_SLEEP = 0.3;
         private static final double AUDIO_BUFFER_MAX_BEFORE_REBUFFER = 0.01; // [s]. Must be > 0.
 
         final BlockingQueue<BufferStatus> bufferStateQueue = new LinkedBlockingQueue<>();
