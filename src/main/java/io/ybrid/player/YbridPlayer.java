@@ -38,6 +38,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
@@ -129,9 +130,7 @@ public class YbridPlayer implements Player {
 
                 if (newMetadata != null) {
                     if (newMetadata.isValid()) {
-                        if (oldMetadata == null) {
-                            distributeMetadata(newMetadata);
-                        } else if (!newMetadata.equals(oldMetadata)) {
+                        if (!Objects.equals(oldMetadata, newMetadata)) {
                             distributeMetadata(newMetadata);
                         }
                     }
