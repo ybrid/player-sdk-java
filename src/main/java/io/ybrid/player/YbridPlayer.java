@@ -103,7 +103,7 @@ public class YbridPlayer implements Player {
         @Override
         public void run() {
             Metadata oldMetadata = null;
-            Metadata newMetadata;
+            PlayoutInfo oldPlayoutInfo = null;
 
             audioSource.addBufferStatusConsumer(bufferStatusConsumer);
             buffer(PlayerState.PLAYING);
@@ -112,6 +112,9 @@ public class YbridPlayer implements Player {
 
             while (!isInterrupted()) {
                 final BufferStatus status;
+                final Metadata newMetadata;
+                final PlayoutInfo newPlayoutInfo;
+                boolean blockUpdatesMetadata = false;
                 PCMDataBlock block = initialAudioBlock;
 
                 try {
@@ -127,16 +130,20 @@ public class YbridPlayer implements Player {
                 }
 
                 newMetadata = block.getMetadata();
+                newPlayoutInfo = block.getPlayoutInfo();
 
-                if (newMetadata != null) {
-                    if (newMetadata.isValid()) {
-                        if (!Objects.equals(oldMetadata, newMetadata)) {
-                            distributeMetadata(newMetadata);
-                        }
-                    }
-
+                if (newMetadata != null && newMetadata.isValid() && !Objects.equals(oldMetadata, newMetadata)) {
+                    blockUpdatesMetadata = true;
                     oldMetadata = newMetadata;
                 }
+
+                if (newMetadata != null && !Objects.equals(oldPlayoutInfo, newPlayoutInfo)) {
+                    blockUpdatesMetadata = true;
+                    oldPlayoutInfo = newPlayoutInfo;
+                }
+
+                if (blockUpdatesMetadata)
+                    distributeMetadata(oldMetadata, oldPlayoutInfo);
 
                 /* empty queue but for the last entry. */
                 while (bufferStateQueue.size() > 1)
@@ -244,8 +251,9 @@ public class YbridPlayer implements Player {
             prepare();
     }
 
-    private void distributeMetadata(Metadata metadata) {
+    private void distributeMetadata(Metadata metadata, PlayoutInfo playoutInfo) {
         metadataConsumer.onMetadataChange(metadata);
+        metadataConsumer.onPlayoutInfoChange(playoutInfo);
         capabilitiesChange();
     }
 
