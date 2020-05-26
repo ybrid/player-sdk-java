@@ -23,6 +23,7 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.Metadata;
+import io.ybrid.api.PlayoutInfo;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -43,8 +44,8 @@ public class ByteDataBlock extends DataBlock {
      * @param metadata The {@link Metadata} to use.
      * @param data The bytes to use.
      */
-    public ByteDataBlock(Metadata metadata, byte[] data) {
-        super(metadata);
+    public ByteDataBlock(Metadata metadata, PlayoutInfo playoutInfo, byte[] data) {
+        super(metadata, playoutInfo);
         this.data = data;
     }
 
@@ -56,8 +57,8 @@ public class ByteDataBlock extends DataBlock {
      * @param length The amount of bytes to read.
      * @throws IOException Thrown in case of I/O-Error.
      */
-    public ByteDataBlock(Metadata metadata, InputStream inputStream, int length) throws IOException {
-        super(metadata);
+    public ByteDataBlock(Metadata metadata, PlayoutInfo playoutInfo, InputStream inputStream, int length) throws IOException {
+        super(metadata, playoutInfo);
         data = new byte[length];
         int ret = inputStream.read(data);
         if (ret < 1)

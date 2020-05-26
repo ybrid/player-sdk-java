@@ -23,6 +23,7 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.Metadata;
+import io.ybrid.api.PlayoutInfo;
 
 /**
  * This class represents generic blocks of data. Instances also store {@link Metadata} for each block.
@@ -32,14 +33,19 @@ public class DataBlock {
      * Internal storage for the {@link Metadata} hold by the object.
      */
     protected Metadata metadata;
+    /**
+     * Internal storage for the {@link PlayoutInfo} hold by the object.
+     */
+    protected PlayoutInfo playoutInfo;
 
     /**
      * Create a new DataBlock.
      *
      * @param metadata The {@link Metadata} to use for the new DataBlock.
      */
-    protected DataBlock(Metadata metadata) {
+    protected DataBlock(Metadata metadata, PlayoutInfo playoutInfo) {
         this.metadata = metadata;
+        this.playoutInfo = playoutInfo;
     }
 
     /**
@@ -57,5 +63,22 @@ public class DataBlock {
      */
     public void setMetadata(Metadata metadata) {
         this.metadata = metadata;
+    }
+
+    /**
+     * Gets the {@link PlayoutInfo} of the block.
+     *
+     * @return The {@link PlayoutInfo} of the block.
+     */
+    public PlayoutInfo getPlayoutInfo() {
+        return playoutInfo;
+    }
+
+    /**
+     * Sets the {@link PlayoutInfo} of the block.
+     * @param playoutInfo The {@link PlayoutInfo} to set.
+     */
+    public void setPlayoutInfo(PlayoutInfo playoutInfo) {
+        this.playoutInfo = playoutInfo;
     }
 }

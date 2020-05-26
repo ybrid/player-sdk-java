@@ -23,6 +23,7 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.Metadata;
+import io.ybrid.api.PlayoutInfo;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.io.InputStream;
 public class MetadataInputStream extends InputStream {
     private final ByteDataSource source;
     private Metadata metadata;
+    private PlayoutInfo playoutInfo;
     private byte[] buffer;
     private int offset;
     private int readLimit = 0;
@@ -57,6 +59,19 @@ public class MetadataInputStream extends InputStream {
     public Metadata getMetadata() throws IOException {
         fillBuffer();
         return metadata;
+    }
+
+    /**
+     * This returns the {@link PlayoutInfo} for an the next byte that can be read.
+     *
+     * This may re-fill internal buffers.
+     *
+     * @return The {@link PlayoutInfo} for the next byte or null.
+     * @throws IOException I/O-Errors as thrown by the backend.
+     */
+    public PlayoutInfo getPlayoutInfo() throws IOException {
+        fillBuffer();
+        return playoutInfo;
     }
 
     @Override

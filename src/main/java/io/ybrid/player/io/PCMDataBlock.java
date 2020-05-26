@@ -23,6 +23,7 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.Metadata;
+import io.ybrid.api.PlayoutInfo;
 
 /**
  * This implements a {@link DataBlock} that holds PCM samples.
@@ -49,8 +50,8 @@ public class PCMDataBlock extends DataBlock {
      * @param sampleRate The sample rate of the signal in [Hz].
      * @param numberOfChannels The number of channels represented.
      */
-    public PCMDataBlock(Metadata metadata, short[] data, int sampleRate, int numberOfChannels) {
-        super(metadata);
+    public PCMDataBlock(Metadata metadata, PlayoutInfo playoutInfo, short[] data, int sampleRate, int numberOfChannels) {
+        super(metadata, playoutInfo);
         this.data = data;
         this.sampleRate = sampleRate;
         this.numberOfChannels = numberOfChannels;

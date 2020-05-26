@@ -80,7 +80,7 @@ public final class DataSourceFactory {
         @Override
         public @NotNull ByteDataBlock read() throws IOException {
             //noinspection MagicNumber
-            return new ByteDataBlock(null, inputStream, 1024*2);
+            return new ByteDataBlock(null, null, inputStream, 1024*2);
         }
 
         @Override

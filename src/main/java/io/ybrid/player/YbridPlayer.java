@@ -177,27 +177,37 @@ public class YbridPlayer implements Player {
         public void run() {
             Metadata metadata = null;
             Metadata oldMetadata = null;
+            PlayoutInfo playoutInfo = null;
+            PlayoutInfo oldPlayoutInfo = null;
 
             while (!isInterrupted()) {
 
                 try {
                     final PCMDataBlock block = metadataBlockQueue.take();
                     Metadata newMetadata = block.getMetadata();
+                    PlayoutInfo newPlayoutInfo = block.getPlayoutInfo();
 
                     if (newMetadata != null && newMetadata != oldMetadata) {
                         metadata = newMetadata;
                         oldMetadata = newMetadata;
                     }
 
+                    if (newPlayoutInfo != null && newPlayoutInfo != oldPlayoutInfo) {
+                        playoutInfo = newPlayoutInfo;
+                        oldPlayoutInfo = newPlayoutInfo;
+                    }
+
                     if (metadata != null && !metadata.isValid()) {
                         try {
-                            session.refresh(SubInfo.METADATA);
+                            session.refresh(EnumSet.of(SubInfo.METADATA, SubInfo.PLAYOUT));
                             metadata = session.getMetadata();
+                            playoutInfo = session.getPlayoutInfo();
                         } catch (IOException ignored) {
                         }
                     }
 
                     block.setMetadata(metadata);
+                    block.setPlayoutInfo(playoutInfo);
                 } catch (InterruptedException e) {
                     return;
                 }

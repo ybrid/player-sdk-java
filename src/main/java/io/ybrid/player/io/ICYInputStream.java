@@ -290,7 +290,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (metadataUpdated)
             blockMetadata = new InvalidMetadata();
 
-        block = new ByteDataBlock(blockMetadata, inputStream, todo);
+        block = new ByteDataBlock(blockMetadata, null, inputStream, todo);
 
         pos += block.getData().length;
 
