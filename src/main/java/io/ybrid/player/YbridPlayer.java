@@ -255,6 +255,7 @@ public class YbridPlayer implements Player {
         metadataConsumer.onMetadataChange(metadata);
         metadataConsumer.onPlayoutInfoChange(playoutInfo);
         capabilitiesChange();
+        bouquetChange();
     }
 
     @SuppressWarnings("ParameterHidesMemberVariable")
@@ -264,11 +265,17 @@ public class YbridPlayer implements Player {
         this.playerState = playerState;
         metadataConsumer.onPlayerStateChange(playerState);
         capabilitiesChange();
+        bouquetChange();
     }
 
     private void capabilitiesChange() {
         if (session.hasChanged(SubInfo.CAPABILITIES))
             metadataConsumer.onCapabilitiesChange(session.getCapabilities().makePlayerSet());
+    }
+
+    private void bouquetChange() {
+        if (session.hasChanged(SubInfo.BOUQUET))
+            metadataConsumer.onBouquetChange(session.getBouquet());
     }
 
     @Override
@@ -318,12 +325,14 @@ public class YbridPlayer implements Player {
     public void refresh(@NotNull SubInfo what) throws IOException {
         session.refresh(what);
         capabilitiesChange();
+        bouquetChange();
     }
 
     @Override
     public void refresh(@NotNull EnumSet<SubInfo> what) throws IOException {
         session.refresh(what);
         capabilitiesChange();
+        bouquetChange();
     }
 
     @Override
