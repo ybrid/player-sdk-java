@@ -317,11 +317,13 @@ public class YbridPlayer implements Player {
     @Override
     public void refresh(@NotNull SubInfo what) throws IOException {
         session.refresh(what);
+        capabilitiesChange();
     }
 
     @Override
     public void refresh(@NotNull EnumSet<SubInfo> what) throws IOException {
         session.refresh(what);
+        capabilitiesChange();
     }
 
     @Override
