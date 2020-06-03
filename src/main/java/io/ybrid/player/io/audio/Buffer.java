@@ -43,11 +43,7 @@ import java.util.function.Consumer;
  * The purpose of this class is to provide a buffer for audio.
  */
 public class Buffer implements PCMDataSource, BufferStatusProvider {
-    private double target;
-    @NotNull private final PCMDataSource backend;
-    private final Consumer<PCMDataBlock> inputConsumer;
-    private BufferThread thread = new BufferThread("Audio Buffer Thread"); //NON-NLS
-    private final Status state = new Status();
+    private final BufferThread thread;
 
     private static class Status implements BufferStatusProvider {
         private static final Duration MINIMUM_BETWEEN_ANNOUNCE = Duration.ofMillis(1000);
@@ -136,15 +132,22 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         }
     }
 
-    private class BufferThread extends Thread implements DataSource {
+    private static class BufferThread extends Thread implements DataSource, BufferStatusProvider {
         private static final long POLL_TIMEOUT = 123; /* [ms] */
         private static final int SLEEP_TIME = 371; /* [ms] */
 
         private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
+        private final Status state = new Status();
+        @NotNull private final PCMDataSource backend;
+        private final Consumer<PCMDataBlock> inputConsumer;
         private Exception exception = null;
+        private double target;
 
-        public BufferThread(String name) {
+        public BufferThread(String name, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer, double target) {
             super(name);
+            this.backend = backend;
+            this.inputConsumer = inputConsumer;
+            this.target = target;
         }
 
         @Override
@@ -226,13 +229,24 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         }
 
         @Override
+        public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
+            state.addBufferStatusConsumer(consumer);
+        }
+
+        @Override
+        public void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
+            state.removeBufferStatusConsumer(consumer);
+        }
+
+        @Override
         public boolean isValid() {
             return exception == null;
         }
 
         @Override
-        public void close() {
+        public void close() throws IOException {
             interrupt();
+            backend.close();
         }
     }
 
@@ -244,10 +258,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
      * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
     public Buffer(double target, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
-        this.target = target;
-        this.backend = backend;
-        this.inputConsumer = inputConsumer;
-
+        thread = new BufferThread("Audio Buffer Thread", backend, inputConsumer, target); //NON-NLS
         thread.start();
     }
 
@@ -258,23 +269,21 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
 
     @Override
     public boolean isValid() {
-        return thread != null && thread.isValid();
+        return thread.isValid();
     }
 
     @Override
     public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
-        state.addBufferStatusConsumer(consumer);
+        thread.addBufferStatusConsumer(consumer);
     }
 
     @Override
     public void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
-        state.removeBufferStatusConsumer(consumer);
+        thread.removeBufferStatusConsumer(consumer);
     }
 
     @Override
     public void close() throws IOException {
         thread.close();
-        thread = null;
-        backend.close();
     }
 }
