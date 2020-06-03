@@ -77,7 +77,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             announce(true, overrunTimestamp);
         }
 
-        private void update(double current) {
+        private void setCurrent(double current) {
             Instant now = Instant.now();
             boolean forceAnnounce = false;
 
@@ -220,7 +220,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
                 ret += block.getBlockLength();
             }
 
-            state.update(ret);
+            state.setCurrent(ret);
 
             return ret;
         }
