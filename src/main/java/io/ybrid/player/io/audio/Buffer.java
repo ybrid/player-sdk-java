@@ -43,7 +43,6 @@ import java.util.function.Consumer;
  * The purpose of this class is to provide a buffer for audio.
  */
 public class Buffer implements PCMDataSource, BufferStatusProvider {
-    private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
     private double target;
     @NotNull private final PCMDataSource backend;
     private final Consumer<PCMDataBlock> inputConsumer;
@@ -141,6 +140,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         private static final long POLL_TIMEOUT = 123; /* [ms] */
         private static final int SLEEP_TIME = 371; /* [ms] */
 
+        private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
         private Exception exception = null;
 
         public BufferThread(String name) {
