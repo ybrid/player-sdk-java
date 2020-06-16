@@ -137,7 +137,7 @@ public class YbridPlayer implements Player {
                     oldMetadata = newMetadata;
                 }
 
-                if (newMetadata != null && !Objects.equals(oldPlayoutInfo, newPlayoutInfo)) {
+                if (newPlayoutInfo != null && !Objects.equals(oldPlayoutInfo, newPlayoutInfo)) {
                     blockUpdatesMetadata = true;
                     oldPlayoutInfo = newPlayoutInfo;
                 }
