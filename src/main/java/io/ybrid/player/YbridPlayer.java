@@ -30,6 +30,7 @@ import io.ybrid.player.io.audio.Buffer;
 import io.ybrid.player.io.audio.BufferStatus;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -87,35 +88,42 @@ public class YbridPlayer implements Player {
             }
         }
 
-        private void buffer(PlayerState nextState) {
+        private @Nullable BufferStatus buffer(PlayerState nextState) {
+            BufferStatus ret = null;
+
             playerStateChange(PlayerState.BUFFERING);
             try {
                 while (!isInterrupted() && audioSource.isValid()) {
-                    if (bufferStateQueue.take().getCurrent() > bufferGoal) {
+                    ret = bufferStateQueue.take();
+                    if (ret.getCurrent() > bufferGoal) {
                         break;
                     }
                 }
             } catch (InterruptedException ignored) {
             }
             playerStateChange(nextState);
+
+            return ret;
         }
 
         @Override
         public void run() {
             Metadata oldMetadata = null;
             PlayoutInfo oldPlayoutInfo = null;
+            PlayoutInfo forwardedPlayoutInfo = null;
+            BufferStatus lastStatus;
 
             audioSource.addBufferStatusConsumer(bufferStatusConsumer);
-            buffer(PlayerState.PLAYING);
+            lastStatus = buffer(PlayerState.PLAYING);
 
             audioBackend.play();
 
             while (!isInterrupted()) {
-                final BufferStatus status;
                 final Metadata newMetadata;
                 final PlayoutInfo newPlayoutInfo;
                 boolean blockUpdatesMetadata = false;
                 PCMDataBlock block = initialAudioBlock;
+                final BufferStatus status;
 
                 try {
                     if (block == null) {
@@ -140,10 +148,15 @@ public class YbridPlayer implements Player {
                 if (newPlayoutInfo != null && !Objects.equals(oldPlayoutInfo, newPlayoutInfo)) {
                     blockUpdatesMetadata = true;
                     oldPlayoutInfo = newPlayoutInfo;
+                    if (lastStatus == null) {
+                        forwardedPlayoutInfo = newPlayoutInfo;
+                    } else {
+                        forwardedPlayoutInfo = newPlayoutInfo.adjustTimeToNextItem(Duration.ofMillis((long) (1000*lastStatus.getCurrent())));
+                    }
                 }
 
                 if (blockUpdatesMetadata)
-                    distributeMetadata(oldMetadata, oldPlayoutInfo);
+                    distributeMetadata(oldMetadata, forwardedPlayoutInfo);
 
                 /* empty queue but for the last entry. */
                 while (bufferStateQueue.size() > 1)
@@ -151,8 +164,9 @@ public class YbridPlayer implements Player {
 
                 status = bufferStateQueue.poll();
                 if (status != null) {
+                    lastStatus = status;
                     if (status.getCurrent() < AUDIO_BUFFER_MAX_BEFORE_REBUFFER) {
-                        buffer(playerState);
+                        lastStatus = buffer(playerState);
                     }
                 }
             }
