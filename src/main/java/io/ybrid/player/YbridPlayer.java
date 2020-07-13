@@ -410,6 +410,11 @@ public class YbridPlayer implements Player {
     }
 
     @Override
+    public boolean isValid() {
+        return session.isValid();
+    }
+
+    @Override
     public void setMetadataConsumer(MetadataConsumer metadataConsumer) {
         if (metadataConsumer == null)
             metadataConsumer = NullMetadataConsumer.getInstance();
