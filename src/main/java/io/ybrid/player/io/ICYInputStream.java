@@ -66,7 +66,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private Metadata blockMetadata = null;
 
     @SuppressWarnings("HardCodedStringLiteral")
-    public ICYInputStream(Session session) throws MalformedURLException {
+    public ICYInputStream(@NotNull Session session) throws MalformedURLException {
         URL url = session.getStreamURL();
 
         this.session = session;
@@ -93,7 +93,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         path = url.getFile();
     }
 
-    private static String acceptListToHeader(@NotNull String header, @Nullable Map<String, Double> list) {
+    private static @NotNull String acceptListToHeader(@NotNull String header, @Nullable Map<String, Double> list) {
         @NonNls StringBuilder ret = new StringBuilder();
 
         if (list == null || list.isEmpty())
@@ -164,7 +164,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         throw new IOException("Can not find end of header");
     }
 
-    private HashMap<String, String> parseHeader(String header) throws IOException {
+    private @NotNull HashMap<String, String> parseHeader(@NotNull String header) throws IOException {
         HashMap<String, String> ret = new HashMap<>();
         boolean firstLine = true;
 
