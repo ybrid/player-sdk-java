@@ -108,9 +108,9 @@ public class YbridPlayer implements Player {
 
         @Override
         public void run() {
-            Metadata oldMetadata = null;
+            Metadata oldMetadata = session.getMetadata();
             PlayoutInfo oldPlayoutInfo = null;
-            PlayoutInfo forwardedPlayoutInfo = null;
+            PlayoutInfo forwardedPlayoutInfo = session.getPlayoutInfo();
             BufferStatus lastStatus;
 
             audioSource.addBufferStatusConsumer(bufferStatusConsumer);
@@ -265,7 +265,7 @@ public class YbridPlayer implements Player {
             prepare();
     }
 
-    private void distributeMetadata(Metadata metadata, PlayoutInfo playoutInfo) {
+    private void distributeMetadata(@NotNull Metadata metadata, @NotNull PlayoutInfo playoutInfo) {
         metadataConsumer.onMetadataChange(metadata);
         metadataConsumer.onPlayoutInfoChange(playoutInfo);
         capabilitiesChange();
