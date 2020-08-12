@@ -22,7 +22,7 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.Metadata;
+import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.Session;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;

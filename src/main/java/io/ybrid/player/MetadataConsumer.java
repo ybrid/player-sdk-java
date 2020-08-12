@@ -22,10 +22,10 @@
 
 package io.ybrid.player;
 
-import io.ybrid.api.Bouquet;
 import io.ybrid.api.CapabilitySet;
-import io.ybrid.api.Metadata;
+import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.PlayoutInfo;
+import io.ybrid.api.bouquet.Bouquet;
 import org.jetbrains.annotations.NotNull;
 
 /**

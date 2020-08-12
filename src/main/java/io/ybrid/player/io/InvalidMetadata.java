@@ -22,9 +22,9 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.Item;
-import io.ybrid.api.Metadata;
-import io.ybrid.api.Service;
+import io.ybrid.api.metadata.Item;
+import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.bouquet.Service;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,12 +64,6 @@ final class InvalidMetadata implements Metadata {
                 return "<invalid>"; //NON-NLS
             }
         };
-    }
-
-    @Override
-    @Deprecated
-    public long getTimeToNextItem() {
-        return -1;
     }
 
     @Override

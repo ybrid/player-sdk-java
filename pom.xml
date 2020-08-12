@@ -38,7 +38,7 @@
         <dependency>
             <groupId>io.ybrid</groupId>
             <artifactId>api-sdk-java</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
