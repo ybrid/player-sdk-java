@@ -60,6 +60,8 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         private Instant minAfterMaxTimestamp = null;
         private double current = 0;
         private Instant currentTimestamp = null;
+        private long samplesRead;
+        private long samplesForwarded;
 
         private void underrun() {
             underruns++;
@@ -73,11 +75,13 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             announce(true, overrunTimestamp);
         }
 
-        private void setCurrent(double current) {
+        private void setCurrent(double current, long samplesRead, long samplesForwarded) {
             Instant now = Instant.now();
             boolean forceAnnounce = false;
 
             this.current = current;
+            this.samplesRead = samplesRead;
+            this.samplesForwarded = samplesForwarded;
             currentTimestamp = now;
 
             if (current > max) {
@@ -104,7 +108,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             if (!force && lastAnnounce != null && lastAnnounce.plus(MINIMUM_BETWEEN_ANNOUNCE).isAfter(now))
                 return;
 
-            status = new BufferStatus(underruns, underrunTimestamp, overruns, overrunTimestamp, max, maxTimestamp, minAfterMax, minAfterMaxTimestamp, current, currentTimestamp);
+            status = new BufferStatus(underruns, underrunTimestamp, overruns, overrunTimestamp, max, maxTimestamp, minAfterMax, minAfterMaxTimestamp, current, currentTimestamp, samplesRead, samplesForwarded);
 
             synchronized (consumers) {
                 for (BufferStatusConsumer consumer : consumers)
@@ -142,6 +146,8 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         private final Consumer<PCMDataBlock> inputConsumer;
         private Exception exception = null;
         private double target;
+        private long samplesRead = 0;
+        private long samplesForwarded = 0;
 
         public BufferThread(String name, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer, double target) {
             super(name);
@@ -177,6 +183,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             }
 
             buffer.put(block);
+            samplesRead += block.getData().length;
         }
 
         private IOException toIOException(Exception e) {
@@ -192,7 +199,10 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
                 PCMDataBlock block = buffer.poll();
 
                 if (block != null) {
-                    getBufferLength(); // Update state.
+                    // Update state.
+                    getBufferLength();
+                    samplesForwarded += block.getData().length;
+
                     return block;
                 }
 
@@ -205,7 +215,10 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
                     block = buffer.poll(POLL_TIMEOUT, TimeUnit.MILLISECONDS);
                 } while (block == null);
 
-                getBufferLength(); // Update state.
+                // Update state.
+                getBufferLength();
+                samplesForwarded += block.getData().length;
+
                 return block;
             } catch (InterruptedException e) {
                 throw toIOException(e);
@@ -223,7 +236,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
                 ret += block.getBlockLength();
             }
 
-            state.setCurrent(ret);
+            state.setCurrent(ret, samplesRead, samplesForwarded);
 
             return ret;
         }

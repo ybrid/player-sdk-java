@@ -44,12 +44,14 @@ final public class BufferStatus implements Serializable {
     private final Instant minAfterMaxTimestamp;
     private final double current;
     private final Instant currentTimestamp;
+    private final long currentSamplesRead;
+    private final long currentSamplesForwarded;
 
     BufferStatus(long underruns, Instant underrunTimestamp,
                  long overruns, @Nullable Instant overrunTimestamp,
                  double max, @Nullable Instant maxTimestamp,
                  double minAfterMax, @Nullable Instant minAfterMaxTimestamp,
-                 double current, @Nullable Instant currentTimestamp) {
+                 double current, @Nullable Instant currentTimestamp, long currentSamplesRead, long currentSamplesForwarded) {
         this.underruns = underruns;
         this.underrunTimestamp = underrunTimestamp;
         this.overruns = overruns;
@@ -60,6 +62,8 @@ final public class BufferStatus implements Serializable {
         this.minAfterMaxTimestamp = minAfterMaxTimestamp;
         this.current = current;
         this.currentTimestamp = currentTimestamp;
+        this.currentSamplesRead = currentSamplesRead;
+        this.currentSamplesForwarded = currentSamplesForwarded;
     }
 
     /**
@@ -140,6 +144,33 @@ final public class BufferStatus implements Serializable {
     }
 
     /**
+     * Gets the current read clock of the buffer.
+     * The read clock represents the number of samples read into the buffer.
+     * <P>
+     * The read clock is monotonous. It can <b>not</b> be converted into units of SI-time as the sample rate
+     * is not fixed.
+     * @return The read clock.
+     * @see #getCurrentSamplesForwarded()
+     */
+    public long getCurrentSamplesRead() {
+        return currentSamplesRead;
+    }
+
+    /**
+     * Gets the current forward clock of the buffer.
+     * The forward clock represents the number of samples forwarded by the buffer.
+     * This is the amount of samples that have been read from the buffer.
+     * <P>
+     * The read clock is monotonous. It can <b>not</b> be converted into units of SI-time as the sample rate
+     * is not fixed.
+     * @return The forward clock.
+     * @see #getCurrentSamplesRead()
+     */
+    public long getCurrentSamplesForwarded() {
+        return currentSamplesForwarded;
+    }
+
+    /**
      * Get time of when current buffer fill was recorded.
      * @return Time of record or null if buffer was never filled.
      */
@@ -152,7 +183,8 @@ final public class BufferStatus implements Serializable {
     @Override
     public String toString() {
         return "BufferStatus{" +
-                "Current = " + current + "[" + currentTimestamp + "]" +
+                "Current = " + current +
+                " clock: " + currentSamplesRead + " -> " + currentSamplesForwarded + " delay: " + (currentSamplesRead - currentSamplesForwarded) + "[" + currentTimestamp + "]" +
                 ", Max = " + max + "[" + maxTimestamp + "]" +
                 ", MinAfterMax = " + minAfterMax + "[" + minAfterMaxTimestamp + "]" +
                 ", Overruns = " + overruns + "[" + overrunTimestamp + "]" +
