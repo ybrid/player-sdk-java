@@ -22,9 +22,9 @@
 
 package io.ybrid.player.io;
 
+import io.ybrid.api.Session;
 import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
-import io.ybrid.api.Session;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.Socket;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,11 +68,13 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
     @SuppressWarnings("HardCodedStringLiteral")
     public ICYInputStream(@NotNull Session session) throws MalformedURLException {
-        URL url = session.getStreamURL();
+        URI uri = session.getStreamURI();
 
         this.session = session;
 
-        switch (url.getProtocol()) {
+        System.out.println("url = " + uri);
+
+        switch (uri.getScheme()) {
             case "icyx":
                 secure = false;
                 break;
@@ -84,14 +86,14 @@ class ICYInputStream implements Closeable, ByteDataSource {
                 secure = true;
                 break;
             default:
-                throw new MalformedURLException("Invalid protocol: " + url.getProtocol());
+                throw new MalformedURLException("Invalid protocol: " + uri.getScheme());
         }
 
-        host = url.getHost();
-        port = url.getPort();
+        host = uri.getHost();
+        port = uri.getPort();
         if (port < 1)
-            port = url.getDefaultPort();
-        path = url.getFile();
+            port = uri.toURL().getDefaultPort();
+        path = uri.getPath();
     }
 
     private static @NotNull String acceptListToHeader(@NotNull String header, @Nullable Map<String, Double> list) {

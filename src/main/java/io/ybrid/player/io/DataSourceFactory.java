@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.logging.Level;
@@ -62,7 +62,7 @@ public final class DataSourceFactory {
         }
 
         public URLSource(Session session) throws IOException {
-            @NonNls URLConnection connection = session.getStreamURL().openConnection();
+            @NonNls URLConnection connection = session.getStreamURI().toURL().openConnection();
 
             connection.setDoInput(true);
             connection.setDoOutput(false);
@@ -107,9 +107,9 @@ public final class DataSourceFactory {
      * @throws IOException I/O-Errors as thrown by the used backends.
      */
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
-        URL url = session.getStreamURL();
+        URI uri = session.getStreamURI();
 
-        LOGGER.log(Level.INFO, "getSourceBySession(session="+session+"): url=" + url); //NON-NLS
+        LOGGER.log(Level.INFO, "getSourceBySession(session="+session+"): uri=" + uri); //NON-NLS
 
         try {
             return new ICYInputStream(session);
