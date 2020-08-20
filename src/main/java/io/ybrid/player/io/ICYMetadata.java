@@ -22,11 +22,13 @@
 
 package io.ybrid.player.io;
 
+import io.ybrid.api.metadata.Item;
+import io.ybrid.api.metadata.SimpleItem;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 class ICYMetadata {
     private final byte[] raw;
@@ -101,6 +103,12 @@ class ICYMetadata {
 
     String get(String key) {
         return getValues().get(key);
+    }
+
+    @NotNull Item asItem() {
+        final @Nullable String title = get("StreamTitle"); //NON-NLS
+
+        return new SimpleItem(UUID.randomUUID().toString(), null, title);
     }
 
     @Override

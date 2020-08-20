@@ -22,6 +22,8 @@
 
 package io.ybrid.player.io;
 
+import io.ybrid.api.ClockManager;
+import io.ybrid.api.MetadataMixer;
 import io.ybrid.api.Session;
 import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
@@ -243,7 +245,9 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
         metadata = new ICYMetadata(rawMetadata);
         LOGGER.info("Got fresh metadata: " + metadata); //NON-NLS
+        LOGGER.info("Item: " + metadata.asItem()); //NON-NLS
         metadataUpdated = true;
+        session.getMetadataMixer().add(metadata.asItem(), MetadataMixer.Source.TRANSPORT, MetadataMixer.Position.CURRENT, null, ClockManager.now());
     }
 
     private void readMetadata() throws IOException {
