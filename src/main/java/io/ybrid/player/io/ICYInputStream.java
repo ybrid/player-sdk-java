@@ -95,7 +95,11 @@ class ICYInputStream implements Closeable, ByteDataSource {
         port = uri.getPort();
         if (port < 1)
             port = uri.toURL().getDefaultPort();
-        path = uri.getPath();
+        if (uri.getQuery().isEmpty()) {
+            path = uri.getPath();
+        } else {
+            path = uri.getPath() + "?" + uri.getQuery();
+        }
     }
 
     private static @NotNull String acceptListToHeader(@NotNull String header, @Nullable Map<String, Double> list) {
