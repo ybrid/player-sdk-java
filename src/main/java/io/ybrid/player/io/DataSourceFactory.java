@@ -107,13 +107,17 @@ public final class DataSourceFactory {
      * @throws IOException I/O-Errors as thrown by the used backends.
      */
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
-        URI uri = session.getStreamURI();
+        final @NotNull URI uri = session.getStreamURI();
+        final @NotNull String scheme = uri.getScheme();
 
         LOGGER.log(Level.INFO, "getSourceBySession(session="+session+"): uri=" + uri); //NON-NLS
 
-        try {
-            return new ICYInputStream(session);
-        } catch (MalformedURLException ignored) {
+        //noinspection SpellCheckingInspection
+        if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS
+            try {
+                return new ICYInputStream(session);
+            } catch (MalformedURLException ignored) {
+            }
         }
 
         return new URLSource(session);
