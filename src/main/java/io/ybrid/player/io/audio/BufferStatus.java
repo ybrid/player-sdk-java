@@ -38,13 +38,13 @@ final public class BufferStatus implements Serializable {
     private final long underruns;
     private final Instant underrunTimestamp;
     private final long overruns;
-    private final Instant overrunTimestamp;
+    private final @Nullable Instant overrunTimestamp;
     private final double max;
-    private final Instant maxTimestamp;
+    private final @Nullable Instant maxTimestamp;
     private final double minAfterMax;
-    private final Instant minAfterMaxTimestamp;
+    private final @Nullable Instant minAfterMaxTimestamp;
     private final double current;
-    private final Instant currentTimestamp;
+    private final @Nullable Instant currentTimestamp;
     private final long currentSamplesRead;
     private final long currentSamplesForwarded;
 

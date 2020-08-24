@@ -52,19 +52,19 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
     private static class Status implements BufferStatusProvider {
         private static final Duration MINIMUM_BETWEEN_ANNOUNCE = Duration.ofMillis(1000);
 
-        final List<BufferStatusConsumer> consumers = new ArrayList<>();
+        private final List<BufferStatusConsumer> consumers = new ArrayList<>();
         private final @NotNull Buffer buffer;
-        private Instant lastAnnounce = null;
+        private @Nullable Instant lastAnnounce = null;
         private long underruns = 0;
-        private Instant underrunTimestamp = null;
+        private @Nullable Instant underrunTimestamp = null;
         private long overruns = 0;
-        private Instant overrunTimestamp = null;
+        private @Nullable Instant overrunTimestamp = null;
         private double max = 0;
-        private Instant maxTimestamp = null;
+        private @Nullable Instant maxTimestamp = null;
         private double minAfterMax = 0;
-        private Instant minAfterMaxTimestamp = null;
+        private @Nullable Instant minAfterMaxTimestamp = null;
         private double current = 0;
-        private Instant currentTimestamp = null;
+        private @Nullable Instant currentTimestamp = null;
         private long samplesRead;
         private long samplesForwarded;
 
