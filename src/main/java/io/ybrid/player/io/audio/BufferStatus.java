@@ -34,6 +34,7 @@ import java.time.Instant;
 final public class BufferStatus implements Serializable {
     private static final long serialVersionUID = -3172756405966691712L;
 
+    private final @Nullable String identifier;
     private final long underruns;
     private final Instant underrunTimestamp;
     private final long overruns;
@@ -47,11 +48,13 @@ final public class BufferStatus implements Serializable {
     private final long currentSamplesRead;
     private final long currentSamplesForwarded;
 
-    BufferStatus(long underruns, Instant underrunTimestamp,
+    BufferStatus(@Nullable String identifier,
+                 long underruns, Instant underrunTimestamp,
                  long overruns, @Nullable Instant overrunTimestamp,
                  double max, @Nullable Instant maxTimestamp,
                  double minAfterMax, @Nullable Instant minAfterMaxTimestamp,
                  double current, @Nullable Instant currentTimestamp, long currentSamplesRead, long currentSamplesForwarded) {
+        this.identifier = identifier;
         this.underruns = underruns;
         this.underrunTimestamp = underrunTimestamp;
         this.overruns = overruns;
@@ -64,6 +67,14 @@ final public class BufferStatus implements Serializable {
         this.currentTimestamp = currentTimestamp;
         this.currentSamplesRead = currentSamplesRead;
         this.currentSamplesForwarded = currentSamplesForwarded;
+    }
+
+    /**
+     * Gets the identifier of the buffer.
+     * @return The identifier of the buffer.
+     */
+    public @Nullable String getIdentifier() {
+        return identifier;
     }
 
     /**
@@ -183,7 +194,8 @@ final public class BufferStatus implements Serializable {
     @Override
     public String toString() {
         return "BufferStatus{" +
-                "Current = " + current +
+                "Buffer Identifier = " + identifier +
+                ", Current = " + current +
                 " clock: " + currentSamplesRead + " -> " + currentSamplesForwarded + " delay: " + (currentSamplesRead - currentSamplesForwarded) + "[" + currentTimestamp + "]" +
                 ", Max = " + max + "[" + maxTimestamp + "]" +
                 ", MinAfterMax = " + minAfterMax + "[" + minAfterMaxTimestamp + "]" +

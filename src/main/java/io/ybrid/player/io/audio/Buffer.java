@@ -26,6 +26,7 @@ import io.ybrid.player.io.DataSource;
 import io.ybrid.player.io.PCMDataBlock;
 import io.ybrid.player.io.PCMDataSource;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -43,12 +44,16 @@ import java.util.function.Consumer;
  * The purpose of this class is to provide a buffer for audio.
  */
 public class Buffer implements PCMDataSource, BufferStatusProvider {
+    private static final String AUDIO_BUFFER_THREAD_NAME = "Audio Buffer Thread"; //NON-NLS
+
     private final BufferThread thread;
+    private @Nullable String identifier;
 
     private static class Status implements BufferStatusProvider {
         private static final Duration MINIMUM_BETWEEN_ANNOUNCE = Duration.ofMillis(1000);
 
         final List<BufferStatusConsumer> consumers = new ArrayList<>();
+        private final @NotNull Buffer buffer;
         private Instant lastAnnounce = null;
         private long underruns = 0;
         private Instant underrunTimestamp = null;
@@ -62,6 +67,10 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         private Instant currentTimestamp = null;
         private long samplesRead;
         private long samplesForwarded;
+
+        private Status(@NotNull Buffer buffer) {
+            this.buffer = buffer;
+        }
 
         private void underrun() {
             underruns++;
@@ -108,7 +117,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             if (!force && lastAnnounce != null && lastAnnounce.plus(MINIMUM_BETWEEN_ANNOUNCE).isAfter(now))
                 return;
 
-            status = new BufferStatus(underruns, underrunTimestamp, overruns, overrunTimestamp, max, maxTimestamp, minAfterMax, minAfterMaxTimestamp, current, currentTimestamp, samplesRead, samplesForwarded);
+            status = new BufferStatus(buffer.getIdentifier(), underruns, underrunTimestamp, overruns, overrunTimestamp, max, maxTimestamp, minAfterMax, minAfterMaxTimestamp, current, currentTimestamp, samplesRead, samplesForwarded);
 
             synchronized (consumers) {
                 for (BufferStatusConsumer consumer : consumers)
@@ -141,7 +150,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         private static final int SLEEP_TIME = 371; /* [ms] */
 
         private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
-        private final Status state = new Status();
+        private final Status state;
         @NotNull private final PCMDataSource backend;
         private final Consumer<PCMDataBlock> inputConsumer;
         private Exception exception = null;
@@ -149,11 +158,12 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         private long samplesRead = 0;
         private long samplesForwarded = 0;
 
-        public BufferThread(String name, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer, double target) {
+        public BufferThread(String name, @NotNull Buffer buffer, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer, double target) {
             super(name);
             this.backend = backend;
             this.inputConsumer = inputConsumer;
             this.target = target;
+            this.state = new Status(buffer);
         }
 
         @Override
@@ -271,8 +281,41 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
      * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
     public Buffer(double target, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
-        thread = new BufferThread("Audio Buffer Thread", backend, inputConsumer, target); //NON-NLS
+        this(null, target, backend, inputConsumer);
+    }
+
+    /**
+     * Create an instance.
+     *
+     * @param identifier The identifier for this buffer.
+     * @param target The amount of audio to be buffered in [s].
+     * @param backend The backend to use.
+     * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
+     */
+    public Buffer(@Nullable String identifier, double target, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
+        setIdentifier(identifier);
+        thread = new BufferThread(AUDIO_BUFFER_THREAD_NAME, this, backend, inputConsumer, target);
         thread.start();
+    }
+
+    /**
+     * Gets the identifier for this buffer.
+     * @return The identifier.
+     */
+    public @Nullable String getIdentifier() {
+        return identifier;
+    }
+
+    /**
+     * Sets the identifier for the buffer.
+     * The identifier can only be set to non-{@code null} once.
+     *
+     * @param identifier The identifier to set to.
+     */
+    public void setIdentifier(@Nullable String identifier) {
+        if (this.identifier != null && !this.identifier.equals(identifier))
+            throw new IllegalArgumentException("Identifier can not be updated (while trying to update from " + this.identifier + " to " + identifier + ")");
+        this.identifier = identifier;
     }
 
     @Override
