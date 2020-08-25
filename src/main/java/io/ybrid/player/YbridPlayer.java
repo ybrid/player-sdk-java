@@ -28,6 +28,7 @@ import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.player.io.BufferedByteDataSource;
+import io.ybrid.player.io.DataBlockMetadataUpdateThread;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
 import io.ybrid.player.io.audio.Buffer;
@@ -46,7 +47,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
 
 /**
  * This implements a Ybrid capable {@link Player}.
@@ -56,7 +56,6 @@ import java.util.function.Consumer;
 public class YbridPlayer implements Player {
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
     private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
-    private static final int METADATA_BLOCK_QUEUE_SIZE = 32;
 
     // Proxy list, used to store BufferStatusConsumers when in non-prepared state.
     final List<BufferStatusConsumer> bufferStatusConsumers = new ArrayList<>();
@@ -69,7 +68,7 @@ public class YbridPlayer implements Player {
     private Buffer audioSource;
     private PlaybackThread playbackThread;
     private PCMDataBlock initialAudioBlock;
-    private MetadataThread metadataThread;
+    private DataBlockMetadataUpdateThread metadataThread;
     private PlayerState playerState = PlayerState.STOPPED;
 
     private class PlaybackThread extends Thread {
@@ -188,68 +187,6 @@ public class YbridPlayer implements Player {
         }
     }
 
-    private static class MetadataThread extends Thread implements Consumer<PCMDataBlock> {
-        private final BlockingQueue<PCMDataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
-        private final Session session;
-
-        MetadataThread(String name, Session session) {
-            super(name);
-            this.session = session;
-        }
-
-        @Override
-        public void run() {
-            Metadata metadata = null;
-            Metadata oldMetadata = null;
-            PlayoutInfo playoutInfo = null;
-            PlayoutInfo oldPlayoutInfo = null;
-
-            while (!isInterrupted()) {
-
-                try {
-                    final PCMDataBlock block = metadataBlockQueue.take();
-                    Metadata newMetadata = block.getMetadata();
-                    PlayoutInfo newPlayoutInfo = block.getPlayoutInfo();
-
-                    if (newMetadata != null && newMetadata != oldMetadata) {
-                        metadata = newMetadata;
-                        oldMetadata = newMetadata;
-                    }
-
-                    if (newPlayoutInfo != null && newPlayoutInfo != oldPlayoutInfo) {
-                        playoutInfo = newPlayoutInfo;
-                        oldPlayoutInfo = newPlayoutInfo;
-                    }
-
-                    if (metadata != null && !metadata.isValid()) {
-                        try {
-                            session.refresh(EnumSet.of(SubInfo.METADATA, SubInfo.PLAYOUT));
-                            metadata = session.getMetadata();
-                            playoutInfo = session.getPlayoutInfo();
-                        } catch (IOException ignored) {
-                        }
-                    }
-
-                    block.setMetadata(metadata);
-                    block.setPlayoutInfo(playoutInfo);
-                } catch (InterruptedException e) {
-                    return;
-                }
-            }
-        }
-
-        @Override
-        public void accept(PCMDataBlock pcmDataBlock) {
-            try {
-                metadataBlockQueue.add(pcmDataBlock);
-            } catch (IllegalStateException e) {
-                /* If the queue is full we fall behind. clear it and try again. */
-                metadataBlockQueue.clear();
-                metadataBlockQueue.add(pcmDataBlock);
-            }
-        }
-    }
-
     /**
      * Creates a new instance of the player.
      *
@@ -301,7 +238,7 @@ public class YbridPlayer implements Player {
         playerStateChange(PlayerState.PREPARING);
 
         playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER); //NON-NLS
-        metadataThread = new MetadataThread("YbridPlayer Metadata Thread", session); //NON-NLS
+        metadataThread = new DataBlockMetadataUpdateThread("YbridPlayer Metadata Thread", session); //NON-NLS
 
         session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
         decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));

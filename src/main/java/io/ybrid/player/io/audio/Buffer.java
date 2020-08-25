@@ -22,6 +22,7 @@
 
 package io.ybrid.player.io.audio;
 
+import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.DataSource;
 import io.ybrid.player.io.PCMDataBlock;
 import io.ybrid.player.io.PCMDataSource;
@@ -152,13 +153,13 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
         private final Status state;
         @NotNull private final PCMDataSource backend;
-        private final Consumer<PCMDataBlock> inputConsumer;
+        private final Consumer<DataBlock> inputConsumer;
         private Exception exception = null;
         private double target;
         private long samplesRead = 0;
         private long samplesForwarded = 0;
 
-        public BufferThread(String name, @NotNull Buffer buffer, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer, double target) {
+        public BufferThread(String name, @NotNull Buffer buffer, @NotNull PCMDataSource backend, Consumer<DataBlock> inputConsumer, double target) {
             super(name);
             this.backend = backend;
             this.inputConsumer = inputConsumer;
@@ -280,7 +281,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
      * @param backend The backend to use.
      * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
-    public Buffer(double target, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
+    public Buffer(double target, @NotNull PCMDataSource backend, Consumer<DataBlock> inputConsumer) {
         this(null, target, backend, inputConsumer);
     }
 
@@ -292,7 +293,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
      * @param backend The backend to use.
      * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
-    public Buffer(@Nullable String identifier, double target, @NotNull PCMDataSource backend, Consumer<PCMDataBlock> inputConsumer) {
+    public Buffer(@Nullable String identifier, double target, @NotNull PCMDataSource backend, Consumer<DataBlock> inputConsumer) {
         setIdentifier(identifier);
         thread = new BufferThread(AUDIO_BUFFER_THREAD_NAME, this, backend, inputConsumer, target);
         thread.start();
