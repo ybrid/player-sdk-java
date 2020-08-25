@@ -28,10 +28,9 @@ import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.player.io.BufferedByteDataSource;
-import io.ybrid.player.io.DataBlockMetadataUpdateThread;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
-import io.ybrid.player.io.audio.Buffer;
+import io.ybrid.player.io.audio.BufferMuxer;
 import io.ybrid.player.io.audio.BufferStatus;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
 import org.jetbrains.annotations.NotNull;
@@ -41,9 +40,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -57,18 +54,15 @@ public class YbridPlayer implements Player {
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
     private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
 
-    // Proxy list, used to store BufferStatusConsumers when in non-prepared state.
-    final List<BufferStatusConsumer> bufferStatusConsumers = new ArrayList<>();
     private final Session session;
     private MetadataConsumer metadataConsumer = null;
     private final DecoderFactory decoderFactory;
     private final AudioBackendFactory audioBackendFactory;
     private Decoder decoder;
     private AudioBackend audioBackend;
-    private Buffer audioSource;
+    private final @NotNull BufferMuxer muxer;
     private PlaybackThread playbackThread;
     private PCMDataBlock initialAudioBlock;
-    private DataBlockMetadataUpdateThread metadataThread;
     private PlayerState playerState = PlayerState.STOPPED;
 
     private class PlaybackThread extends Thread {
@@ -96,7 +90,7 @@ public class YbridPlayer implements Player {
 
             playerStateChange(PlayerState.BUFFERING);
             try {
-                while (!isInterrupted() && audioSource.isValid()) {
+                while (!isInterrupted() && muxer.isValid()) {
                     ret = bufferStateQueue.take();
                     if (ret.getCurrent() > bufferGoal) {
                         break;
@@ -116,7 +110,7 @@ public class YbridPlayer implements Player {
             PlayoutInfo forwardedPlayoutInfo = session.getPlayoutInfo();
             BufferStatus lastStatus;
 
-            audioSource.addBufferStatusConsumer(bufferStatusConsumer);
+            muxer.addBufferStatusConsumer(bufferStatusConsumer);
             lastStatus = buffer(PlayerState.PLAYING);
 
             audioBackend.play();
@@ -130,7 +124,7 @@ public class YbridPlayer implements Player {
 
                 try {
                     if (block == null) {
-                        block = audioSource.read();
+                        block = muxer.read();
                     } else {
                         initialAudioBlock = null;
                     }
@@ -174,12 +168,11 @@ public class YbridPlayer implements Player {
                 }
             }
 
-            audioSource.removeBufferStatusConsumer(bufferStatusConsumer);
+            muxer.removeBufferStatusConsumer(bufferStatusConsumer);
 
             close(audioBackend);
             audioBackend = null;
-            close(audioSource);
-            audioSource = null;
+            close(muxer);
             close(decoder);
             decoder = null;
 
@@ -195,6 +188,7 @@ public class YbridPlayer implements Player {
      * @param audioBackendFactory The {@link AudioBackendFactory} used to create a {@link AudioBackend} to interact with the host audio output.
      */
     public YbridPlayer(Session session, DecoderFactory decoderFactory, AudioBackendFactory audioBackendFactory) {
+        this.muxer = new BufferMuxer(session);
         this.session = session;
         this.decoderFactory = decoderFactory;
         this.audioBackendFactory = audioBackendFactory;
@@ -238,17 +232,13 @@ public class YbridPlayer implements Player {
         playerStateChange(PlayerState.PREPARING);
 
         playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER); //NON-NLS
-        metadataThread = new DataBlockMetadataUpdateThread("YbridPlayer Metadata Thread", session); //NON-NLS
 
         session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
         decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
-        audioSource = new Buffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);
-
-        for (BufferStatusConsumer consumer : bufferStatusConsumers)
-            audioSource.addBufferStatusConsumer(consumer);
+        muxer.addBuffer(decoder);
 
         audioBackend = audioBackendFactory.getAudioBackend();
-        initialAudioBlock = audioSource.read();
+        initialAudioBlock = muxer.read();
         audioBackend.prepare(initialAudioBlock);
     }
 
@@ -256,13 +246,11 @@ public class YbridPlayer implements Player {
     public void play() throws IOException {
         assertPrepared();
         playbackThread.start();
-        metadataThread.start();
     }
 
     @Override
     public void stop() {
         playbackThread.interrupt();
-        metadataThread.interrupt();
     }
 
 
@@ -364,19 +352,12 @@ public class YbridPlayer implements Player {
 
     @Override
     public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
-        if (!bufferStatusConsumers.contains(consumer))
-            bufferStatusConsumers.add(consumer);
-
-        if (audioSource != null)
-            audioSource.addBufferStatusConsumer(consumer);
+        muxer.addBufferStatusConsumer(consumer);
     }
 
     @Override
     public void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
-        bufferStatusConsumers.remove(consumer);
-
-        if (audioSource != null)
-            audioSource.removeBufferStatusConsumer(consumer);
+        muxer.removeBufferStatusConsumer(consumer);
     }
 
     @Override
