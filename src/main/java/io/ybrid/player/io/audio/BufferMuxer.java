@@ -93,6 +93,10 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
                 final @NotNull Entry entry = iterator.next();
 
                 if (!entry.isValid()) {
+                    try {
+                        entry.getBuffer().close();
+                    } catch (IOException ignored) {
+                    }
                     iterator.remove();
                     continue;
                 }
