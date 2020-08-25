@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +53,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
     private static class Status implements BufferStatusProvider {
         private static final Duration MINIMUM_BETWEEN_ANNOUNCE = Duration.ofMillis(1000);
 
-        private final List<BufferStatusConsumer> consumers = new ArrayList<>();
+        private final Set<BufferStatusConsumer> consumers = new HashSet<>();
         private final @NotNull Buffer buffer;
         private @Nullable Instant lastAnnounce = null;
         private long underruns = 0;
@@ -131,10 +131,8 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
         @Override
         public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
             synchronized (consumers) {
-                if (!consumers.contains(consumer)) {
-                    consumers.add(consumer);
+                if (consumers.add(consumer))
                     lastAnnounce = null; // force next announce
-                }
             }
         }
 
