@@ -59,6 +59,14 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
         public boolean isValid() {
             return buffer.isValid();
         }
+
+        @Override
+        public String toString() {
+            //noinspection HardCodedStringLiteral
+            return "Entry{" +
+                    "buffer=" + buffer + " (isValid: " + buffer.isValid() + ")" +
+                    "}";
+        }
     }
 
     private final @NotNull Set<BufferStatusConsumer> consumers = new HashSet<>();
