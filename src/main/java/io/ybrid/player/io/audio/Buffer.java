@@ -262,7 +262,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
 
         @Override
         public boolean isValid() {
-            return exception == null;
+            return !buffer.isEmpty() || exception == null;
         }
 
         @Override
