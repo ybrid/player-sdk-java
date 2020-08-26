@@ -129,6 +129,14 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
     @Override
     public @NotNull PCMDataBlock read() throws IOException {
         synchronized (buffers) {
+            if (selectedBuffer == null || !selectedBuffer.isValid()) {
+                LOGGER.info("Buffer is invalid, selecting a new one.");
+                selectNext();
+                if (selectedBuffer == null || !selectedBuffer.isValid()) {
+                    LOGGER.info("Buffer is still invalid. Throwing error.");
+                    throw new IOException("No valid Buffer");
+                }
+            }
             try {
                 return selectedBuffer.read();
             } catch (Exception e) {
