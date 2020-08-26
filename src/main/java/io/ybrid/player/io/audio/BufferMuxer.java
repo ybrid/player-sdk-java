@@ -23,17 +23,18 @@
 package io.ybrid.player.io.audio;
 
 import io.ybrid.api.Session;
-import io.ybrid.player.io.DataBlock;
-import io.ybrid.player.io.DataBlockMetadataUpdateThread;
-import io.ybrid.player.io.PCMDataBlock;
-import io.ybrid.player.io.PCMDataSource;
+import io.ybrid.player.io.*;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferStatusConsumer {
+    @NonNls
+    static final Logger LOGGER = Logger.getLogger(BufferMuxer.class.getName());
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
 
     private interface DataBlockConsumer {
@@ -82,12 +83,14 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
                 onBufferStatusUpdate(status);
         });
 
+        LOGGER.info("Adding Entry: " + newEntry);
         synchronized (buffers) {
             buffers.add(newEntry);
         }
     }
 
     private void selectNext() {
+        LOGGER.info("Selecting new entry...");
         synchronized (buffers) {
             for (final @NotNull Iterator<Entry> iterator = buffers.iterator(); iterator.hasNext(); ) {
                 final @NotNull Entry entry = iterator.next();
@@ -104,11 +107,13 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
                 if (entry == selectedBuffer)
                     continue;
 
+                LOGGER.info("Selected: " + entry);
                 selectedBuffer = entry;
                 return;
             }
 
             // No valid buffer found.
+            LOGGER.info("Selected: <null>");
             selectedBuffer = null;
         }
     }
