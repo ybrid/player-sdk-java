@@ -230,6 +230,8 @@ public class YbridPlayer implements Player {
     }
 
     private void connectSource() throws IOException {
+        session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
+
         muxer.addBuffer(decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session))));
     }
 
@@ -238,8 +240,6 @@ public class YbridPlayer implements Player {
         playerStateChange(PlayerState.PREPARING);
 
         playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER); //NON-NLS
-
-        session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
 
         connectSource();
 
