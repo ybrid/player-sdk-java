@@ -33,6 +33,7 @@ import io.ybrid.player.io.PCMDataBlock;
 import io.ybrid.player.io.audio.BufferMuxer;
 import io.ybrid.player.io.audio.BufferStatus;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +45,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
 
 /**
  * This implements a Ybrid capable {@link Player}.
@@ -51,6 +53,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * See also {@link SessionClient}.
  */
 public class YbridPlayer implements Player {
+    static final @NonNls Logger LOGGER = Logger.getLogger(YbridPlayer.class.getName());
+
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
     private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
 
@@ -211,6 +215,7 @@ public class YbridPlayer implements Player {
     private void playerStateChange(PlayerState playerState) {
         if (this.playerState == PlayerState.ERROR)
             return;
+        LOGGER.info("playerState: " + this.playerState + " -> " + playerState);
         this.playerState = playerState;
         metadataConsumer.onPlayerStateChange(playerState);
         capabilitiesChange();
