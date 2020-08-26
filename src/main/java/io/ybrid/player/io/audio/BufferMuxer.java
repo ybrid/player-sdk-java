@@ -157,6 +157,22 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
         return false;
     }
 
+    public boolean isInHandover() {
+        synchronized (buffers) {
+            if (!selectedBuffer.getBuffer().hasInputReachedEOF())
+                return false;
+
+            for (final @NotNull Entry entry : buffers) {
+                if (entry == selectedBuffer)
+                    continue;
+
+                if (entry.isValid())
+                    return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void close() throws IOException {
         synchronized (buffers) {
