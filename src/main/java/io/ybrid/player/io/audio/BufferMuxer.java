@@ -141,6 +141,7 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
         synchronized (buffers) {
             for (final @NotNull Entry entry : buffers)
                 entry.getBuffer().close();
+            buffers.clear();
         }
         metadataUpdateThread.interrupt();
     }
