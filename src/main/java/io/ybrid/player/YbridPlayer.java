@@ -166,7 +166,7 @@ public class YbridPlayer implements Player {
                 status = bufferStateQueue.poll();
                 if (status != null) {
                     lastStatus = status;
-                    if (status.getCurrent() < AUDIO_BUFFER_MAX_BEFORE_REBUFFER) {
+                    if (status.getCurrent() < AUDIO_BUFFER_MAX_BEFORE_REBUFFER && !muxer.isInHandover()) {
                         lastStatus = buffer(playerState);
                     }
                 }
