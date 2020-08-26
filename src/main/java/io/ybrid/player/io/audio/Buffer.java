@@ -270,6 +270,10 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
             interrupt();
             backend.close();
         }
+
+        public boolean hasInputReachedEOF() {
+            return exception != null;
+        }
     }
 
     /**
@@ -340,5 +344,14 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
     @Override
     public void close() throws IOException {
         thread.close();
+    }
+
+
+    /**
+     * Gets whether the input side has reached EOF.
+     * @return Whether input reached EOF.
+     */
+    public boolean hasInputReachedEOF() {
+        return thread.hasInputReachedEOF();
     }
 }
