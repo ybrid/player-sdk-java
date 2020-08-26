@@ -62,7 +62,6 @@ public class YbridPlayer implements Player {
     private MetadataConsumer metadataConsumer = null;
     private final DecoderFactory decoderFactory;
     private final AudioBackendFactory audioBackendFactory;
-    private Decoder decoder;
     private AudioBackend audioBackend;
     private final @NotNull BufferMuxer muxer;
     private PlaybackThread playbackThread;
@@ -177,8 +176,6 @@ public class YbridPlayer implements Player {
             close(audioBackend);
             audioBackend = null;
             close(muxer);
-            close(decoder);
-            decoder = null;
 
             playerStateChange(PlayerState.STOPPED);
         }
@@ -232,6 +229,10 @@ public class YbridPlayer implements Player {
             metadataConsumer.onBouquetChange(session.getBouquet());
     }
 
+    private void connectSource() throws IOException {
+        muxer.addBuffer(decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session))));
+    }
+
     @Override
     public void prepare() throws IOException {
         playerStateChange(PlayerState.PREPARING);
@@ -239,8 +240,8 @@ public class YbridPlayer implements Player {
         playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER); //NON-NLS
 
         session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
-        decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
-        muxer.addBuffer(decoder);
+
+        connectSource();
 
         audioBackend = audioBackendFactory.getAudioBackend();
         initialAudioBlock = muxer.read();
