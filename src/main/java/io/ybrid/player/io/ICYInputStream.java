@@ -92,13 +92,6 @@ class ICYInputStream implements Closeable, ByteDataSource {
             case "icyxs":
                 secure = true;
                 break;
-                /* Workarounds */
-            case "http":
-                secure = false;
-                break;
-            case "https":
-                secure = true;
-                break;
             default:
                 throw new MalformedURLException("Invalid protocol: " + uri.getScheme());
         }
