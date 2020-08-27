@@ -31,6 +31,7 @@ import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.metadata.source.Source;
 import io.ybrid.api.metadata.source.SourceType;
+import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -60,6 +61,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private static final int ICY_METADATA_BLOCK_MULTIPLAYER = 16;
     private final @NotNull Source source;
     private final Session session;
+    private final @NotNull URITransportDescription transportDescription;
     private final String host;
     private int port;
     private final String path;
@@ -74,14 +76,14 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private Metadata blockMetadata = null;
 
     @SuppressWarnings("HardCodedStringLiteral")
-    public ICYInputStream(@NotNull Session session) throws MalformedURLException {
-        URI uri = session.getStreamURI();
+    public ICYInputStream(@NotNull URITransportDescription transportDescription, @NotNull Session session) throws MalformedURLException {
+        final URI uri = transportDescription.getURI();
 
         this.source = new Source(SourceType.TRANSPORT);
-
+        this.transportDescription = transportDescription;
         this.session = session;
 
-        System.out.println("url = " + uri);
+        LOGGER.info("URL = " + uri);
 
         switch (uri.getScheme()) {
             case "icyx":
@@ -130,8 +132,8 @@ class ICYInputStream implements Closeable, ByteDataSource {
         req += "Host: " + host + ":" + port + "\r\n";
         req += "Connection: close\r\n";
         req += "User-Agent: Ybrid Player\r\n";
-        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT, session.getAcceptedMediaFormats());
-        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT_LANGUAGE, session.getAcceptedLanguages());
+        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
+        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
         req += "Accept-Charset: utf-8, *; q=0\r\n";
         req += "Accept-Encoding: identity, *; q=0\r\n";
         req += "Icy-MetaData: 1\r\n";

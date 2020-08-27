@@ -31,6 +31,8 @@ import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.metadata.source.Source;
 import io.ybrid.api.metadata.source.SourceType;
+import io.ybrid.api.transport.TransportDescription;
+import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -85,14 +87,14 @@ public final class DataSourceFactory {
             return ret;
         }
 
-        public URLSource(Session session) throws IOException {
-            @NonNls URLConnection connection = session.getStreamURI().toURL().openConnection();
+        public URLSource(@NotNull URITransportDescription transportDescription) throws IOException {
+            @NonNls URLConnection connection = transportDescription.getURI().toURL().openConnection();
 
             connection.setDoInput(true);
             connection.setDoOutput(false);
 
-            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, session.getAcceptedMediaFormats());
-            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, session.getAcceptedLanguages());
+            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
+            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
             connection.setRequestProperty("Accept-Charset", "utf-8, *; q=0");
 
             connection.connect();
@@ -138,19 +140,25 @@ public final class DataSourceFactory {
      * @throws IOException I/O-Errors as thrown by the used backends.
      */
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
-        final @NotNull URI uri = session.getStreamURI();
-        final @NotNull String scheme = uri.getScheme();
+        final @NotNull TransportDescription transportDescription = session.getStreamTransportDescription();
 
-        LOGGER.log(Level.INFO, "getSourceBySession(session="+session+"): uri=" + uri); //NON-NLS
+        if (transportDescription instanceof URITransportDescription) {
+            final @NotNull URI uri = ((URITransportDescription) transportDescription).getURI();
+            final @NotNull String scheme = uri.getScheme();
 
-        //noinspection SpellCheckingInspection
-        if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS
-            try {
-                return new ICYInputStream(session);
-            } catch (MalformedURLException ignored) {
+            LOGGER.log(Level.INFO, "getSourceBySession(session=" + session + "): uri=" + uri); //NON-NLS
+
+            //noinspection SpellCheckingInspection
+            if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS
+                try {
+                    return new ICYInputStream((URITransportDescription)transportDescription, session);
+                } catch (MalformedURLException ignored) {
+                }
             }
-        }
 
-        return new URLSource(session);
+            return new URLSource((URITransportDescription)transportDescription);
+        } else {
+            throw new IllegalArgumentException("Unsupported transport description: " + transportDescription);
+        }
     }
 }
