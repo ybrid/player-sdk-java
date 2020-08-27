@@ -45,7 +45,7 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
         private final @NotNull Buffer buffer;
 
         public Entry(@NotNull PCMDataSource source, @NotNull DataBlockConsumer consumer) {
-            this.buffer = new Buffer(AUDIO_BUFFER_TARGET, source, (dataBlock -> consumer.blockAccept(dataBlock, this)));
+            this.buffer = new Buffer(AUDIO_BUFFER_TARGET, source, dataBlock -> consumer.blockAccept(dataBlock, this));
         }
 
         public @NotNull Buffer getBuffer() {
