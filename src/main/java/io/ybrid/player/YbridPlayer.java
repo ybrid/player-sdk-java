@@ -30,9 +30,10 @@ import io.ybrid.api.metadata.Metadata;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
-import io.ybrid.player.io.audio.Buffer;
+import io.ybrid.player.io.audio.BufferMuxer;
 import io.ybrid.player.io.audio.BufferStatus;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,13 +41,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 /**
  * This implements a Ybrid capable {@link Player}.
@@ -54,23 +53,21 @@ import java.util.function.Consumer;
  * See also {@link SessionClient}.
  */
 public class YbridPlayer implements Player {
+    static final @NonNls Logger LOGGER = Logger.getLogger(YbridPlayer.class.getName());
+
     private static final double AUDIO_BUFFER_TARGET = 10; /* [s] */
     private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
-    private static final int METADATA_BLOCK_QUEUE_SIZE = 32;
 
-    // Proxy list, used to store BufferStatusConsumers when in non-prepared state.
-    final List<BufferStatusConsumer> bufferStatusConsumers = new ArrayList<>();
     private final Session session;
     private MetadataConsumer metadataConsumer = null;
     private final DecoderFactory decoderFactory;
     private final AudioBackendFactory audioBackendFactory;
-    private Decoder decoder;
     private AudioBackend audioBackend;
-    private Buffer audioSource;
+    private final @NotNull BufferMuxer muxer;
     private PlaybackThread playbackThread;
     private PCMDataBlock initialAudioBlock;
-    private MetadataThread metadataThread;
     private PlayerState playerState = PlayerState.STOPPED;
+    private boolean autoReconnect = true;
 
     private class PlaybackThread extends Thread {
         private static final double AUDIO_BUFFER_MAX_BEFORE_REBUFFER = 0.01; // [s]. Must be > 0.
@@ -97,7 +94,7 @@ public class YbridPlayer implements Player {
 
             playerStateChange(PlayerState.BUFFERING);
             try {
-                while (!isInterrupted() && audioSource.isValid()) {
+                while (!isInterrupted() && muxer.isValid()) {
                     ret = bufferStateQueue.take();
                     if (ret.getCurrent() > bufferGoal) {
                         break;
@@ -117,7 +114,7 @@ public class YbridPlayer implements Player {
             PlayoutInfo forwardedPlayoutInfo = session.getPlayoutInfo();
             BufferStatus lastStatus;
 
-            audioSource.addBufferStatusConsumer(bufferStatusConsumer);
+            muxer.addBufferStatusConsumer(bufferStatusConsumer);
             lastStatus = buffer(PlayerState.PLAYING);
 
             audioBackend.play();
@@ -131,7 +128,7 @@ public class YbridPlayer implements Player {
 
                 try {
                     if (block == null) {
-                        block = audioSource.read();
+                        block = muxer.read();
                     } else {
                         initialAudioBlock = null;
                     }
@@ -169,84 +166,19 @@ public class YbridPlayer implements Player {
                 status = bufferStateQueue.poll();
                 if (status != null) {
                     lastStatus = status;
-                    if (status.getCurrent() < AUDIO_BUFFER_MAX_BEFORE_REBUFFER) {
+                    if (status.getCurrent() < AUDIO_BUFFER_MAX_BEFORE_REBUFFER && !muxer.isInHandover()) {
                         lastStatus = buffer(playerState);
                     }
                 }
             }
 
-            audioSource.removeBufferStatusConsumer(bufferStatusConsumer);
+            muxer.removeBufferStatusConsumer(bufferStatusConsumer);
 
             close(audioBackend);
             audioBackend = null;
-            close(audioSource);
-            audioSource = null;
-            close(decoder);
-            decoder = null;
+            close(muxer);
 
             playerStateChange(PlayerState.STOPPED);
-        }
-    }
-
-    private static class MetadataThread extends Thread implements Consumer<PCMDataBlock> {
-        private final BlockingQueue<PCMDataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
-        private final Session session;
-
-        MetadataThread(String name, Session session) {
-            super(name);
-            this.session = session;
-        }
-
-        @Override
-        public void run() {
-            Metadata metadata = null;
-            Metadata oldMetadata = null;
-            PlayoutInfo playoutInfo = null;
-            PlayoutInfo oldPlayoutInfo = null;
-
-            while (!isInterrupted()) {
-
-                try {
-                    final PCMDataBlock block = metadataBlockQueue.take();
-                    Metadata newMetadata = block.getMetadata();
-                    PlayoutInfo newPlayoutInfo = block.getPlayoutInfo();
-
-                    if (newMetadata != null && newMetadata != oldMetadata) {
-                        metadata = newMetadata;
-                        oldMetadata = newMetadata;
-                    }
-
-                    if (newPlayoutInfo != null && newPlayoutInfo != oldPlayoutInfo) {
-                        playoutInfo = newPlayoutInfo;
-                        oldPlayoutInfo = newPlayoutInfo;
-                    }
-
-                    if (metadata != null && !metadata.isValid()) {
-                        try {
-                            session.refresh(EnumSet.of(SubInfo.METADATA, SubInfo.PLAYOUT));
-                            metadata = session.getMetadata();
-                            playoutInfo = session.getPlayoutInfo();
-                        } catch (IOException ignored) {
-                        }
-                    }
-
-                    block.setMetadata(metadata);
-                    block.setPlayoutInfo(playoutInfo);
-                } catch (InterruptedException e) {
-                    return;
-                }
-            }
-        }
-
-        @Override
-        public void accept(PCMDataBlock pcmDataBlock) {
-            try {
-                metadataBlockQueue.add(pcmDataBlock);
-            } catch (IllegalStateException e) {
-                /* If the queue is full we fall behind. clear it and try again. */
-                metadataBlockQueue.clear();
-                metadataBlockQueue.add(pcmDataBlock);
-            }
         }
     }
 
@@ -258,6 +190,7 @@ public class YbridPlayer implements Player {
      * @param audioBackendFactory The {@link AudioBackendFactory} used to create a {@link AudioBackend} to interact with the host audio output.
      */
     public YbridPlayer(Session session, DecoderFactory decoderFactory, AudioBackendFactory audioBackendFactory) {
+        this.muxer = new BufferMuxer(session);
         this.session = session;
         this.decoderFactory = decoderFactory;
         this.audioBackendFactory = audioBackendFactory;
@@ -267,6 +200,33 @@ public class YbridPlayer implements Player {
     private void assertPrepared() throws IOException {
         if (audioBackend == null)
             prepare();
+    }
+
+    private void onInputEOF() {
+        LOGGER.info("Input EOF reached");
+
+        if (!autoReconnect)
+            return;
+
+        if (!session.isValid())
+            return;
+
+        if (muxer.isInHandover())
+            return;
+
+        LOGGER.info("Auto Reconnect is enabled, we have a valid session, and are not in a handover. Connecting new source and validating session.");
+
+        try {
+            connectSource();
+        } catch (IOException e) {
+            LOGGER.warning("Connecting new source failed.");
+        }
+
+        try {
+            session.refresh(SubInfo.VALIDITY);
+        } catch (IOException e) {
+            LOGGER.warning("Validating session failed.");
+        }
     }
 
     private void distributeMetadata(@NotNull Metadata metadata, @NotNull PlayoutInfo playoutInfo) {
@@ -280,6 +240,7 @@ public class YbridPlayer implements Player {
     private void playerStateChange(PlayerState playerState) {
         if (this.playerState == PlayerState.ERROR)
             return;
+        LOGGER.info("playerState: " + this.playerState + " -> " + playerState);
         this.playerState = playerState;
         metadataConsumer.onPlayerStateChange(playerState);
         capabilitiesChange();
@@ -296,22 +257,43 @@ public class YbridPlayer implements Player {
             metadataConsumer.onBouquetChange(session.getBouquet());
     }
 
+    private void connectSource() throws IOException {
+        final @Nullable Decoder decoder;
+
+        session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
+
+        /*
+         * We disconnect the inputEOFCallback while we connect a new source to avoid race conditions between the
+         * server sending EOF and us adding the new buffer.
+         */
+        muxer.setInputEOFCallback(null);
+        decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
+        if (decoder == null) {
+            LOGGER.warning("Can not create decoder for new input.");
+        } else {
+            muxer.addBuffer(decoder);
+        }
+        muxer.setInputEOFCallback(this::onInputEOF);
+    }
+
+    public boolean isAutoReconnect() {
+        return autoReconnect;
+    }
+
+    public void setAutoReconnect(boolean autoReconnect) {
+        this.autoReconnect = autoReconnect;
+    }
+
     @Override
     public void prepare() throws IOException {
         playerStateChange(PlayerState.PREPARING);
 
         playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER); //NON-NLS
-        metadataThread = new MetadataThread("YbridPlayer Metadata Thread", session); //NON-NLS
 
-        session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
-        decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
-        audioSource = new Buffer(AUDIO_BUFFER_TARGET, decoder, metadataThread);
-
-        for (BufferStatusConsumer consumer : bufferStatusConsumers)
-            audioSource.addBufferStatusConsumer(consumer);
+        connectSource();
 
         audioBackend = audioBackendFactory.getAudioBackend();
-        initialAudioBlock = audioSource.read();
+        initialAudioBlock = muxer.read();
         audioBackend.prepare(initialAudioBlock);
     }
 
@@ -319,13 +301,11 @@ public class YbridPlayer implements Player {
     public void play() throws IOException {
         assertPrepared();
         playbackThread.start();
-        metadataThread.start();
     }
 
     @Override
     public void stop() {
         playbackThread.interrupt();
-        metadataThread.interrupt();
     }
 
 
@@ -427,19 +407,12 @@ public class YbridPlayer implements Player {
 
     @Override
     public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
-        if (!bufferStatusConsumers.contains(consumer))
-            bufferStatusConsumers.add(consumer);
-
-        if (audioSource != null)
-            audioSource.addBufferStatusConsumer(consumer);
+        muxer.addBufferStatusConsumer(consumer);
     }
 
     @Override
     public void removeBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {
-        bufferStatusConsumers.remove(consumer);
-
-        if (audioSource != null)
-            audioSource.removeBufferStatusConsumer(consumer);
+        muxer.removeBufferStatusConsumer(consumer);
     }
 
     @Override

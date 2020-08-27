@@ -39,6 +39,7 @@ public class MetadataInputStream extends InputStream {
     private byte[] buffer;
     private int offset;
     private int readLimit = 0;
+    private boolean eof = false;
 
     /**
      * This creates an instance using a {@link ByteDataSource}.
@@ -100,6 +101,7 @@ public class MetadataInputStream extends InputStream {
             buffer = block.getData();
             metadata = block.getMetadata();
         } catch (EOFException ignored) {
+            eof = true;
             buffer = null;
             metadata = null;
         }
@@ -142,6 +144,9 @@ public class MetadataInputStream extends InputStream {
             len -= res;
             ret += res;
         }
+
+        if (ret == 0 && eof)
+            throw new EOFException();
 
         return ret;
     }
