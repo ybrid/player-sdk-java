@@ -258,6 +258,8 @@ public class YbridPlayer implements Player {
     }
 
     private void connectSource() throws IOException {
+        final @Nullable Decoder decoder;
+
         session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
 
         /*
@@ -265,7 +267,12 @@ public class YbridPlayer implements Player {
          * server sending EOF and us adding the new buffer.
          */
         muxer.setInputEOFCallback(null);
-        muxer.addBuffer(decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session))));
+        decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
+        if (decoder == null) {
+            LOGGER.warning("Can not create decoder for new input.");
+        } else {
+            muxer.addBuffer(decoder);
+        }
         muxer.setInputEOFCallback(this::onInputEOF);
     }
 
