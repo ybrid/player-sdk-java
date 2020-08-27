@@ -67,6 +67,7 @@ public class YbridPlayer implements Player {
     private PlaybackThread playbackThread;
     private PCMDataBlock initialAudioBlock;
     private PlayerState playerState = PlayerState.STOPPED;
+    private boolean autoReconnect = true;
 
     private class PlaybackThread extends Thread {
         private static final double AUDIO_BUFFER_MAX_BEFORE_REBUFFER = 0.01; // [s]. Must be > 0.
@@ -201,6 +202,33 @@ public class YbridPlayer implements Player {
             prepare();
     }
 
+    private void onInputEOF() {
+        LOGGER.info("Input EOF reached");
+
+        if (!autoReconnect)
+            return;
+
+        if (!session.isValid())
+            return;
+
+        if (muxer.isInHandover())
+            return;
+
+        LOGGER.info("Auto Reconnect is enabled, we have a valid session, and are not in a handover. Connecting new source and validating session.");
+
+        try {
+            connectSource();
+        } catch (IOException e) {
+            LOGGER.warning("Connecting new source failed.");
+        }
+
+        try {
+            session.refresh(SubInfo.VALIDITY);
+        } catch (IOException e) {
+            LOGGER.warning("Validating session failed.");
+        }
+    }
+
     private void distributeMetadata(@NotNull Metadata metadata, @NotNull PlayoutInfo playoutInfo) {
         metadataConsumer.onMetadataChange(metadata);
         metadataConsumer.onPlayoutInfoChange(playoutInfo);
@@ -232,7 +260,21 @@ public class YbridPlayer implements Player {
     private void connectSource() throws IOException {
         session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
 
+        /*
+         * We disconnect the inputEOFCallback while we connect a new source to avoid race conditions between the
+         * server sending EOF and us adding the new buffer.
+         */
+        muxer.setInputEOFCallback(null);
         muxer.addBuffer(decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session))));
+        muxer.setInputEOFCallback(this::onInputEOF);
+    }
+
+    public boolean isAutoReconnect() {
+        return autoReconnect;
+    }
+
+    public void setAutoReconnect(boolean autoReconnect) {
+        this.autoReconnect = autoReconnect;
     }
 
     @Override
