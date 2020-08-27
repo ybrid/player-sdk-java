@@ -69,11 +69,55 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
         }
     }
 
+    private static class Callback implements Runnable {
+        private @Nullable Runnable callback = null;
+        private boolean fired = false;
+        private boolean running = false;
+
+        public synchronized void setCallback(@Nullable Runnable callback) {
+            this.callback = callback;
+        }
+
+        public synchronized boolean isSet() {
+            return callback != null;
+        }
+
+        public synchronized void recover () {
+            fired = false;
+        }
+
+        @Override
+        public void run() {
+            final @NotNull Runnable runnable;
+
+            synchronized (this) {
+                if (fired || running || callback == null)
+                    return;
+
+                fired = true;
+                running = true;
+                runnable = callback;
+            }
+
+            new Thread(() -> {
+                try {
+                    runnable.run();
+                } catch (Throwable ignored) {
+                }
+                synchronized (Callback.this) {
+                    running = false;
+                }
+            }).start();
+        }
+    }
+
     private final @NotNull Set<BufferStatusConsumer> consumers = new HashSet<>();
     private final @NotNull DataBlockMetadataUpdateThread metadataUpdateThread;
     private final @NotNull List<Entry> buffers = new ArrayList<>();
     private Entry selectedBuffer;
     private @Nullable BufferStatus lastBufferStatus = null;
+    private final @NotNull Object callbackLock = new Object();
+    private final @NotNull Callback inputEOFCallback = new Callback();
 
     public BufferMuxer(@NotNull Session session) {
         metadataUpdateThread = new DataBlockMetadataUpdateThread("Main Metadata Update Thread", session);
@@ -138,6 +182,15 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
                 }
             }
             try {
+                synchronized (callbackLock) {
+                    if (inputEOFCallback.isSet()) {
+                        if (selectedBuffer.getBuffer().hasInputReachedEOF()) {
+                            inputEOFCallback.run();
+                        } else {
+                            inputEOFCallback.recover();
+                        }
+                    }
+                }
                 return selectedBuffer.read();
             } catch (Exception e) {
                 selectNext();
@@ -173,8 +226,15 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
         return false;
     }
 
+    public void setInputEOFCallback(@Nullable Runnable inputEOFCallback) {
+        synchronized (callbackLock) {
+            this.inputEOFCallback.setCallback(inputEOFCallback);
+        }
+    }
+
     @Override
     public void close() throws IOException {
+        setInputEOFCallback(null);
         synchronized (buffers) {
             for (final @NotNull Entry entry : buffers)
                 entry.getBuffer().close();
