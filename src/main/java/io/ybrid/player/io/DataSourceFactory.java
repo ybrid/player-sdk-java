@@ -31,6 +31,7 @@ import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.metadata.source.Source;
 import io.ybrid.api.metadata.source.SourceType;
+import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.transport.TransportDescription;
 import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.NonNls;
@@ -39,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URLConnection;
@@ -87,15 +89,26 @@ public final class DataSourceFactory {
             return ret;
         }
 
-        public URLSource(@NotNull URITransportDescription transportDescription) throws IOException {
+        public URLSource(@NotNull URITransportDescription transportDescription, @NotNull Session session) throws IOException {
             @NonNls URLConnection connection = transportDescription.getURI().toURL().openConnection();
+            final @Nullable MessageBody messageBody = transportDescription.getRequestBody();
 
             connection.setDoInput(true);
-            connection.setDoOutput(false);
+            connection.setDoOutput(messageBody != null);
 
             acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
             acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
             connection.setRequestProperty("Accept-Charset", "utf-8, *; q=0");
+
+            if (messageBody != null) {
+                final @NotNull OutputStream outputStream;
+
+                connection.setRequestProperty(HttpHelper.HEADER_CONTENT_TYPE, messageBody.getMediaType());
+
+                outputStream = connection.getOutputStream();
+                outputStream.write(messageBody.getBytes());
+                outputStream.close();
+            }
 
             connection.connect();
 
@@ -156,7 +169,7 @@ public final class DataSourceFactory {
                 }
             }
 
-            return new URLSource((URITransportDescription)transportDescription);
+            return new URLSource((URITransportDescription)transportDescription, session);
         } else {
             throw new IllegalArgumentException("Unsupported transport description: " + transportDescription);
         }

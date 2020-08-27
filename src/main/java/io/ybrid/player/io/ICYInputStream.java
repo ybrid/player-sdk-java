@@ -27,6 +27,7 @@ import io.ybrid.api.Session;
 import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
 import io.ybrid.api.bouquet.source.SourceServiceMetadata;
+import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.metadata.source.Source;
@@ -38,10 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.net.ssl.SSLSocketFactory;
-import java.io.BufferedInputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
@@ -123,6 +121,10 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
     @SuppressWarnings("HardCodedStringLiteral")
     private void sendRequest() throws IOException {
+        final @NotNull OutputStream outputStream;
+        final @Nullable MessageBody messageBody = transportDescription.getRequestBody();
+        final @Nullable byte[] body;
+
         String req = "GET " + path + " HTTP/1.0\r\n";
 
         req += "Host: " + host + ":" + port + "\r\n";
@@ -133,9 +135,21 @@ class ICYInputStream implements Closeable, ByteDataSource {
         req += "Accept-Charset: utf-8, *; q=0\r\n";
         req += "Accept-Encoding: identity, *; q=0\r\n";
         req += "Icy-MetaData: 1\r\n";
+
+        if (messageBody != null) {
+            req += HttpHelper.HEADER_CONTENT_TYPE + ": " + messageBody.getMediaType() + "\r\n";
+            body = messageBody.getBytes();
+            req += "Content-length: " + body.length + "\r\n";
+        } else {
+            body = null;
+        }
+
         req += "\r\n";
 
-        socket.getOutputStream().write(req.getBytes(StandardCharsets.US_ASCII));
+        outputStream = socket.getOutputStream();
+        outputStream.write(req.getBytes(StandardCharsets.US_ASCII));
+        if (body != null)
+            outputStream.write(body);
     }
 
     @Contract("_ -> new")
