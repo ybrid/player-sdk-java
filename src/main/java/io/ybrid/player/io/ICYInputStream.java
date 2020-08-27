@@ -89,6 +89,9 @@ class ICYInputStream implements Closeable, ByteDataSource {
             case "icyx":
                 secure = false;
                 break;
+            case "icyxs":
+                secure = true;
+                break;
                 /* Workarounds */
             case "http":
                 secure = false;
