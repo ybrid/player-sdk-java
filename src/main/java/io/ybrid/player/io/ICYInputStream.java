@@ -225,6 +225,8 @@ class ICYInputStream implements Closeable, ByteDataSource {
         }
         sendRequest();
         receiveReply();
+        //noinspection SpellCheckingInspection
+        LOGGER.info("ICY Request to " + (secure ? "icyxs://" : "icyx://") + host + ":" + port + path + " returned 200 [" + getContentType() + "]"); //NON-NLS
     }
 
 
