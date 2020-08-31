@@ -27,7 +27,6 @@ import io.ybrid.api.MetadataMixer;
 import io.ybrid.api.Session;
 import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
-import io.ybrid.api.metadata.source.Source;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -254,7 +253,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         LOGGER.info("Got fresh metadata: " + metadata); //NON-NLS
         LOGGER.info("Item: " + metadata.asItem()); //NON-NLS
         metadataUpdated = true;
-        session.getMetadataMixer().add(metadata.asItem(), Source.TRANSPORT, MetadataMixer.Position.CURRENT, null, ClockManager.now());
+        session.getMetadataMixer().add(metadata, MetadataMixer.Position.CURRENT, null, ClockManager.now());
     }
 
     private void readMetadata() throws IOException {

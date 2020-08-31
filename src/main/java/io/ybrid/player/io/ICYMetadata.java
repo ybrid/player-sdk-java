@@ -24,13 +24,18 @@ package io.ybrid.player.io;
 
 import io.ybrid.api.metadata.Item;
 import io.ybrid.api.metadata.SimpleItem;
+import io.ybrid.api.metadata.source.Source;
+import io.ybrid.api.metadata.source.SourceTrackMetadata;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-class ICYMetadata {
+class ICYMetadata implements SourceTrackMetadata {
+    private static final @NonNls String KEY_STREAM_TITLE = "StreamTitle";
+
     private final byte[] raw;
     private byte[] reduced;
     private final Map<String, String> values = new HashMap<>();
@@ -106,9 +111,19 @@ class ICYMetadata {
     }
 
     @NotNull Item asItem() {
-        final @Nullable String title = get("StreamTitle"); //NON-NLS
+        final @Nullable String title = get(KEY_STREAM_TITLE); //NON-NLS
 
         return new SimpleItem(UUID.randomUUID().toString(), null, title);
+    }
+
+    @Override
+    public @Nullable String getDisplayTitle() {
+        return get(KEY_STREAM_TITLE); //NON-NLS
+    }
+
+    @Override
+    public @NotNull Source getSource() {
+        return Source.TRANSPORT;
     }
 
     @Override
