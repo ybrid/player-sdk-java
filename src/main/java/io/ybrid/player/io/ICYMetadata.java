@@ -22,8 +22,6 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.metadata.Item;
-import io.ybrid.api.metadata.SimpleItem;
 import io.ybrid.api.metadata.source.Source;
 import io.ybrid.api.metadata.source.SourceTrackMetadata;
 import org.jetbrains.annotations.NonNls;
@@ -31,7 +29,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 class ICYMetadata implements SourceTrackMetadata {
     private static final @NonNls String KEY_STREAM_TITLE = "StreamTitle";
@@ -108,12 +109,6 @@ class ICYMetadata implements SourceTrackMetadata {
 
     String get(String key) {
         return getValues().get(key);
-    }
-
-    @NotNull Item asItem() {
-        final @Nullable String title = get(KEY_STREAM_TITLE); //NON-NLS
-
-        return new SimpleItem(UUID.randomUUID().toString(), null, title);
     }
 
     @Override

@@ -251,7 +251,6 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
         metadata = new ICYMetadata(rawMetadata);
         LOGGER.info("Got fresh metadata: " + metadata); //NON-NLS
-        LOGGER.info("Item: " + metadata.asItem()); //NON-NLS
         metadataUpdated = true;
         session.getMetadataMixer().add(metadata, MetadataMixer.Position.CURRENT, null, ClockManager.now());
     }
