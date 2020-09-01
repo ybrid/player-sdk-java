@@ -25,6 +25,8 @@ package io.ybrid.player.io;
 import io.ybrid.api.MetadataMixer;
 import io.ybrid.api.Session;
 import io.ybrid.api.TemporalValidity;
+import io.ybrid.api.bouquet.source.ICEBasedService;
+import io.ybrid.api.bouquet.source.SourceServiceMetadata;
 import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.metadata.source.Source;
@@ -232,6 +234,12 @@ class ICYInputStream implements Closeable, ByteDataSource {
         receiveReply();
         //noinspection SpellCheckingInspection
         LOGGER.info("ICY Request to " + (secure ? "icyxs://" : "icyx://") + host + ":" + port + path + " returned 200 [" + getContentType() + "]"); //NON-NLS
+
+        {
+            final @NotNull MetadataMixer mixer = session.getMetadataMixer();
+            final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getMetadata().getService().getIdentifier(), replyHeaders);
+            mixer.add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+        }
     }
 
 
