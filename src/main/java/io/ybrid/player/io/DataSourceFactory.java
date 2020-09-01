@@ -22,7 +22,15 @@
 
 package io.ybrid.player.io;
 
+import io.ybrid.api.MetadataMixer;
 import io.ybrid.api.Session;
+import io.ybrid.api.TemporalValidity;
+import io.ybrid.api.bouquet.source.ICEBasedService;
+import io.ybrid.api.bouquet.source.SourceServiceMetadata;
+import io.ybrid.api.metadata.InvalidMetadata;
+import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.metadata.source.Source;
+import io.ybrid.api.metadata.source.SourceType;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +40,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +52,7 @@ public final class DataSourceFactory {
     static final Logger LOGGER = Logger.getLogger(DataSourceFactory.class.getName());
 
     private static class URLSource implements ByteDataSource {
+        private final @NotNull Metadata metadata = new InvalidMetadata();
         private final InputStream inputStream;
         private final String contentType;
 
@@ -61,6 +71,20 @@ public final class DataSourceFactory {
             connection.setRequestProperty(header, ret.toString());
         }
 
+        private @NotNull Map<@NotNull String, @NotNull String> getHeadersAsMap(@NotNull URLConnection connection) {
+            final @NotNull Map<@NotNull String, @NotNull String> ret = new HashMap<>();
+
+            for (int i = 0; ; i++) {
+                final @Nullable String key = connection.getHeaderFieldKey(i);
+                final @Nullable String value = connection.getHeaderField(i);
+                if (key == null || value == null)
+                    break;
+                ret.put(key, value);
+            }
+
+            return ret;
+        }
+
         public URLSource(Session session) throws IOException {
             @NonNls URLConnection connection = session.getStreamURI().toURL().openConnection();
 
@@ -75,12 +99,19 @@ public final class DataSourceFactory {
 
             inputStream = connection.getInputStream();
             contentType = connection.getContentType();
+
+            {
+                final @NotNull Source source = new Source(SourceType.TRANSPORT);
+                final @NotNull MetadataMixer mixer = session.getMetadataMixer();
+                final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getMetadata().getService().getIdentifier(), getHeadersAsMap(connection));
+                mixer.add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+            }
         }
 
         @Override
         public @NotNull ByteDataBlock read() throws IOException {
             //noinspection MagicNumber
-            return new ByteDataBlock(null, null, inputStream, 1024*2);
+            return new ByteDataBlock(metadata, null, inputStream, 1024*2);
         }
 
         @Override
