@@ -39,10 +39,12 @@ class ICYMetadata implements SourceTrackMetadata {
     private static final @NonNls String KEY_STREAM_TITLE = "StreamTitle";
 
     private final @NotNull Map<String, String> values = new HashMap<>();
+    private final @NotNull Source source;
     private final @NotNull byte[] raw;
     private byte[] reduced;
 
-    ICYMetadata(@NotNull byte[] raw) {
+    ICYMetadata(@NotNull Source source, @NotNull byte[] raw) {
+        this.source = source;
         this.raw = raw;
         parse();
     }
@@ -119,7 +121,7 @@ class ICYMetadata implements SourceTrackMetadata {
 
     @Override
     public @NotNull Source getSource() {
-        return Source.TRANSPORT;
+        return source;
     }
 
     @Override
