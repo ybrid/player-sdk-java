@@ -103,7 +103,7 @@ public final class DataSourceFactory {
             {
                 final @NotNull Source source = new Source(SourceType.TRANSPORT);
                 final @NotNull MetadataMixer mixer = session.getMetadataMixer();
-                final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getMetadata().getService().getIdentifier(), getHeadersAsMap(connection));
+                final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getCurrentService().getIdentifier(), getHeadersAsMap(connection));
                 mixer.add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
             }
         }

@@ -237,7 +237,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
         {
             final @NotNull MetadataMixer mixer = session.getMetadataMixer();
-            final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getMetadata().getService().getIdentifier(), replyHeaders);
+            final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getCurrentService().getIdentifier(), replyHeaders);
             mixer.add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
         }
     }
