@@ -22,11 +22,15 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.ClockManager;
 import io.ybrid.api.MetadataMixer;
 import io.ybrid.api.Session;
+import io.ybrid.api.TemporalValidity;
+import io.ybrid.api.bouquet.source.ICEBasedService;
+import io.ybrid.api.bouquet.source.SourceServiceMetadata;
 import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.metadata.source.Source;
+import io.ybrid.api.metadata.source.SourceType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +58,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private static final int MAX_METATDATA_INTERVAL = 128*1024;
     private static final int READ_BUFFER_LENGTH = 2048;
     private static final int ICY_METADATA_BLOCK_MULTIPLAYER = 16;
+    private final @NotNull Source source;
     private final Session session;
     private final String host;
     private int port;
@@ -71,6 +76,8 @@ class ICYInputStream implements Closeable, ByteDataSource {
     @SuppressWarnings("HardCodedStringLiteral")
     public ICYInputStream(@NotNull Session session) throws MalformedURLException {
         URI uri = session.getStreamURI();
+
+        this.source = new Source(SourceType.TRANSPORT);
 
         this.session = session;
 
@@ -95,7 +102,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         port = uri.getPort();
         if (port < 1)
             port = uri.toURL().getDefaultPort();
-        if (uri.getQuery().isEmpty()) {
+        if (uri.getQuery() == null || uri.getQuery().isEmpty()) {
             path = uri.getPath();
         } else {
             path = uri.getPath() + "?" + uri.getQuery();
@@ -227,6 +234,12 @@ class ICYInputStream implements Closeable, ByteDataSource {
         receiveReply();
         //noinspection SpellCheckingInspection
         LOGGER.info("ICY Request to " + (secure ? "icyxs://" : "icyx://") + host + ":" + port + path + " returned 200 [" + getContentType() + "]"); //NON-NLS
+
+        {
+            final @NotNull MetadataMixer mixer = session.getMetadataMixer();
+            final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getCurrentService().getIdentifier(), replyHeaders);
+            mixer.add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+        }
     }
 
 
@@ -249,11 +262,10 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (ret != length)
             throw new IOException("Can not read body: length = " + length + ", ret = " + ret);
 
-        metadata = new ICYMetadata(rawMetadata);
+        metadata = new ICYMetadata(source, rawMetadata);
         LOGGER.info("Got fresh metadata: " + metadata); //NON-NLS
-        LOGGER.info("Item: " + metadata.asItem()); //NON-NLS
         metadataUpdated = true;
-        session.getMetadataMixer().add(metadata.asItem(), MetadataMixer.Source.TRANSPORT, MetadataMixer.Position.CURRENT, null, ClockManager.now());
+        session.getMetadataMixer().add(metadata, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
     }
 
     private void readMetadata() throws IOException {

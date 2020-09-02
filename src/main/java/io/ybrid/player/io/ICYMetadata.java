@@ -22,20 +22,29 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.metadata.Item;
-import io.ybrid.api.metadata.SimpleItem;
+import io.ybrid.api.metadata.source.Source;
+import io.ybrid.api.metadata.source.SourceTrackMetadata;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-class ICYMetadata {
-    private final byte[] raw;
+class ICYMetadata implements SourceTrackMetadata {
+    private static final @NonNls String KEY_STREAM_TITLE = "StreamTitle";
+
+    private final @NotNull Map<String, String> values = new HashMap<>();
+    private final @NotNull Source source;
+    private final @NotNull byte[] raw;
     private byte[] reduced;
-    private final Map<String, String> values = new HashMap<>();
 
-    ICYMetadata(byte[] raw) {
+    ICYMetadata(@NotNull Source source, @NotNull byte[] raw) {
+        this.source = source;
         this.raw = raw;
         parse();
     }
@@ -93,22 +102,26 @@ class ICYMetadata {
             offset = parseKeyValue(reduced, offset);
     }
 
-    byte[] getRaw() {
+    @NotNull byte[] getRaw() {
         return raw;
     }
 
-    Map<String, String> getValues() {
+    @NotNull @UnmodifiableView Map<String, String> getValues() {
         return Collections.unmodifiableMap(values);
     }
 
-    String get(String key) {
+    @Nullable String get(@NotNull @NonNls String key) {
         return getValues().get(key);
     }
 
-    @NotNull Item asItem() {
-        final @Nullable String title = get("StreamTitle"); //NON-NLS
+    @Override
+    public @Nullable String getDisplayTitle() {
+        return get(KEY_STREAM_TITLE); //NON-NLS
+    }
 
-        return new SimpleItem(UUID.randomUUID().toString(), null, title);
+    @Override
+    public @NotNull Source getSource() {
+        return source;
     }
 
     @Override

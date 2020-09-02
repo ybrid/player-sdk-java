@@ -389,11 +389,6 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public @NotNull Service getCurrentService() {
-        return session.getCurrentService();
-    }
-
-    @Override
     public boolean isValid() {
         return session.isValid();
     }
