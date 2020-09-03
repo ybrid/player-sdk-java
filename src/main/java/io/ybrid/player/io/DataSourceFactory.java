@@ -54,7 +54,7 @@ public final class DataSourceFactory {
     static final Logger LOGGER = Logger.getLogger(DataSourceFactory.class.getName());
 
     private static class URLSource implements ByteDataSource {
-        private final @NotNull Metadata metadata = new InvalidMetadata();
+        private final @NotNull Metadata metadata;
         private final InputStream inputStream;
         private final String contentType;
 
@@ -115,6 +115,7 @@ public final class DataSourceFactory {
 
             {
                 final @NotNull SourceServiceMetadata service = new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), getHeadersAsMap(connection));
+                metadata = new InvalidMetadata(service);
                 transportDescription.getMetadataMixer().add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
             }
         }

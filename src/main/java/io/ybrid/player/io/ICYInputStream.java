@@ -66,6 +66,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private int pos = 0;
     private ICYMetadata metadata;
     private boolean metadataUpdated = false;
+    private SourceServiceMetadata service = null;
     private Metadata blockMetadata = null;
 
     @SuppressWarnings("HardCodedStringLiteral")
@@ -241,7 +242,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
         LOGGER.info("ICY Request to " + (secure ? "icyxs://" : "icyx://") + host + ":" + port + path + " returned 200 [" + getContentType() + "]"); //NON-NLS
 
         {
-            final @NotNull SourceServiceMetadata service = new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), replyHeaders);
+            service = new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), replyHeaders);
             transportDescription.getMetadataMixer().add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
         }
     }
@@ -317,7 +318,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
             todo = MAX_READ_LENGTH;
 
         if (metadataUpdated)
-            blockMetadata = new InvalidMetadata();
+            blockMetadata = new InvalidMetadata(service);
 
         block = new ByteDataBlock(blockMetadata, null, inputStream, todo);
 
