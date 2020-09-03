@@ -27,11 +27,9 @@ import io.ybrid.api.Session;
 import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
 import io.ybrid.api.bouquet.source.SourceServiceMetadata;
+import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
-import io.ybrid.api.metadata.source.Source;
-import io.ybrid.api.metadata.source.SourceType;
-import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.transport.TransportDescription;
 import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.NonNls;
@@ -89,7 +87,7 @@ public final class DataSourceFactory {
             return ret;
         }
 
-        public URLSource(@NotNull URITransportDescription transportDescription, @NotNull Session session) throws IOException {
+        public URLSource(@NotNull URITransportDescription transportDescription) throws IOException {
             @NonNls URLConnection connection = transportDescription.getURI().toURL().openConnection();
             final @Nullable MessageBody messageBody = transportDescription.getRequestBody();
 
@@ -116,10 +114,8 @@ public final class DataSourceFactory {
             contentType = connection.getContentType();
 
             {
-                final @NotNull Source source = new Source(SourceType.TRANSPORT);
-                final @NotNull MetadataMixer mixer = session.getMetadataMixer();
-                final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getCurrentService().getIdentifier(), getHeadersAsMap(connection));
-                mixer.add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+                final @NotNull SourceServiceMetadata service = new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), getHeadersAsMap(connection));
+                transportDescription.getMetadataMixer().add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
             }
         }
 
@@ -164,12 +160,12 @@ public final class DataSourceFactory {
             //noinspection SpellCheckingInspection
             if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS
                 try {
-                    return new ICYInputStream((URITransportDescription)transportDescription, session);
+                    return new ICYInputStream((URITransportDescription)transportDescription);
                 } catch (MalformedURLException ignored) {
                 }
             }
 
-            return new URLSource((URITransportDescription)transportDescription, session);
+            return new URLSource((URITransportDescription)transportDescription);
         } else {
             throw new IllegalArgumentException("Unsupported transport description: " + transportDescription);
         }
