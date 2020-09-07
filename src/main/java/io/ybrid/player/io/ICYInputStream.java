@@ -23,24 +23,20 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.MetadataMixer;
-import io.ybrid.api.Session;
 import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
 import io.ybrid.api.bouquet.source.SourceServiceMetadata;
+import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
-import io.ybrid.api.metadata.source.Source;
-import io.ybrid.api.metadata.source.SourceType;
+import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.net.ssl.SSLSocketFactory;
-import java.io.BufferedInputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
@@ -58,8 +54,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private static final int MAX_METATDATA_INTERVAL = 128*1024;
     private static final int READ_BUFFER_LENGTH = 2048;
     private static final int ICY_METADATA_BLOCK_MULTIPLAYER = 16;
-    private final @NotNull Source source;
-    private final Session session;
+    private final @NotNull URITransportDescription transportDescription;
     private final String host;
     private int port;
     private final String path;
@@ -71,27 +66,22 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private int pos = 0;
     private ICYMetadata metadata;
     private boolean metadataUpdated = false;
+    private SourceServiceMetadata service = null;
     private Metadata blockMetadata = null;
 
     @SuppressWarnings("HardCodedStringLiteral")
-    public ICYInputStream(@NotNull Session session) throws MalformedURLException {
-        URI uri = session.getStreamURI();
+    public ICYInputStream(@NotNull URITransportDescription transportDescription) throws MalformedURLException {
+        final URI uri = transportDescription.getURI();
 
-        this.source = new Source(SourceType.TRANSPORT);
+        this.transportDescription = transportDescription;
 
-        this.session = session;
-
-        System.out.println("url = " + uri);
+        LOGGER.info("URL = " + uri);
 
         switch (uri.getScheme()) {
             case "icyx":
                 secure = false;
                 break;
-                /* Workarounds */
-            case "http":
-                secure = false;
-                break;
-            case "https":
+            case "icyxs":
                 secure = true;
                 break;
             default:
@@ -125,19 +115,35 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
     @SuppressWarnings("HardCodedStringLiteral")
     private void sendRequest() throws IOException {
+        final @NotNull OutputStream outputStream;
+        final @Nullable MessageBody messageBody = transportDescription.getRequestBody();
+        final @Nullable byte[] body;
+
         String req = "GET " + path + " HTTP/1.0\r\n";
 
         req += "Host: " + host + ":" + port + "\r\n";
         req += "Connection: close\r\n";
         req += "User-Agent: Ybrid Player\r\n";
-        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT, session.getAcceptedMediaFormats());
-        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT_LANGUAGE, session.getAcceptedLanguages());
+        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
+        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
         req += "Accept-Charset: utf-8, *; q=0\r\n";
         req += "Accept-Encoding: identity, *; q=0\r\n";
         req += "Icy-MetaData: 1\r\n";
+
+        if (messageBody != null) {
+            req += HttpHelper.HEADER_CONTENT_TYPE + ": " + messageBody.getMediaType() + "\r\n";
+            body = messageBody.getBytes();
+            req += "Content-length: " + body.length + "\r\n";
+        } else {
+            body = null;
+        }
+
         req += "\r\n";
 
-        socket.getOutputStream().write(req.getBytes(StandardCharsets.US_ASCII));
+        outputStream = socket.getOutputStream();
+        outputStream.write(req.getBytes(StandardCharsets.US_ASCII));
+        if (body != null)
+            outputStream.write(body);
     }
 
     @Contract("_ -> new")
@@ -236,9 +242,8 @@ class ICYInputStream implements Closeable, ByteDataSource {
         LOGGER.info("ICY Request to " + (secure ? "icyxs://" : "icyx://") + host + ":" + port + path + " returned 200 [" + getContentType() + "]"); //NON-NLS
 
         {
-            final @NotNull MetadataMixer mixer = session.getMetadataMixer();
-            final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getCurrentService().getIdentifier(), replyHeaders);
-            mixer.add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+            service = new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), replyHeaders);
+            transportDescription.getMetadataMixer().add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
         }
     }
 
@@ -262,10 +267,10 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (ret != length)
             throw new IOException("Can not read body: length = " + length + ", ret = " + ret);
 
-        metadata = new ICYMetadata(source, rawMetadata);
+        metadata = new ICYMetadata(transportDescription.getSource(), rawMetadata);
         LOGGER.info("Got fresh metadata: " + metadata); //NON-NLS
         metadataUpdated = true;
-        session.getMetadataMixer().add(metadata, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+        transportDescription.getMetadataMixer().add(metadata, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
     }
 
     private void readMetadata() throws IOException {
@@ -313,7 +318,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
             todo = MAX_READ_LENGTH;
 
         if (metadataUpdated)
-            blockMetadata = new InvalidMetadata();
+            blockMetadata = new InvalidMetadata(service);
 
         block = new ByteDataBlock(blockMetadata, null, inputStream, todo);
 

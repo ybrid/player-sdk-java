@@ -27,16 +27,18 @@ import io.ybrid.api.Session;
 import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
 import io.ybrid.api.bouquet.source.SourceServiceMetadata;
+import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.InvalidMetadata;
 import io.ybrid.api.metadata.Metadata;
-import io.ybrid.api.metadata.source.Source;
-import io.ybrid.api.metadata.source.SourceType;
+import io.ybrid.api.transport.TransportDescription;
+import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URLConnection;
@@ -52,7 +54,7 @@ public final class DataSourceFactory {
     static final Logger LOGGER = Logger.getLogger(DataSourceFactory.class.getName());
 
     private static class URLSource implements ByteDataSource {
-        private final @NotNull Metadata metadata = new InvalidMetadata();
+        private final @NotNull Metadata metadata;
         private final InputStream inputStream;
         private final String contentType;
 
@@ -85,15 +87,26 @@ public final class DataSourceFactory {
             return ret;
         }
 
-        public URLSource(Session session) throws IOException {
-            @NonNls URLConnection connection = session.getStreamURI().toURL().openConnection();
+        public URLSource(@NotNull URITransportDescription transportDescription) throws IOException {
+            @NonNls URLConnection connection = transportDescription.getURI().toURL().openConnection();
+            final @Nullable MessageBody messageBody = transportDescription.getRequestBody();
 
             connection.setDoInput(true);
-            connection.setDoOutput(false);
+            connection.setDoOutput(messageBody != null);
 
-            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, session.getAcceptedMediaFormats());
-            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, session.getAcceptedLanguages());
+            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
+            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
             connection.setRequestProperty("Accept-Charset", "utf-8, *; q=0");
+
+            if (messageBody != null) {
+                final @NotNull OutputStream outputStream;
+
+                connection.setRequestProperty(HttpHelper.HEADER_CONTENT_TYPE, messageBody.getMediaType());
+
+                outputStream = connection.getOutputStream();
+                outputStream.write(messageBody.getBytes());
+                outputStream.close();
+            }
 
             connection.connect();
 
@@ -101,10 +114,9 @@ public final class DataSourceFactory {
             contentType = connection.getContentType();
 
             {
-                final @NotNull Source source = new Source(SourceType.TRANSPORT);
-                final @NotNull MetadataMixer mixer = session.getMetadataMixer();
-                final @NotNull SourceServiceMetadata service = new ICEBasedService(source, mixer.getCurrentService().getIdentifier(), getHeadersAsMap(connection));
-                mixer.add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+                final @NotNull SourceServiceMetadata service = new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), getHeadersAsMap(connection));
+                metadata = new InvalidMetadata(service);
+                transportDescription.getMetadataMixer().add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
             }
         }
 
@@ -138,19 +150,25 @@ public final class DataSourceFactory {
      * @throws IOException I/O-Errors as thrown by the used backends.
      */
     public static ByteDataSource getSourceBySession(Session session) throws IOException {
-        final @NotNull URI uri = session.getStreamURI();
-        final @NotNull String scheme = uri.getScheme();
+        final @NotNull TransportDescription transportDescription = session.getStreamTransportDescription();
 
-        LOGGER.log(Level.INFO, "getSourceBySession(session="+session+"): uri=" + uri); //NON-NLS
+        if (transportDescription instanceof URITransportDescription) {
+            final @NotNull URI uri = ((URITransportDescription) transportDescription).getURI();
+            final @NotNull String scheme = uri.getScheme();
 
-        //noinspection SpellCheckingInspection
-        if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS
-            try {
-                return new ICYInputStream(session);
-            } catch (MalformedURLException ignored) {
+            LOGGER.log(Level.INFO, "getSourceBySession(session=" + session + "): uri=" + uri); //NON-NLS
+
+            //noinspection SpellCheckingInspection
+            if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS
+                try {
+                    return new ICYInputStream((URITransportDescription)transportDescription);
+                } catch (MalformedURLException ignored) {
+                }
             }
-        }
 
-        return new URLSource(session);
+            return new URLSource((URITransportDescription)transportDescription);
+        } else {
+            throw new IllegalArgumentException("Unsupported transport description: " + transportDescription);
+        }
     }
 }
