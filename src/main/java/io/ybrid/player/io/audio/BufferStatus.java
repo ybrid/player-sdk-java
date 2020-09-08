@@ -22,7 +22,10 @@
 
 package io.ybrid.player.io.audio;
 
+import io.ybrid.api.Identifier;
+import io.ybrid.api.hasIdentifier;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -31,10 +34,10 @@ import java.time.Instant;
 /**
  * This class is used to hold a state of the {@link Buffer}.
  */
-final public class BufferStatus implements Serializable {
+final public class BufferStatus implements Serializable, hasIdentifier {
     private static final long serialVersionUID = -3172756405966691712L;
 
-    private final @Nullable String identifier;
+    private final @NotNull Identifier identifier;
     private final long underruns;
     private final Instant underrunTimestamp;
     private final long overruns;
@@ -48,7 +51,7 @@ final public class BufferStatus implements Serializable {
     private final long currentSamplesRead;
     private final long currentSamplesForwarded;
 
-    BufferStatus(@Nullable String identifier,
+    BufferStatus(@NotNull Identifier identifier,
                  long underruns, Instant underrunTimestamp,
                  long overruns, @Nullable Instant overrunTimestamp,
                  double max, @Nullable Instant maxTimestamp,
@@ -73,7 +76,8 @@ final public class BufferStatus implements Serializable {
      * Gets the identifier of the buffer.
      * @return The identifier of the buffer.
      */
-    public @Nullable String getIdentifier() {
+    @Override
+    public @NotNull Identifier getIdentifier() {
         return identifier;
     }
 

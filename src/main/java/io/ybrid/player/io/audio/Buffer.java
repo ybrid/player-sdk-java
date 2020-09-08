@@ -22,6 +22,8 @@
 
 package io.ybrid.player.io.audio;
 
+import io.ybrid.api.Identifier;
+import io.ybrid.api.hasIdentifier;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.DataSource;
 import io.ybrid.player.io.PCMDataBlock;
@@ -44,11 +46,11 @@ import java.util.function.Consumer;
  *
  * The purpose of this class is to provide a buffer for audio.
  */
-public class Buffer implements PCMDataSource, BufferStatusProvider {
+public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifier {
     private static final String AUDIO_BUFFER_THREAD_NAME = "Audio Buffer Thread"; //NON-NLS
 
     private final BufferThread thread;
-    private @Nullable String identifier;
+    private @NotNull Identifier identifier;
 
     private static class Status implements BufferStatusProvider {
         private static final Duration MINIMUM_BETWEEN_ANNOUNCE = Duration.ofMillis(1000);
@@ -284,7 +286,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
      * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
     public Buffer(double target, @NotNull PCMDataSource backend, Consumer<DataBlock> inputConsumer) {
-        this(null, target, backend, inputConsumer);
+        this(new Identifier(), target, backend, inputConsumer);
     }
 
     /**
@@ -295,7 +297,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
      * @param backend The backend to use.
      * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
-    public Buffer(@Nullable String identifier, double target, @NotNull PCMDataSource backend, Consumer<DataBlock> inputConsumer) {
+    public Buffer(@Nullable Identifier identifier, double target, @NotNull PCMDataSource backend, Consumer<DataBlock> inputConsumer) {
         setIdentifier(identifier);
         thread = new BufferThread(AUDIO_BUFFER_THREAD_NAME, this, backend, inputConsumer, target);
         thread.start();
@@ -305,7 +307,8 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
      * Gets the identifier for this buffer.
      * @return The identifier.
      */
-    public @Nullable String getIdentifier() {
+    @Override
+    public @NotNull Identifier getIdentifier() {
         return identifier;
     }
 
@@ -315,7 +318,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider {
      *
      * @param identifier The identifier to set to.
      */
-    public void setIdentifier(@Nullable String identifier) {
+    public void setIdentifier(@Nullable Identifier identifier) {
         if (this.identifier != null && !this.identifier.equals(identifier))
             throw new IllegalArgumentException("Identifier can not be updated (while trying to update from " + this.identifier + " to " + identifier + ")");
         this.identifier = identifier;
