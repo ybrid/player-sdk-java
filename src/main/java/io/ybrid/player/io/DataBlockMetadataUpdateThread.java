@@ -26,9 +26,10 @@ import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.Session;
 import io.ybrid.api.SubInfo;
 import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.session.Command;
+import io.ybrid.api.transaction.SessionTransaction;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.EnumSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -70,11 +71,11 @@ public class DataBlockMetadataUpdateThread extends Thread implements Consumer<Da
                 }
 
                 if (metadata != null && !metadata.isValid()) {
-                    try {
-                        session.refresh(EnumSet.of(SubInfo.METADATA, SubInfo.PLAYOUT));
+                    final @NotNull SessionTransaction transaction = session.createTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.METADATA, SubInfo.PLAYOUT)));
+                    transaction.run();
+                    if (transaction.getError() == null) {
                         metadata = session.getMetadata();
                         playoutInfo = session.getPlayoutInfo();
-                    } catch (IOException ignored) {
                     }
                 }
 

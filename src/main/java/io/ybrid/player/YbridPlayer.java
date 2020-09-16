@@ -22,11 +22,17 @@
 
 package io.ybrid.player;
 
-import io.ybrid.api.*;
+import io.ybrid.api.PlayoutInfo;
+import io.ybrid.api.Session;
+import io.ybrid.api.SubInfo;
+import io.ybrid.api.SwapMode;
 import io.ybrid.api.bouquet.Bouquet;
 import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.session.Command;
+import io.ybrid.api.session.Request;
+import io.ybrid.api.transaction.SessionTransaction;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
@@ -223,7 +229,7 @@ public class YbridPlayer implements Player {
         }
 
         try {
-            session.refresh(SubInfo.VALIDITY);
+            executeRequestAsTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.VALIDITY)));
         } catch (IOException e) {
             LOGGER.warning("Validating session failed.");
         }
@@ -319,58 +325,72 @@ public class YbridPlayer implements Player {
         return session.getBouquet();
     }
 
+    private void executeRequestAsTransaction(@NotNull Request request) throws IOException {
+        final @NotNull SessionTransaction transaction = session.createTransaction(request);
+        final @Nullable Throwable error;
+
+        transaction.run();
+        error = transaction.getError();
+
+        if (error == null)
+            return;
+
+        if (error instanceof IOException)
+            throw (IOException)error;
+
+        throw new IOException(error);
+    }
+
     @Override
     public void refresh(@NotNull SubInfo what) throws IOException {
-        session.refresh(what);
-        capabilitiesChange();
-        bouquetChange();
+        refresh(EnumSet.of(what));
     }
 
     @Override
     public void refresh(@NotNull EnumSet<SubInfo> what) throws IOException {
-        session.refresh(what);
+        executeRequestAsTransaction(Command.REFRESH.makeRequest(what));
         capabilitiesChange();
         bouquetChange();
     }
 
     @Override
     public void windToLive() throws IOException {
-        session.windToLive();
+        executeRequestAsTransaction(Command.WIND_TO_LIVE.makeRequest());
     }
 
     @Override
     public void windTo(@NotNull Instant timestamp) throws IOException {
-        session.windTo(timestamp);
+        executeRequestAsTransaction(Command.WIND_TO.makeRequest(timestamp));
     }
 
     @Override
     public void wind(@NotNull Duration duration) throws IOException {
-        session.wind(duration);
+        executeRequestAsTransaction(Command.WIND_BY.makeRequest(duration));
     }
 
     @Override
     public void skipForwards(ItemType itemType) throws IOException {
-        session.skipForwards(itemType);
+        executeRequestAsTransaction(Command.SKIP_FORWARD.makeRequest(itemType));
     }
 
     @Override
     public void skipBackwards(ItemType itemType) throws IOException {
-        session.skipBackwards(itemType);
+        executeRequestAsTransaction(Command.SKIP_BACKWARD.makeRequest(itemType));
     }
 
     @Override
     public void swapItem(SwapMode mode) throws IOException {
-        session.swapItem(mode);
+        executeRequestAsTransaction(Command.SWAP_ITEM.makeRequest(mode));
     }
 
     @Override
     public void swapService(@NotNull Service service) throws IOException {
-        session.swapService(service);
+        executeRequestAsTransaction(Command.SWAP_SERVICE.makeRequest(service));
     }
 
     @Override
     public void swapToMain() throws IOException {
-        session.swapToMain();
+        executeRequestAsTransaction(Command.SWAP_TO_MAIN_SERVICE.makeRequest());
     }
 
     @Override

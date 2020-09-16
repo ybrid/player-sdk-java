@@ -22,7 +22,6 @@
 
 package io.ybrid.player;
 
-import io.ybrid.api.SessionClient;
 import io.ybrid.player.io.audio.BufferStatusProvider;
 
 import java.io.Closeable;
