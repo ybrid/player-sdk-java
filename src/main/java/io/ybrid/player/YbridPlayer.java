@@ -268,7 +268,7 @@ public class YbridPlayer implements Player {
         }
 
         try {
-            executeRequestAsTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.VALIDITY)));
+            executeRequestAsTransaction(Command.REFRESH, EnumSet.of(SubInfo.VALIDITY));
         } catch (IOException e) {
             LOGGER.warning("Validating session failed.");
         }
@@ -362,6 +362,14 @@ public class YbridPlayer implements Player {
         throw new IOException(error);
     }
 
+    private void executeRequestAsTransaction(@NotNull Command command) throws IOException {
+        executeRequestAsTransaction(command.makeRequest());
+    }
+
+    private void executeRequestAsTransaction(@NotNull Command command, @Nullable Object argument) throws IOException {
+        executeRequestAsTransaction(command.makeRequest(argument));
+    }
+
     @Override
     public void refresh(@NotNull SubInfo what) throws IOException {
         refresh(EnumSet.of(what));
@@ -369,49 +377,49 @@ public class YbridPlayer implements Player {
 
     @Override
     public void refresh(@NotNull EnumSet<SubInfo> what) throws IOException {
-        executeRequestAsTransaction(Command.REFRESH.makeRequest(what));
+        executeRequestAsTransaction(Command.REFRESH, what);
         capabilitiesChange();
         bouquetChange();
     }
 
     @Override
     public void windToLive() throws IOException {
-        executeRequestAsTransaction(Command.WIND_TO_LIVE.makeRequest());
+        executeRequestAsTransaction(Command.WIND_TO_LIVE);
     }
 
     @Override
     public void windTo(@NotNull Instant timestamp) throws IOException {
-        executeRequestAsTransaction(Command.WIND_TO.makeRequest(timestamp));
+        executeRequestAsTransaction(Command.WIND_TO, timestamp);
     }
 
     @Override
     public void wind(@NotNull Duration duration) throws IOException {
-        executeRequestAsTransaction(Command.WIND_BY.makeRequest(duration));
+        executeRequestAsTransaction(Command.WIND_BY, duration);
     }
 
     @Override
     public void skipForwards(ItemType itemType) throws IOException {
-        executeRequestAsTransaction(Command.SKIP_FORWARD.makeRequest(itemType));
+        executeRequestAsTransaction(Command.SKIP_FORWARD, itemType);
     }
 
     @Override
     public void skipBackwards(ItemType itemType) throws IOException {
-        executeRequestAsTransaction(Command.SKIP_BACKWARD.makeRequest(itemType));
+        executeRequestAsTransaction(Command.SKIP_BACKWARD, itemType);
     }
 
     @Override
     public void swapItem(SwapMode mode) throws IOException {
-        executeRequestAsTransaction(Command.SWAP_ITEM.makeRequest(mode));
+        executeRequestAsTransaction(Command.SWAP_ITEM, mode);
     }
 
     @Override
     public void swapService(@NotNull Service service) throws IOException {
-        executeRequestAsTransaction(Command.SWAP_SERVICE.makeRequest(service));
+        executeRequestAsTransaction(Command.SWAP_SERVICE, service);
     }
 
     @Override
     public void swapToMain() throws IOException {
-        executeRequestAsTransaction(Command.SWAP_TO_MAIN_SERVICE.makeRequest());
+        executeRequestAsTransaction(Command.SWAP_TO_MAIN_SERVICE);
     }
 
     @Override
