@@ -32,7 +32,7 @@ import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.session.Request;
-import io.ybrid.api.transaction.SessionTransaction;
+import io.ybrid.api.transaction.Transaction;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
@@ -326,7 +326,7 @@ public class YbridPlayer implements Player {
     }
 
     private void executeRequestAsTransaction(@NotNull Request request) throws IOException {
-        final @NotNull SessionTransaction transaction = session.createTransaction(request);
+        final @NotNull Transaction transaction = session.createTransaction(request);
         final @Nullable Throwable error;
 
         transaction.run();

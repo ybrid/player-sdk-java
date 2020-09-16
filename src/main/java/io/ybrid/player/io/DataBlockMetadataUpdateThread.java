@@ -27,7 +27,7 @@ import io.ybrid.api.Session;
 import io.ybrid.api.SubInfo;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.session.Command;
-import io.ybrid.api.transaction.SessionTransaction;
+import io.ybrid.api.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
@@ -71,7 +71,7 @@ public class DataBlockMetadataUpdateThread extends Thread implements Consumer<Da
                 }
 
                 if (metadata != null && !metadata.isValid()) {
-                    final @NotNull SessionTransaction transaction = session.createTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.METADATA, SubInfo.PLAYOUT)));
+                    final @NotNull Transaction transaction = session.createTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.METADATA, SubInfo.PLAYOUT)));
                     transaction.run();
                     if (transaction.getError() == null) {
                         metadata = session.getMetadata();
