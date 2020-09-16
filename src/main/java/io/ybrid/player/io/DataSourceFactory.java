@@ -23,7 +23,6 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.MetadataMixer;
-import io.ybrid.api.Session;
 import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
 import io.ybrid.api.bouquet.source.SourceServiceMetadata;
@@ -143,20 +142,18 @@ public final class DataSourceFactory {
     }
 
     /**
-     * This builds a {@link ByteDataSource} for the audio stream of a {@link Session}.
+     * This builds a {@link ByteDataSource} for the audio stream based on a {@link TransportDescription}.
      *
-     * @param session The {@link Session} to use.
+     * @param transportDescription The {@link TransportDescription} to use.
      * @return The {@link ByteDataSource} for the stream.
      * @throws IOException I/O-Errors as thrown by the used backends.
      */
-    public static ByteDataSource getSourceBySession(Session session) throws IOException {
-        final @NotNull TransportDescription transportDescription = session.getStreamTransportDescription();
-
+    public static ByteDataSource getSourceByTransportDescription(@NotNull TransportDescription transportDescription) throws IOException {
         if (transportDescription instanceof URITransportDescription) {
             final @NotNull URI uri = ((URITransportDescription) transportDescription).getURI();
             final @NotNull String scheme = uri.getScheme();
 
-            LOGGER.log(Level.INFO, "getSourceBySession(session=" + session + "): uri=" + uri); //NON-NLS
+            LOGGER.log(Level.INFO, "getSourceByTransportDescription(session=" + transportDescription + "): uri=" + uri); //NON-NLS
 
             //noinspection SpellCheckingInspection
             if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS

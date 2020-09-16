@@ -31,8 +31,10 @@ import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.session.Command;
+import io.ybrid.api.session.PlayerControl;
 import io.ybrid.api.session.Request;
 import io.ybrid.api.transaction.Transaction;
+import io.ybrid.api.transport.TransportDescription;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
@@ -48,6 +50,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -71,6 +74,7 @@ public class YbridPlayer implements Player {
     private AudioBackend audioBackend;
     private final @NotNull BufferMuxer muxer;
     private PlaybackThread playbackThread;
+    private final @NotNull PlayerControl playerControl;
     private PCMDataBlock initialAudioBlock;
     private PlayerState playerState = PlayerState.STOPPED;
     private boolean autoReconnect = true;
@@ -188,6 +192,38 @@ public class YbridPlayer implements Player {
         }
     }
 
+    private @NotNull PlayerControl buildPlayerControl() {
+        return new PlayerControl() {
+            @Override
+            public void onDetach(@NotNull Session unused) {
+                close();
+            }
+
+            @Override
+            public @NotNull Map<String, Double> getAcceptedMediaFormats() {
+                return decoderFactory.getSupportedFormats();
+            }
+
+            @Override
+            public void connectTransport(@NotNull TransportDescription transportDescription) throws Exception {
+                final @Nullable Decoder decoder;
+
+                /*
+                 * We disconnect the inputEOFCallback while we connect a new source to avoid race conditions between the
+                 * server sending EOF and us adding the new buffer.
+                 */
+                muxer.setInputEOFCallback(null);
+                decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceByTransportDescription(transportDescription)));
+                if (decoder == null) {
+                    LOGGER.warning("Can not create decoder for new input.");
+                } else {
+                    muxer.addBuffer(decoder);
+                }
+                muxer.setInputEOFCallback(() -> onInputEOF());
+            }
+        };
+    }
+
     /**
      * Creates a new instance of the player.
      *
@@ -200,7 +236,9 @@ public class YbridPlayer implements Player {
         this.session = session;
         this.decoderFactory = decoderFactory;
         this.audioBackendFactory = audioBackendFactory;
+        this.playerControl = buildPlayerControl();
         setMetadataConsumer(null);
+        session.attachPlayer(this.playerControl);
     }
 
     private void assertPrepared() throws IOException {
@@ -222,10 +260,11 @@ public class YbridPlayer implements Player {
 
         LOGGER.info("Auto Reconnect is enabled, we have a valid session, and are not in a handover. Connecting new source and validating session.");
 
-        try {
-            connectSource();
-        } catch (IOException e) {
-            LOGGER.warning("Connecting new source failed.");
+        {
+            final @NotNull Transaction transaction = session.createTransaction(Command.RECONNECT_TRANSPORT.makeRequest());
+            transaction.run();
+            if (transaction.getError() != null)
+                LOGGER.warning("Connecting new source failed: " + transaction.getError()); //NON-NLS
         }
 
         try {
@@ -263,25 +302,6 @@ public class YbridPlayer implements Player {
             metadataConsumer.onBouquetChange(session.getBouquet());
     }
 
-    private void connectSource() throws IOException {
-        final @Nullable Decoder decoder;
-
-        session.setAcceptedMediaFormats(decoderFactory.getSupportedFormats());
-
-        /*
-         * We disconnect the inputEOFCallback while we connect a new source to avoid race conditions between the
-         * server sending EOF and us adding the new buffer.
-         */
-        muxer.setInputEOFCallback(null);
-        decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceBySession(session)));
-        if (decoder == null) {
-            LOGGER.warning("Can not create decoder for new input.");
-        } else {
-            muxer.addBuffer(decoder);
-        }
-        muxer.setInputEOFCallback(this::onInputEOF);
-    }
-
     public boolean isAutoReconnect() {
         return autoReconnect;
     }
@@ -296,7 +316,7 @@ public class YbridPlayer implements Player {
 
         playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER); //NON-NLS
 
-        connectSource();
+        session.createTransaction(Command.CONNECT_INITIAL_TRANSPORT.makeRequest()).run();
 
         audioBackend = audioBackendFactory.getAudioBackend();
         initialAudioBlock = muxer.read();
@@ -312,6 +332,7 @@ public class YbridPlayer implements Player {
     @Override
     public void stop() {
         playbackThread.interrupt();
+        session.detachPlayer(playerControl);
     }
 
 
