@@ -222,7 +222,7 @@ public class YbridPlayer implements Player {
                 if (decoder == null) {
                     LOGGER.warning("Can not create decoder for new input.");
                 } else {
-                    muxer.addBuffer(decoder);
+                    muxer.addBuffer(decoder, transportDescription.getTransaction());
                 }
                 muxer.setInputEOFCallback(() -> onInputEOF());
             }

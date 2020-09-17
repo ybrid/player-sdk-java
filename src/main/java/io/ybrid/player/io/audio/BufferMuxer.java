@@ -23,6 +23,7 @@
 package io.ybrid.player.io.audio;
 
 import io.ybrid.api.Session;
+import io.ybrid.api.transaction.Transaction;
 import io.ybrid.player.io.*;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -43,8 +44,10 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
 
     private static class Entry {
         private final @NotNull Buffer buffer;
+        private final @NotNull Transaction transaction;
 
-        public Entry(@NotNull PCMDataSource source, @NotNull DataBlockConsumer consumer) {
+        public Entry(@NotNull PCMDataSource source, @NotNull DataBlockConsumer consumer, @NotNull Transaction transaction) {
+            this.transaction = transaction;
             this.buffer = new Buffer(AUDIO_BUFFER_TARGET, source, dataBlock -> consumer.blockAccept(dataBlock, this));
         }
 
@@ -53,7 +56,15 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
         }
 
         public @NotNull PCMDataBlock read() throws IOException {
-            return buffer.read();
+            final @NotNull PCMDataBlock block = buffer.read();
+            final @Nullable Runnable onAudible = block.getOnAudible();
+
+            if (onAudible == null) {
+                block.setOnAudible(transaction::setAudioComplete);
+            } else {
+                block.setOnAudible(() -> {onAudible.run(); transaction.setAudioComplete();});
+            }
+            return block;
         }
 
         public boolean isValid() {
@@ -124,11 +135,11 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
         metadataUpdateThread.start();
     }
 
-    public void addBuffer(@NotNull PCMDataSource source) {
+    public void addBuffer(@NotNull PCMDataSource source, @NotNull Transaction transaction) {
         final @NotNull Entry newEntry = new Entry(source, ((dataBlock, entry) -> {
             if (entry == selectedBuffer)
                 metadataUpdateThread.accept(dataBlock);
-        }));
+        }), transaction);
 
         newEntry.getBuffer().addBufferStatusConsumer(status -> {
             if (newEntry == selectedBuffer)
