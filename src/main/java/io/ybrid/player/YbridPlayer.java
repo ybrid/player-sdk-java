@@ -143,6 +143,11 @@ public class YbridPlayer implements Player {
                         initialAudioBlock = null;
                     }
                     audioBackend.write(block);
+                    try {
+                        block.audible();
+                    } catch (Throwable e) {
+                        LOGGER.warning("on audible handler for PCM block " + block + " failed with " + e);
+                    }
                 } catch (IOException e) {
                     playerStateChange(PlayerState.ERROR);
                     break;
