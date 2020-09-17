@@ -24,6 +24,8 @@ package io.ybrid.player.io;
 
 import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.PlayoutInfo;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This implements a {@link DataBlock} that holds PCM samples.
@@ -41,6 +43,8 @@ public class PCMDataBlock extends DataBlock {
      * Internal storage for the number of channels represented this block.
      */
     protected final int numberOfChannels;
+
+    protected @Nullable Runnable onAudible = null;
 
     /**
      * Create a block from an array if samples.
@@ -91,5 +95,37 @@ public class PCMDataBlock extends DataBlock {
      */
     public double getBlockLength() {
         return (double)getData().length / (double)(getSampleRate() * getNumberOfChannels());
+    }
+
+    /**
+     * Gets the callback for for when the block is audible.
+     * For calling the callback {@link #audible()} should be used.
+     *
+     * @return The callback or {@code null}.
+     * @see #audible()
+     */
+    @Contract(pure = true)
+    public @Nullable Runnable getOnAudible() {
+        return onAudible;
+    }
+
+    /**
+     * Sets a callback for when the block is audible.
+     * This callback can be called multiple times.
+     *
+     * @param onAudible The callback to set or {@code null}.
+     */
+    public void setOnAudible(@Nullable Runnable onAudible) {
+        this.onAudible = onAudible;
+    }
+
+    /**
+     * This should be called when the block is audible.
+     * It calls the callback set by {@link #setOnAudible(Runnable)} if any.
+     * This may also update statistics or provide hints to other parts of the runtime.
+     */
+    public void audible() {
+        if (onAudible != null)
+            onAudible.run();
     }
 }
