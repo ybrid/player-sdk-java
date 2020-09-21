@@ -23,6 +23,7 @@
 package io.ybrid.player.io.audio;
 
 import io.ybrid.api.Session;
+import io.ybrid.api.Workaround;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transport.TransportDescription;
 import io.ybrid.player.io.*;
@@ -46,10 +47,24 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
     private static class Entry {
         private final @NotNull Buffer buffer;
         private final @NotNull TransportDescription transportDescription;
+        private final @NotNull PCMDataSource source;
+        private final @Nullable PCMDataSource silenceEliminator;
 
         public Entry(@NotNull PCMDataSource source, @NotNull DataBlockConsumer consumer, @NotNull TransportDescription transportDescription) {
+            final @NotNull PCMDataSource usedSource;
+
+            this.source = source;
             this.transportDescription = transportDescription;
-            this.buffer = new Buffer(AUDIO_BUFFER_TARGET, source, dataBlock -> consumer.blockAccept(dataBlock, this));
+
+            if (transportDescription.getActiveWorkarounds().get(Workaround.WORKAROUND_SKIP_SILENCE).toBool(true)) {
+                silenceEliminator = new SilenceEliminator(source, SilenceEliminator.SilenceType.ANALOG);
+                usedSource = silenceEliminator;
+            } else {
+                silenceEliminator = null;
+                usedSource = source;
+            }
+
+            this.buffer = new Buffer(AUDIO_BUFFER_TARGET, usedSource, dataBlock -> consumer.blockAccept(dataBlock, this));
         }
 
         public @NotNull Buffer getBuffer() {
@@ -66,6 +81,11 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
             } else {
                 block.setOnAudible(() -> {onAudible.run(); transaction.setAudioComplete();});
             }
+
+            if (silenceEliminator != null && silenceEliminator.getSkippedSamples() > source.getSkippedSamples()) {
+                transportDescription.getActiveWorkarounds().enableIfAutomatic(Workaround.WORKAROUND_SKIP_SILENCE);
+            }
+
             return block;
         }
 
