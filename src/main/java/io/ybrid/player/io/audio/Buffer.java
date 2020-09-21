@@ -241,13 +241,14 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
          * @return The fullness in [s].
          */
         public double getBufferLength() {
+            final long skipped = backend.getSkippedSamples();
             double ret = 0;
 
             for (PCMDataBlock block : buffer) {
                 ret += block.getBlockLength();
             }
 
-            state.setCurrent(ret, samplesRead, samplesForwarded);
+            state.setCurrent(ret, samplesRead + skipped, samplesForwarded > 0 ? samplesForwarded + skipped : 0);
 
             return ret;
         }
