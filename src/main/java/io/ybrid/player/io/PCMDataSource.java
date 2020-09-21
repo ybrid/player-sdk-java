@@ -38,4 +38,23 @@ public interface PCMDataSource extends DataSource {
      */
     @Override
     @NotNull PCMDataBlock read() throws IOException;
+
+    /**
+     * Gets the number of samples skipped by this data source including all backends.
+     * <P>
+     * For filter sources (sources using another source as backend) this should
+     * return the number of samples skipped by this source plus the number of samples skipped by any backend.
+     * As each backend can skip samples at any point implementations must not cache values from their backends.
+     * <P>
+     * For non-filter streams this should return zero.
+     * <P>
+     * Note: Samples that are skipped by decoders on behalf of the decoded format such as Ogg skips or Opus pre-skip
+     *       must not be included in this value.
+     * The default implementation returns zero.
+     *
+     * @return Returns the number of skipped samples.
+     */
+    default long getSkippedSamples() {
+        return 0;
+    }
 }
