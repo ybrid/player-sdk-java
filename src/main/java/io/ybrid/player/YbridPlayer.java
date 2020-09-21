@@ -321,7 +321,7 @@ public class YbridPlayer implements Player {
 
         playbackThread = new PlaybackThread("YbridPlayer Playback Thread", AUDIO_BUFFER_PREBUFFER); //NON-NLS
 
-        session.createTransaction(Command.CONNECT_INITIAL_TRANSPORT.makeRequest()).run();
+        executeRequestAsTransaction(Command.CONNECT_INITIAL_TRANSPORT);
 
         audioBackend = audioBackendFactory.getAudioBackend();
         initialAudioBlock = muxer.read();
