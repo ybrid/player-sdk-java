@@ -37,6 +37,5 @@ public interface PCMDataSource extends DataSource {
      * @throws IOException And I/O-Errors occurred while reading the block.
      */
     @Override
-    @NotNull
-    PCMDataBlock read() throws IOException;
+    @NotNull PCMDataBlock read() throws IOException;
 }
