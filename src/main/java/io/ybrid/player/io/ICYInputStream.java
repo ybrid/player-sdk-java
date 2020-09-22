@@ -40,6 +40,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,17 +49,13 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 class ICYInputStream implements Closeable, ByteDataSource {
-    static final Logger LOGGER = Logger.getLogger(ICYInputStream.class.getName());
+    static final @NonNls Logger LOGGER = Logger.getLogger(ICYInputStream.class.getName());
     private static final String HEADER_ICY_METAINT = "icy-metaint"; //NON-NLS
     private static final int MAX_READ_LENGTH = 4*1024;
     private static final int MAX_METATDATA_INTERVAL = 128*1024;
     private static final int READ_BUFFER_LENGTH = 2048;
     private static final int ICY_METADATA_BLOCK_MULTIPLAYER = 16;
     private final @NotNull URITransportDescription transportDescription;
-    private final String host;
-    private int port;
-    private final String path;
-    private final boolean secure;
     private Socket socket;
     private InputStream inputStream;
     private HashMap<String, String> replyHeaders;
@@ -68,35 +65,25 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private boolean metadataUpdated = false;
     private SourceServiceMetadata service = null;
     private Metadata blockMetadata = null;
+    private int status = 0;
+    private @NotNull URI uri;
+
+    private int getPort() throws MalformedURLException {
+        int port = uri.getPort();
+
+        if (port < 1)
+            port = uri.toURL().getDefaultPort();
+
+        return port;
+    }
 
     @SuppressWarnings("HardCodedStringLiteral")
     public ICYInputStream(@NotNull URITransportDescription transportDescription) throws MalformedURLException {
-        final URI uri = transportDescription.getURI();
+        uri = transportDescription.getURI();
 
         this.transportDescription = transportDescription;
 
         LOGGER.info("URL = " + uri);
-
-        switch (uri.getScheme()) {
-            case "icyx":
-                secure = false;
-                break;
-            case "icyxs":
-                secure = true;
-                break;
-            default:
-                throw new MalformedURLException("Invalid protocol: " + uri.getScheme());
-        }
-
-        host = uri.getHost();
-        port = uri.getPort();
-        if (port < 1)
-            port = uri.toURL().getDefaultPort();
-        if (uri.getQuery() == null || uri.getQuery().isEmpty()) {
-            path = uri.getPath();
-        } else {
-            path = uri.getPath() + "?" + uri.getQuery();
-        }
     }
 
     private static @NotNull String acceptListToHeader(@NotNull String header, @Nullable Map<String, Double> list) {
@@ -118,10 +105,18 @@ class ICYInputStream implements Closeable, ByteDataSource {
         final @NotNull OutputStream outputStream;
         final @Nullable MessageBody messageBody = transportDescription.getRequestBody();
         final @Nullable byte[] body;
+        final @NotNull String path;
+        String req;
 
-        String req = "GET " + path + " HTTP/1.0\r\n";
+        if (uri.getQuery() == null || uri.getQuery().isEmpty()) {
+            path = uri.getPath();
+        } else {
+            path = uri.getPath() + "?" + uri.getQuery();
+        }
 
-        req += "Host: " + host + ":" + port + "\r\n";
+        req = "GET " + path + " HTTP/1.0\r\n";
+
+        req += "Host: " + uri.getHost() + ":" + getPort() + "\r\n";
         req += "Connection: close\r\n";
         req += "User-Agent: Ybrid Player\r\n";
         req += acceptListToHeader(HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
@@ -194,9 +189,10 @@ class ICYInputStream implements Closeable, ByteDataSource {
             String[] kv;
 
             if (firstLine) {
-                String[] status = line.split(" ");
-                if (!status[1].equals("200"))
-                    throw new IOException("Bad reply");
+                String[] statusLine = line.split(" ");
+                status = Integer.parseInt(statusLine[1], 10);
+                if (status < HttpHelper.STATUS_PERMANENT_MIN || status > HttpHelper.STATUS_PERMANENT_MAX)
+                    throw new IOException("Bad reply with status " + status);
                 firstLine = false;
                 continue;
             }
@@ -231,15 +227,49 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (inputStream != null)
             return;
 
-        if (secure) {
-            socket = SSLSocketFactory.getDefault().createSocket(host, port);
-        } else {
-            socket = new Socket(host, port);
+        for (int connection = 0; connection < 3; connection++) {
+            switch (uri.getScheme()) {
+                case "http": //NON-NLS
+                    LOGGER.warning("Invalid protocol " + uri.getScheme() + ", guessing icyx"); //NON-NLS
+                case "icyx": //NON-NLS
+                    socket = new Socket(uri.getHost(), getPort());
+                    break;
+                case "https": //NON-NLS
+                    LOGGER.warning("Invalid protocol " + uri.getScheme() + ", guessing icyxs"); //NON-NLS
+                case "icyxs": //NON-NLS
+                    socket = SSLSocketFactory.getDefault().createSocket(uri.getHost(), getPort());
+                    break;
+                default:
+                    throw new MalformedURLException("Invalid protocol: " + uri.getScheme());
+            }
+            sendRequest();
+            receiveReply();
+            LOGGER.info("ICY Request to " + uri + " returned " + status + " [" + getContentType() + "]"); //NON-NLS
+
+            if (HttpHelper.isRedirect(status)) {
+                final @Nullable String location = replyHeaders.get(HttpHelper.HEADER_LOCATION.toLowerCase(Locale.ROOT));
+                LOGGER.warning("Got redirect from " + uri + " to " + location);
+                if (location != null && !location.isEmpty()) {
+                    try {
+                        final @NotNull URI locationURI = new URI(location);
+                        if (locationURI.isAbsolute()) {
+                            uri = locationURI;
+                        } else {
+                            throw new IOException("Unsupported redirect from " + uri + " to " + location);
+                        }
+                    } catch (URISyntaxException e) {
+                        throw new IOException(e);
+                    }
+
+                    close();
+                    continue;
+                }
+            }
+            break;
         }
-        sendRequest();
-        receiveReply();
-        //noinspection SpellCheckingInspection
-        LOGGER.info("ICY Request to " + (secure ? "icyxs://" : "icyx://") + host + ":" + port + path + " returned 200 [" + getContentType() + "]"); //NON-NLS
+
+        if (status != HttpHelper.STATUS_OK)
+            throw new IOException("Bad ICY reply with unexpected status " + status);
 
         {
             service = new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), replyHeaders);

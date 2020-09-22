@@ -22,13 +22,50 @@
 
 package io.ybrid.player.io;
 
+import org.jetbrains.annotations.Contract;
+
 /**
  * This class only stores common constants used by HTTP.
  * See RFCs 7230 to 7235 for reference.
  */
 @SuppressWarnings("HardCodedStringLiteral")
 final class HttpHelper {
+    static final int STATUS_MIN = 100;
+    static final int STATUS_MAX = 599;
+    static final int STATUS_PERMANENT_MIN = 200;
+    static final int STATUS_PERMANENT_MAX = STATUS_MAX;
+
+    static final int STATUS_OK = 200;
+    static final int STATUS_MOVED_PERMANENTLY = 301;
+    static final int STATUS_FOUND = 302;
+    static final int STATUS_SEE_OTHER = 303;
+    static final int STATUS_TEMPORARY_REDIRECT = 307;
+    static final int STATUS_PERMANENT_REDIRECT = 308;
+
     static final String HEADER_CONTENT_TYPE = "Content-Type";
     static final String HEADER_ACCEPT = "Accept";
     static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
+    static final String HEADER_LOCATION = "Location";
+
+    /**
+     * Returns whether the given HTTP status code indicates a redirect.
+     * @param status The status code to test.
+     * @return Whether the status indicates a redirect.
+     */
+    @Contract(pure = true)
+    static boolean isRedirect(int status) {
+        if (status < STATUS_MIN || status > STATUS_MAX)
+            throw new IllegalArgumentException("Status is out of range: " + status);
+
+        switch (status) {
+            case STATUS_MOVED_PERMANENTLY:
+            case STATUS_FOUND:
+            case STATUS_SEE_OTHER:
+            case STATUS_TEMPORARY_REDIRECT:
+            case STATUS_PERMANENT_REDIRECT:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
