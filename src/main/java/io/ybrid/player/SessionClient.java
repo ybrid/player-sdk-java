@@ -32,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.EnumSet;
 
 /**
  * This interface is implemented by objects that control a session.
@@ -90,32 +89,6 @@ public interface SessionClient extends KnowsSubInfoState {
 
 
     /* --- Actions --- */
-
-    /**
-     * Reload the state of {@code what} from the server.
-     *
-     * This should be used sparely.
-     * If multiple items need to be refreshed {@link #refresh(EnumSet)} should be used instead.
-     *
-     * @param what What to refresh.
-     * @throws IOException Thrown on any I/O-Error.
-     */
-    void refresh(@NotNull SubInfo what) throws IOException;
-
-    /**
-     * Reload the state of {@code what} from the server.
-     * This is the same as calling {@link #refresh(SubInfo)} for each element in the set expect
-     * that the backend can optimize calls to the server.
-     *
-     * This should be used sparely.
-     *
-     * @param what What to refresh.
-     * @throws IOException Thrown on any I/O-Error.
-     */
-    default void refresh(@NotNull EnumSet<SubInfo> what) throws IOException {
-        for (SubInfo subInfo : what)
-            refresh(subInfo);
-    }
 
     /**
      * This call requests the session to be brought back to the live portion of the current service.

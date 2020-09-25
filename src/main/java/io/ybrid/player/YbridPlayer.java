@@ -376,18 +376,6 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public void refresh(@NotNull SubInfo what) throws IOException {
-        refresh(EnumSet.of(what));
-    }
-
-    @Override
-    public void refresh(@NotNull EnumSet<SubInfo> what) throws IOException {
-        executeRequestAsTransaction(Command.REFRESH, what);
-        capabilitiesChange();
-        bouquetChange();
-    }
-
-    @Override
     public void windToLive() throws IOException {
         executeRequestAsTransaction(Command.WIND_TO_LIVE);
     }
