@@ -22,8 +22,8 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.PlayoutInfo;
+import io.ybrid.api.metadata.Metadata;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 

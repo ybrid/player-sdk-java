@@ -22,8 +22,8 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.metadata.Metadata;
 import io.ybrid.api.PlayoutInfo;
+import io.ybrid.api.metadata.Metadata;
 
 /**
  * This class represents generic blocks of data. Instances also store {@link Metadata} for each block.
