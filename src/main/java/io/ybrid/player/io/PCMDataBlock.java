@@ -23,8 +23,9 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.PlayoutInfo;
-import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.metadata.Sync;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -49,13 +50,14 @@ public class PCMDataBlock extends DataBlock {
     /**
      * Create a block from an array if samples.
      *
-     * @param metadata The {@link Metadata} to use.
+     * @param sync The {@link Sync} to use for the new DataBlock.
+     * @param playoutInfo The {@link PlayoutInfo} to use for the new DataBlock.
      * @param data The samples to use as 16 bit PCM interleaved values.
      * @param sampleRate The sample rate of the signal in [Hz].
      * @param numberOfChannels The number of channels represented.
      */
-    public PCMDataBlock(Metadata metadata, PlayoutInfo playoutInfo, short[] data, int sampleRate, int numberOfChannels) {
-        super(metadata, playoutInfo);
+    public PCMDataBlock(@NotNull Sync sync, PlayoutInfo playoutInfo, short[] data, int sampleRate, int numberOfChannels) {
+        super(sync, playoutInfo);
         this.data = data;
         this.sampleRate = sampleRate;
         this.numberOfChannels = numberOfChannels;

@@ -23,7 +23,8 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.PlayoutInfo;
-import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.metadata.Sync;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -39,26 +40,28 @@ public class ByteDataBlock extends DataBlock {
     protected byte[] data;
 
     /**
-     * Create an instance using {@link Metadata} and an array of bytes.
+     * Create an instance using an array of bytes.
      *
-     * @param metadata The {@link Metadata} to use.
+     * @param sync The {@link Sync} to use for the new DataBlock.
+     * @param playoutInfo The {@link PlayoutInfo} to use for the new DataBlock.
      * @param data The bytes to use.
      */
-    public ByteDataBlock(Metadata metadata, PlayoutInfo playoutInfo, byte[] data) {
-        super(metadata, playoutInfo);
+    public ByteDataBlock(@NotNull Sync sync, PlayoutInfo playoutInfo, byte[] data) {
+        super(sync, playoutInfo);
         this.data = data;
     }
 
     /**
      * This creates a block by reading bytes off an {@link InputStream}.
      *
-     * @param metadata The {@link Metadata} to use.
+     * @param sync The {@link Sync} to use for the new DataBlock.
+     * @param playoutInfo The {@link PlayoutInfo} to use for the new DataBlock.
      * @param inputStream The {@link InputStream} to read the data from.
      * @param length The amount of bytes to read.
      * @throws IOException Thrown in case of I/O-Error.
      */
-    public ByteDataBlock(Metadata metadata, PlayoutInfo playoutInfo, InputStream inputStream, int length) throws IOException {
-        super(metadata, playoutInfo);
+    public ByteDataBlock(@NotNull Sync sync, PlayoutInfo playoutInfo, InputStream inputStream, int length) throws IOException {
+        super(sync, playoutInfo);
         data = new byte[length];
         int ret = inputStream.read(data);
         if (ret < 1)
@@ -85,7 +88,7 @@ public class ByteDataBlock extends DataBlock {
         //noinspection HardCodedStringLiteral
         return "ByteDataBlock{" +
                 "data.length=" + data.length +
-                ", metadata=" + metadata +
+                ", sync=" + getSync() +
                 "}";
     }
 }

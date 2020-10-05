@@ -22,13 +22,10 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.MetadataMixer;
 import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
-import io.ybrid.api.bouquet.source.SourceServiceMetadata;
 import io.ybrid.api.message.MessageBody;
-import io.ybrid.api.metadata.InvalidMetadata;
-import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.transport.TransportDescription;
 import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.NonNls;
@@ -53,7 +50,7 @@ public final class DataSourceFactory {
     static final Logger LOGGER = Logger.getLogger(DataSourceFactory.class.getName());
 
     private static class URLSource implements ByteDataSource {
-        private final @NotNull Metadata metadata;
+        private final @NotNull Sync sync;
         private final InputStream inputStream;
         private final String contentType;
 
@@ -113,16 +110,18 @@ public final class DataSourceFactory {
             contentType = connection.getContentType();
 
             {
-                final @NotNull SourceServiceMetadata service = new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), getHeadersAsMap(connection));
-                metadata = new InvalidMetadata(service);
-                transportDescription.getMetadataMixer().add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+                final @NotNull Sync.Builder builder = new Sync.Builder(transportDescription.getSource());
+                builder.setCurrentService(new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), getHeadersAsMap(connection)));
+                builder.setTemporalValidity(TemporalValidity.INDEFINITELY_VALID);
+                sync = builder.build();
+                transportDescription.getMetadataMixer().accept(sync);
             }
         }
 
         @Override
         public @NotNull ByteDataBlock read() throws IOException {
             //noinspection MagicNumber
-            return new ByteDataBlock(metadata, null, inputStream, 1024*2);
+            return new ByteDataBlock(sync, null, inputStream, 1024*2);
         }
 
         @Override

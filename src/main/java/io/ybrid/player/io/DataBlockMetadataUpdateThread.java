@@ -24,13 +24,12 @@ package io.ybrid.player.io;
 
 import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.Session;
-import io.ybrid.api.SubInfo;
-import io.ybrid.api.metadata.Metadata;
-import io.ybrid.api.session.Command;
+import io.ybrid.api.metadata.MetadataMixer;
+import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
@@ -48,8 +47,8 @@ public class DataBlockMetadataUpdateThread extends Thread implements Consumer<Da
 
     @Override
     public void run() {
-        Metadata metadata = null;
-        Metadata oldMetadata = null;
+        final @NotNull MetadataMixer metadataMixer = session.getMetadataMixer();
+        Sync oldSync = null;
         PlayoutInfo playoutInfo = null;
         PlayoutInfo oldPlayoutInfo = null;
 
@@ -57,30 +56,27 @@ public class DataBlockMetadataUpdateThread extends Thread implements Consumer<Da
 
             try {
                 final DataBlock block = metadataBlockQueue.take();
-                Metadata newMetadata = block.getMetadata();
-                PlayoutInfo newPlayoutInfo = block.getPlayoutInfo();
-
-                if (newMetadata != null && newMetadata != oldMetadata) {
-                    metadata = newMetadata;
-                    oldMetadata = newMetadata;
-                }
+                final @NotNull Sync newSync = block.getSync();
+                final @Nullable PlayoutInfo newPlayoutInfo = block.getPlayoutInfo();
+                boolean playoutInfoChanged = false;
 
                 if (newPlayoutInfo != null && newPlayoutInfo != oldPlayoutInfo) {
                     playoutInfo = newPlayoutInfo;
                     oldPlayoutInfo = newPlayoutInfo;
+                    playoutInfoChanged = true;
                 }
 
-                if (metadata != null && !metadata.isValid()) {
-                    final @NotNull Transaction transaction = session.createTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.METADATA, SubInfo.PLAYOUT)));
+                if (playoutInfoChanged || !newSync.equals(oldSync)) {
+                    final @NotNull Transaction transaction = metadataMixer.refreshSession(newSync);
                     transaction.run();
                     if (transaction.getError() == null) {
-                        metadata = session.getMetadata();
                         playoutInfo = session.getPlayoutInfo();
                     }
                 }
 
-                block.setMetadata(metadata);
                 block.setPlayoutInfo(playoutInfo);
+
+                oldSync = newSync;
             } catch (InterruptedException e) {
                 return;
             }

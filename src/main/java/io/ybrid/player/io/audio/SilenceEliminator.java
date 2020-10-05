@@ -121,7 +121,7 @@ public final class SilenceEliminator implements PCMDataSource {
                 final short[] newData = new short[data.length - toSkip];
                 System.arraycopy(data, toSkip, newData, 0, data.length - toSkip);
                 skipComplete = true;
-                return new PCMDataBlock(block.getMetadata(), block.getPlayoutInfo(), newData, block.getSampleRate(), numberOfChannels);
+                return new PCMDataBlock(block.getSync(), block.getPlayoutInfo(), newData, block.getSampleRate(), numberOfChannels);
             }
         }
     }

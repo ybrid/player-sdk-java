@@ -23,18 +23,20 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.PlayoutInfo;
-import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.metadata.Sync;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * This implements a {@link InputStream} that adds support of {@link Metadata}.
+ * This implements a {@link InputStream} that adds support of {@link Sync}.
  */
 public class MetadataInputStream extends InputStream {
     private final ByteDataSource source;
-    private Metadata metadata;
+    private Sync sync;
     private PlayoutInfo playoutInfo;
     private byte[] buffer;
     private int offset;
@@ -50,16 +52,16 @@ public class MetadataInputStream extends InputStream {
     }
 
     /**
-     * This returns the {@link Metadata} for an the next byte that can be read.
+     * This returns the {@link Sync} for the next byte that can be read.
      *
      * This may re-fill internal buffers.
      *
-     * @return The {@link Metadata} for the next byte or null.
+     * @return The {@link Sync} for the next byte or null.
      * @throws IOException I/O-Errors as thrown by the backend.
      */
-    public Metadata getMetadata() throws IOException {
+    public @Nullable Sync getSync() throws IOException {
         fillBuffer();
-        return metadata;
+        return sync;
     }
 
     /**
@@ -85,7 +87,6 @@ public class MetadataInputStream extends InputStream {
     }
 
     private void fillBuffer() throws IOException {
-        ByteDataBlock block;
 
         if (buffer != null && buffer.length == offset) {
             buffer = null;
@@ -96,14 +97,14 @@ public class MetadataInputStream extends InputStream {
             return;
 
         try {
-            block = source.read();
+            final @NotNull ByteDataBlock block = source.read();
 
             buffer = block.getData();
-            metadata = block.getMetadata();
+            sync = block.getSync();
         } catch (EOFException ignored) {
             eof = true;
             buffer = null;
-            metadata = null;
+            sync = null;
         }
     }
 

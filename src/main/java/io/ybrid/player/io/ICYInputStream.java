@@ -22,13 +22,10 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.MetadataMixer;
 import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
-import io.ybrid.api.bouquet.source.SourceServiceMetadata;
 import io.ybrid.api.message.MessageBody;
-import io.ybrid.api.metadata.InvalidMetadata;
-import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
@@ -61,10 +58,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private HashMap<String, String> replyHeaders;
     private int metadataInterval;
     private int pos = 0;
-    private ICYMetadata metadata;
-    private boolean metadataUpdated = false;
-    private SourceServiceMetadata service = null;
-    private Metadata blockMetadata = null;
+    private Sync sync = null;
     private int status = 0;
     private @NotNull URI uri;
 
@@ -272,8 +266,11 @@ class ICYInputStream implements Closeable, ByteDataSource {
             throw new IOException("Bad ICY reply with unexpected status " + status);
 
         {
-            service = new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), replyHeaders);
-            transportDescription.getMetadataMixer().add(service, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+            final @NotNull Sync.Builder builder = new Sync.Builder(transportDescription.getSource());
+            builder.setCurrentService(new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), replyHeaders));
+            builder.setTemporalValidity(TemporalValidity.INDEFINITELY_VALID);
+            sync = builder.build();
+            transportDescription.getMetadataMixer().accept(sync);
         }
     }
 
@@ -297,10 +294,15 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (ret != length)
             throw new IOException("Can not read body: length = " + length + ", ret = " + ret);
 
-        metadata = new ICYMetadata(transportDescription.getSource(), rawMetadata);
-        LOGGER.info("Got fresh metadata: " + metadata); //NON-NLS
-        metadataUpdated = true;
-        transportDescription.getMetadataMixer().add(metadata, MetadataMixer.Position.CURRENT, TemporalValidity.INDEFINITELY_VALID);
+        {
+            final @NotNull Sync.Builder builder = new Sync.Builder(sync);
+            final @NotNull ICYMetadata metadata = new ICYMetadata(transportDescription.getSource(), rawMetadata);
+            builder.setCurrentTrack(metadata);
+            builder.autoFill();
+            sync = builder.build();
+            transportDescription.getMetadataMixer().accept(sync);
+            LOGGER.info("Got fresh metadata: " + metadata); //NON-NLS
+        }
     }
 
     private void readMetadata() throws IOException {
@@ -313,10 +315,6 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
     Map<String, String> getReplyHeaders() {
         return Collections.unmodifiableMap(replyHeaders);
-    }
-
-    ICYMetadata getMetadata() {
-        return metadata;
     }
 
     @Override
@@ -347,15 +345,9 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (todo > MAX_READ_LENGTH)
             todo = MAX_READ_LENGTH;
 
-        if (metadataUpdated)
-            blockMetadata = new InvalidMetadata(service);
-
-        block = new ByteDataBlock(blockMetadata, null, inputStream, todo);
+        block = new ByteDataBlock(sync, null, inputStream, todo);
 
         pos += block.getData().length;
-
-        if (blockMetadata != null)
-            metadataUpdated = false;
 
         if (metadataInterval > 0 && pos == metadataInterval) {
             pos = 0;

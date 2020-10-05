@@ -23,16 +23,18 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.PlayoutInfo;
-import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.metadata.Sync;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * This class represents generic blocks of data. Instances also store {@link Metadata} for each block.
+ * This class represents generic blocks of data. Instances also store {@link Sync} for each block.
  */
 public class DataBlock {
     /**
-     * Internal storage for the {@link Metadata} hold by the object.
+     * Internal storage for the {@link Sync} hold by the object.
      */
-    protected Metadata metadata;
+    private final @NotNull Sync sync;
     /**
      * Internal storage for the {@link PlayoutInfo} hold by the object.
      */
@@ -41,28 +43,22 @@ public class DataBlock {
     /**
      * Create a new DataBlock.
      *
-     * @param metadata The {@link Metadata} to use for the new DataBlock.
+     * @param sync The {@link Sync} to use for the new DataBlock.
+     * @param playoutInfo The {@link PlayoutInfo} to use for the new DataBlock.
      */
-    protected DataBlock(Metadata metadata, PlayoutInfo playoutInfo) {
-        this.metadata = metadata;
+    protected DataBlock(@NotNull Sync sync, PlayoutInfo playoutInfo) {
+        this.sync = sync;
         this.playoutInfo = playoutInfo;
     }
 
     /**
-     * Gets the {@link Metadata} of the block.
+     * Gets the {@link Sync} of the block.
      *
-     * @return The {@link Metadata} of the block.
+     * @return The {@link Sync} of the block.
      */
-    public Metadata getMetadata() {
-        return metadata;
-    }
-
-    /**
-     * Sets the {@link Metadata} of the block.
-     * @param metadata The {@link Metadata} to set.
-     */
-    public void setMetadata(Metadata metadata) {
-        this.metadata = metadata;
+    @Contract(pure = true)
+    public @NotNull Sync getSync() {
+        return sync;
     }
 
     /**

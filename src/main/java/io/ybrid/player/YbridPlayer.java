@@ -30,6 +30,8 @@ import io.ybrid.api.bouquet.Bouquet;
 import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.metadata.Metadata;
+import io.ybrid.api.metadata.MetadataMixer;
+import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.session.PlayerControl;
 import io.ybrid.api.session.Request;
@@ -119,7 +121,8 @@ public class YbridPlayer implements Player {
 
         @Override
         public void run() {
-            Metadata oldMetadata = session.getMetadata();
+            final @NotNull MetadataMixer metadataMixer = session.getMetadataMixer();
+            Sync oldSync = null;
             PlayoutInfo oldPlayoutInfo = null;
             PlayoutInfo forwardedPlayoutInfo = session.getPlayoutInfo();
             BufferStatus lastStatus;
@@ -130,7 +133,7 @@ public class YbridPlayer implements Player {
             audioBackend.play();
 
             while (!isInterrupted()) {
-                final Metadata newMetadata;
+                final @NotNull Sync newSync;
                 final PlayoutInfo newPlayoutInfo;
                 boolean blockUpdatesMetadata = false;
                 PCMDataBlock block = initialAudioBlock;
@@ -153,12 +156,12 @@ public class YbridPlayer implements Player {
                     break;
                 }
 
-                newMetadata = block.getMetadata();
+                newSync = block.getSync();
                 newPlayoutInfo = block.getPlayoutInfo();
 
-                if (newMetadata != null && newMetadata.isValid() && !Objects.equals(oldMetadata, newMetadata)) {
+                if (!newSync.equals(oldSync)) {
                     blockUpdatesMetadata = true;
-                    oldMetadata = newMetadata;
+                    oldSync = newSync;
                 }
 
                 if (newPlayoutInfo != null && !Objects.equals(oldPlayoutInfo, newPlayoutInfo)) {
@@ -172,7 +175,7 @@ public class YbridPlayer implements Player {
                 }
 
                 if (blockUpdatesMetadata)
-                    distributeMetadata(oldMetadata, forwardedPlayoutInfo);
+                    distributeMetadata(metadataMixer.resolveMetadata(newSync), forwardedPlayoutInfo);
 
                 /* empty queue but for the last entry. */
                 while (bufferStateQueue.size() > 1)
