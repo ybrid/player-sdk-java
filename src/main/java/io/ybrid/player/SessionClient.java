@@ -26,7 +26,6 @@ import io.ybrid.api.*;
 import io.ybrid.api.bouquet.Bouquet;
 import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
-import io.ybrid.api.metadata.Metadata;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -68,15 +67,6 @@ public interface SessionClient extends KnowsSubInfoState {
      */
     @NotNull
     Bouquet getBouquet();
-
-    /**
-     * Get the current Metadata for the session.
-     *
-     * Calling this resets the flag returned by {@link KnowsSubInfoState#hasChanged(SubInfo)}
-     * @return Returns the current Metadata.
-     */
-    @NotNull
-    Metadata getMetadata();
 
     /**
      * Get the current {@link PlayoutInfo} for the session.

@@ -424,11 +424,6 @@ public class YbridPlayer implements Player {
     }
 
     @Override
-    public @NotNull Metadata getMetadata() {
-        return session.getMetadata();
-    }
-
-    @Override
     public @NotNull PlayoutInfo getPlayoutInfo() {
         return session.getPlayoutInfo();
     }
