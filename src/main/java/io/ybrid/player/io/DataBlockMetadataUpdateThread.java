@@ -26,6 +26,7 @@ import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.Session;
 import io.ybrid.api.metadata.MetadataMixer;
 import io.ybrid.api.metadata.Sync;
+import io.ybrid.api.session.Command;
 import io.ybrid.api.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,7 +68,7 @@ public class DataBlockMetadataUpdateThread extends Thread implements Consumer<Da
                 }
 
                 if (playoutInfoChanged || !newSync.equals(oldSync)) {
-                    final @NotNull Transaction transaction = metadataMixer.refreshSession(newSync);
+                    final @NotNull Transaction transaction = session.createTransaction(Command.REFRESH.makeRequest(newSync));
                     transaction.run();
                     if (transaction.getError() == null) {
                         playoutInfo = session.getPlayoutInfo();
