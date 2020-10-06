@@ -351,7 +351,7 @@ public class YbridPlayer implements Player {
 
     @Override
     public @NotNull Bouquet getBouquet() {
-        return session.getBouquet();
+        return session.getMetadataMixer().getBouquet();
     }
 
     private void executeRequestAsTransaction(@NotNull Request request) throws IOException {
