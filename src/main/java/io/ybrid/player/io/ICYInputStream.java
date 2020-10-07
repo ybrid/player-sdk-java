@@ -26,6 +26,7 @@ import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
 import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.Sync;
+import io.ybrid.api.transport.TransportConnectionState;
 import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
@@ -221,49 +222,58 @@ class ICYInputStream implements Closeable, ByteDataSource {
         if (inputStream != null)
             return;
 
-        for (int connection = 0; connection < 3; connection++) {
-            switch (uri.getScheme()) {
-                case "http": //NON-NLS
-                    LOGGER.warning("Invalid protocol " + uri.getScheme() + ", guessing icyx"); //NON-NLS
-                case "icyx": //NON-NLS
-                    socket = new Socket(uri.getHost(), getPort());
-                    break;
-                case "https": //NON-NLS
-                    LOGGER.warning("Invalid protocol " + uri.getScheme() + ", guessing icyxs"); //NON-NLS
-                case "icyxs": //NON-NLS
-                    socket = SSLSocketFactory.getDefault().createSocket(uri.getHost(), getPort());
-                    break;
-                default:
-                    throw new MalformedURLException("Invalid protocol: " + uri.getScheme());
-            }
-            sendRequest();
-            receiveReply();
-            LOGGER.info("ICY Request to " + uri + " returned " + status + " [" + getContentType() + "]"); //NON-NLS
+        transportDescription.signalConnectionState(TransportConnectionState.CONNECTING);
 
-            if (HttpHelper.isRedirect(status)) {
-                final @Nullable String location = replyHeaders.get(HttpHelper.HEADER_LOCATION.toLowerCase(Locale.ROOT));
-                LOGGER.warning("Got redirect from " + uri + " to " + location);
-                if (location != null && !location.isEmpty()) {
-                    try {
-                        final @NotNull URI locationURI = new URI(location);
-                        if (locationURI.isAbsolute()) {
-                            uri = locationURI;
-                        } else {
-                            throw new IOException("Unsupported redirect from " + uri + " to " + location);
-                        }
-                    } catch (URISyntaxException e) {
-                        throw new IOException(e);
-                    }
-
-                    close();
-                    continue;
+        try {
+            for (int connection = 0; connection < 3; connection++) {
+                switch (uri.getScheme()) {
+                    case "http": //NON-NLS
+                        LOGGER.warning("Invalid protocol " + uri.getScheme() + ", guessing icyx"); //NON-NLS
+                    case "icyx": //NON-NLS
+                        socket = new Socket(uri.getHost(), getPort());
+                        break;
+                    case "https": //NON-NLS
+                        LOGGER.warning("Invalid protocol " + uri.getScheme() + ", guessing icyxs"); //NON-NLS
+                    case "icyxs": //NON-NLS
+                        socket = SSLSocketFactory.getDefault().createSocket(uri.getHost(), getPort());
+                        break;
+                    default:
+                        throw new MalformedURLException("Invalid protocol: " + uri.getScheme());
                 }
+                sendRequest();
+                receiveReply();
+                LOGGER.info("ICY Request to " + uri + " returned " + status + " [" + getContentType() + "]"); //NON-NLS
+
+                if (HttpHelper.isRedirect(status)) {
+                    final @Nullable String location = replyHeaders.get(HttpHelper.HEADER_LOCATION.toLowerCase(Locale.ROOT));
+                    LOGGER.warning("Got redirect from " + uri + " to " + location);
+                    if (location != null && !location.isEmpty()) {
+                        try {
+                            final @NotNull URI locationURI = new URI(location);
+                            if (locationURI.isAbsolute()) {
+                                uri = locationURI;
+                            } else {
+                                throw new IOException("Unsupported redirect from " + uri + " to " + location);
+                            }
+                        } catch (URISyntaxException e) {
+                            throw new IOException(e);
+                        }
+
+                        close();
+                        continue;
+                    }
+                }
+                break;
             }
-            break;
+
+            if (status != HttpHelper.STATUS_OK)
+                throw new IOException("Bad ICY reply with unexpected status " + status);
+        } catch (Exception e) {
+            transportDescription.signalConnectionState(TransportConnectionState.ERROR);
+            throw e;
         }
 
-        if (status != HttpHelper.STATUS_OK)
-            throw new IOException("Bad ICY reply with unexpected status " + status);
+        transportDescription.signalConnectionState(TransportConnectionState.CONNECTED);
 
         {
             final @NotNull Sync.Builder builder = new Sync.Builder(transportDescription.getSource());
@@ -319,6 +329,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
 
     @Override
     public synchronized void close() throws IOException {
+        transportDescription.signalConnectionState(TransportConnectionState.DISCONNECTING);
         if (inputStream != null) {
             inputStream.close();
             inputStream = null;
@@ -327,6 +338,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
             socket.close();
             socket = null;
         }
+        transportDescription.signalConnectionState(TransportConnectionState.DISCONNECTED);
     }
 
     @Override

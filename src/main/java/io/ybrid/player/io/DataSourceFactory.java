@@ -26,6 +26,7 @@ import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
 import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.Sync;
+import io.ybrid.api.transport.TransportConnectionState;
 import io.ybrid.api.transport.TransportDescription;
 import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.NonNls;
@@ -50,6 +51,7 @@ public final class DataSourceFactory {
     static final Logger LOGGER = Logger.getLogger(DataSourceFactory.class.getName());
 
     private static class URLSource implements ByteDataSource {
+        private final @NotNull URITransportDescription transportDescription;
         private final @NotNull Sync sync;
         private final InputStream inputStream;
         private final String contentType;
@@ -87,27 +89,38 @@ public final class DataSourceFactory {
             @NonNls URLConnection connection = transportDescription.getURI().toURL().openConnection();
             final @Nullable MessageBody messageBody = transportDescription.getRequestBody();
 
-            connection.setDoInput(true);
-            connection.setDoOutput(messageBody != null);
+            this.transportDescription = transportDescription;
 
-            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
-            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
-            connection.setRequestProperty("Accept-Charset", "utf-8, *; q=0");
+            transportDescription.signalConnectionState(TransportConnectionState.CONNECTING);
 
-            if (messageBody != null) {
-                final @NotNull OutputStream outputStream;
+            try {
+                connection.setDoInput(true);
+                connection.setDoOutput(messageBody != null);
 
-                connection.setRequestProperty(HttpHelper.HEADER_CONTENT_TYPE, messageBody.getMediaType());
+                acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
+                acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
+                connection.setRequestProperty("Accept-Charset", "utf-8, *; q=0");
 
-                outputStream = connection.getOutputStream();
-                outputStream.write(messageBody.getBytes());
-                outputStream.close();
+                if (messageBody != null) {
+                    final @NotNull OutputStream outputStream;
+
+                    connection.setRequestProperty(HttpHelper.HEADER_CONTENT_TYPE, messageBody.getMediaType());
+
+                    outputStream = connection.getOutputStream();
+                    outputStream.write(messageBody.getBytes());
+                    outputStream.close();
+                }
+
+                connection.connect();
+
+                inputStream = connection.getInputStream();
+                contentType = connection.getContentType();
+            } catch (Exception e) {
+                transportDescription.signalConnectionState(TransportConnectionState.ERROR);
+                throw e;
             }
 
-            connection.connect();
-
-            inputStream = connection.getInputStream();
-            contentType = connection.getContentType();
+            transportDescription.signalConnectionState(TransportConnectionState.CONNECTED);
 
             {
                 final @NotNull Sync.Builder builder = new Sync.Builder(transportDescription.getSource());
@@ -136,7 +149,9 @@ public final class DataSourceFactory {
 
         @Override
         public void close() throws IOException {
+            transportDescription.signalConnectionState(TransportConnectionState.DISCONNECTING);
             inputStream.close();
+            transportDescription.signalConnectionState(TransportConnectionState.DISCONNECTED);
         }
     }
 
