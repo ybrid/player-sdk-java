@@ -307,7 +307,7 @@ public class YbridPlayer implements Player {
 
     private void bouquetChange() {
         if (session.hasChanged(SubInfo.BOUQUET))
-            metadataConsumer.onBouquetChange(session.getBouquet());
+            metadataConsumer.onBouquetChange(session.getMetadataMixer().getBouquet());
     }
 
     public boolean isAutoReconnect() {
