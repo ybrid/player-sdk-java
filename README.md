@@ -42,6 +42,7 @@ The player implements the full protocol and can then be controlled using its API
 ```java
 import io.ybrid.api.Alias;
 import io.ybrid.api.Session;
+import io.ybrid.api.session.Command;
 import io.ybrid.player.Player;
 import io.ybrid.player.YbridPlayer;
 
@@ -52,8 +53,11 @@ import java.util.logging.Logger;
 class myPlayer {
     private void run() throws IOException {
         /* First create a Alias object and a Session. */
-        Alias alias = new Alias(Logger.getLogger(new URL("http://.../...")));
-        Session session = alias.createSession();
+        final Alias alias = new Alias(Logger.getLogger(new URL("https://.../...")));
+        final Session session = alias.createSession();
+
+        /* Connect the session to the server. */
+        session.createTransaction(Command.CONNECT.makeRequest()).run();
 
         /* We create a player using the Decoder and AudioBackend we provide */
         Player player = new YbridPlayer(session, myDecoderFactory.getInstance(), myAudioBackendFactory.getInstance());
@@ -78,6 +82,9 @@ class myPlayer {
         * After close() returned the player must not be reused.
         */
         player.close();
+
+        /* After the player finished close the session. */
+        session.close();
     }
 }
 ```
