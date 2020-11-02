@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -228,7 +229,12 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
                     }
                 }
                 return selectedBuffer.read();
+            } catch (EOFException e) {
+                LOGGER.info("Reached EOF (by EOFException), selecting next buffer...");
+                selectNext();
+                return selectedBuffer.read();
             } catch (Exception e) {
+                LOGGER.info("Unexpected error (" + e + "), selecting next buffer...");
                 selectNext();
                 return selectedBuffer.read();
             }
