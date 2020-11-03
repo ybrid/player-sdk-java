@@ -65,7 +65,7 @@ public class MetadataInputStream extends InputStream {
     }
 
     /**
-     * This returns the {@link PlayoutInfo} for an the next byte that can be read.
+     * This returns the {@link PlayoutInfo} for the next byte that can be read.
      *
      * This may re-fill internal buffers.
      *
