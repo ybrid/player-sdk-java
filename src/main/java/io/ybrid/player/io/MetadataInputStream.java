@@ -83,7 +83,7 @@ public class MetadataInputStream extends InputStream {
         int ret = read(buf, 0, 1);
         if (ret != 1)
             return -1;
-        return buf[0];
+        return buf[0] & 0xFF;
     }
 
     private void fillBuffer() throws IOException {
