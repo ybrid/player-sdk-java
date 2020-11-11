@@ -22,37 +22,8 @@
 
 package io.ybrid.player.io.muxer;
 
-import io.ybrid.player.io.mapping.Mapping;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
-
-public class StreamInfo {
-    private final @NotNull Mapping<?, ?> mapping;
-
-    public StreamInfo(@NotNull Mapping<?, ?> mapping) {
-        this.mapping = mapping;
-    }
-
-    public @NotNull Mapping<?, ?> getMapping() {
-        return mapping;
-    }
-
-    public @NotNull StreamUsage getPrimaryStreamUsage() {
-        return mapping.getPrimaryStreamUsage();
-    }
-
-    public @NotNull Set<StreamUsage> getStreamUsage() {
-        return mapping.getStreamUsage();
-    }
-
-    @Override
-    public String toString() {
-        //noinspection HardCodedStringLiteral
-        return "StreamInfo{" +
-                "mapping=" + mapping +
-                ", getPrimaryStreamUsage()=" + getPrimaryStreamUsage() +
-                ", getStreamUsage()=" + getStreamUsage() +
-                "}";
-    }
+public enum StreamUsage {
+    AUDIO,
+    METADATA,
+    OTHER;
 }

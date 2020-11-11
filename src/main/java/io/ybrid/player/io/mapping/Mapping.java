@@ -23,8 +23,14 @@
 package io.ybrid.player.io.mapping;
 
 import io.ybrid.player.io.DataBlock;
+import io.ybrid.player.io.muxer.StreamUsage;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
 
 public interface Mapping<I extends DataBlock, O extends DataBlock> {
     @NotNull O process(@NotNull I block);
+
+    @NotNull StreamUsage getPrimaryStreamUsage();
+    @NotNull Set<StreamUsage> getStreamUsage();
 }
