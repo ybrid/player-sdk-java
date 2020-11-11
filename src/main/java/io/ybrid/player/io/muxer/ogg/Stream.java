@@ -26,6 +26,7 @@ import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.container.ogg.Packet;
 import io.ybrid.player.io.mapping.Header;
 import io.ybrid.player.io.mapping.Mapping;
+import io.ybrid.player.io.muxer.StreamInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,8 +49,8 @@ public class Stream extends io.ybrid.player.io.muxer.Stream<Stream, Header, Data
         }
     }
 
-    public Stream(@NotNull Mapping<PacketAdapter, ?> mapping, @NotNull Demuxer demuxer) {
-        super(mapping, demuxer);
+    public Stream(@NotNull StreamInfo streamInfo, @NotNull Demuxer demuxer) {
+        super(streamInfo, demuxer);
     }
 
     @Override

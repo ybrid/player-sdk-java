@@ -26,11 +26,11 @@ import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.metadata.source.Source;
 import io.ybrid.api.metadata.source.SourceType;
 import io.ybrid.player.io.ByteDataBlock;
-import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.container.ogg.Flag;
 import io.ybrid.player.io.container.ogg.Page;
 import io.ybrid.player.io.container.ogg.Sync;
 import io.ybrid.player.io.mapping.ogg.Generic;
+import io.ybrid.player.io.muxer.StreamInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,26 +55,20 @@ public class Demuxer extends io.ybrid.player.io.muxer.Demuxer<Stream, PacketAdap
         final @Nullable Stream stream;
 
         if (flags.contains(Flag.BOS)) {
-            @Nullable Class<? extends Generic> clazz = null;
+            @Nullable StreamInfo streamInfo = null;
 
             for (final @NotNull Class<? extends Generic> mapping : mappings) {
                 try {
-                    if ((boolean)mapping.getMethod("test", Page.class).invoke(null, page)) {
-                        clazz = mapping;
+                    streamInfo = (StreamInfo) mapping.getMethod("test", Page.class).invoke(null, page);
+                    if (streamInfo != null)
                         break;
-                    }
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
                 }
             }
 
-            if (clazz != null) {
-                block = new PageAdapter(blockSync, blockPlayoutInfo, page);
-                if (runPredicate(isWantedCallback, block, false)) {
-                    try {
-                        stream = new Stream(clazz.newInstance(), this);
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
+            if (streamInfo != null) {
+                if (runPredicate(isWantedCallback, streamInfo, false)) {
+                    stream = new Stream(streamInfo, this);
                     streams.put(serial, stream);
                     runConsumer(onBeginOfStreamCallback, stream);
                 } else {
@@ -90,8 +84,7 @@ public class Demuxer extends io.ybrid.player.io.muxer.Demuxer<Stream, PacketAdap
         if (stream == null)
             return;
 
-        if (block == null)
-            block = new PageAdapter(blockSync, blockPlayoutInfo, page);
+        block = new PageAdapter(blockSync, blockPlayoutInfo, page);
 
         stream.consume(block);
 
