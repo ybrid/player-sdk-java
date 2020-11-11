@@ -22,50 +22,34 @@
 
 package io.ybrid.player.io.mapping.ogg.opus;
 
-import io.ybrid.player.io.DataBlock;
-import io.ybrid.player.io.MediaType;
-import io.ybrid.player.io.container.ogg.Page;
-import io.ybrid.player.io.mapping.ogg.Generic;
-import io.ybrid.player.io.muxer.StreamInfo;
-import io.ybrid.player.io.muxer.StreamUsage;
+import io.ybrid.api.PlayoutInfo;
+import io.ybrid.api.metadata.Sync;
 import io.ybrid.player.io.muxer.ogg.PacketAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
+abstract class Header extends io.ybrid.player.io.mapping.Header {
+    /**
+     * Create a new DataBlock.
+     *
+     * @param sync        The {@link Sync} to use for the new DataBlock.
+     * @param playoutInfo The {@link PlayoutInfo} to use for the new DataBlock.
+     */
+    protected Header(@NotNull Sync sync, PlayoutInfo playoutInfo) {
+        super(sync, playoutInfo);
+    }
 
-public class Mapping extends Generic {
-    @Override
-    public @NotNull DataBlock process(@NotNull PacketAdapter block) {
-        if (Header.isHeader(block, OpusHead.MAGIC)) {
-            return new OpusHead(block);
-        } else if (Header.isHeader(block, OpusTags.MAGIC)) {
-            return new OpusTags(block);
-        } else {
-            return block;
+    @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
+    static boolean isHeader(@NotNull PacketAdapter block, @NotNull byte[] magic) {
+        final @NotNull byte[] data = block.getData();
+
+        if (data.length < magic.length)
+            return false;
+
+        for (int i = 0; i < magic.length; i++) {
+            if (data[i] != magic[i])
+                return false;
         }
-    }
 
-    @Override
-    public @NotNull StreamUsage getPrimaryStreamUsage() {
-        return StreamUsage.AUDIO;
-    }
-
-    @Override
-    public @NotNull Set<StreamUsage> getStreamUsage() {
-        return EnumSet.of(StreamUsage.AUDIO, StreamUsage.METADATA);
-    }
-
-    public static @Nullable StreamInfo test(@NotNull Page page) {
-        if (page.getBody().length > 8 && page.bodyContains(0, OpusHead.MAGIC)) {
-            return new StreamInfo(new Mapping());
-        }
-        return null;
-    }
-
-    @Override
-    public @NotNull String getContentType() {
-        return MediaType.BLOCK_STREAM_OPUS;
+        return true;
     }
 }
