@@ -38,7 +38,7 @@ import java.util.function.Consumer;
 public abstract class Stream<T extends Stream<T, H, D, I>, H extends Header, D extends DataBlock, I extends DataBlock> implements DataSource {
     protected final @NotNull List<@NotNull H> headers = new ArrayList<>();
     protected final @NotNull Queue<D> readyPackets = new LinkedList<>();
-    protected final @NotNull Mapping<I, ?> mapping;
+    protected final @NotNull StreamInfo streamInfo;
     protected final @NotNull Demuxer<T, I> demuxer;
     protected boolean headersComplete = false;
     protected @Nullable Consumer<@NotNull T> onBeginOfStreamCallback;
@@ -58,8 +58,8 @@ public abstract class Stream<T extends Stream<T, H, D, I>, H extends Header, D e
         }
     }
 
-    protected Stream(@NotNull Mapping<I, ?> mapping, @NotNull Demuxer<T, I> demuxer) {
-        this.mapping = mapping;
+    protected Stream(@NotNull StreamInfo streamInfo, @NotNull Demuxer<T, I> demuxer) {
+        this.streamInfo = streamInfo;
         this.demuxer = demuxer;
     }
 
@@ -83,12 +83,13 @@ public abstract class Stream<T extends Stream<T, H, D, I>, H extends Header, D e
         this.onDataReadyCallback = onDataReadyCallback;
     }
 
-    public @NotNull Mapping<I, ?> getMapping() {
-        return mapping;
+    public @NotNull StreamInfo getStreamInfo() {
+        return streamInfo;
     }
 
     public void consume(@NotNull I packet) {
-        final @NotNull DataBlock n = mapping.process(packet);
+        //noinspection unchecked
+        final @NotNull DataBlock n = ((Mapping<I, ? extends DataBlock>)streamInfo.getMapping()).process(packet);
         try {
             //noinspection unchecked
             headers.add((H) n);
