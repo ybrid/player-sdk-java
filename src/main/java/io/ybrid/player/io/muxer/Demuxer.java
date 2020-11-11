@@ -36,7 +36,7 @@ import java.util.function.Predicate;
 public abstract class Demuxer<T extends Stream<T, ?, ?, I>, I extends DataBlock> {
     protected boolean eofOnAutofill = false;
     protected @Nullable ByteDataSource autofillSource;
-    protected @Nullable Predicate<@NotNull I> isWantedCallback;
+    protected @Nullable Predicate<@NotNull DataBlock> isWantedCallback;
     protected @Nullable Consumer<@NotNull T> onBeginOfStreamCallback;
     protected @Nullable Consumer<@NotNull T> onEndOfStreamCallback;
 
@@ -61,7 +61,7 @@ public abstract class Demuxer<T extends Stream<T, ?, ?, I>, I extends DataBlock>
         }
     }
 
-    public void setIsWantedCallback(@Nullable Predicate<I> isWantedCallback) {
+    public void setIsWantedCallback(@Nullable Predicate<DataBlock> isWantedCallback) {
         this.isWantedCallback = isWantedCallback;
     }
 
