@@ -178,6 +178,10 @@ public class Page implements hasGranularPosition {
         return body;
     }
 
+    public boolean bodyContains(int offset, @NotNull byte[] needle) {
+        return arrayBeginsWith(body, offset, needle);
+    }
+
     @Override
     public String toString() {
         return "Page{" +
