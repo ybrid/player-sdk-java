@@ -35,11 +35,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class Demuxer extends io.ybrid.player.io.muxer.Demuxer<Stream, DataBlock> {
+    @SuppressWarnings("unchecked")
+    private final Class<? extends Generic>[] mappings = new Class[]{Generic.class};
     private final @NotNull Sync sync = new Sync();
     private final Map<Integer, @Nullable Stream> streams = new HashMap<>();
     private io.ybrid.api.metadata.Sync blockSync = new io.ybrid.api.metadata.Sync.Builder(new Source(SourceType.FORMAT)).build();
@@ -52,11 +55,31 @@ public class Demuxer extends io.ybrid.player.io.muxer.Demuxer<Stream, DataBlock>
         final @Nullable Stream stream;
 
         if (flags.contains(Flag.BOS)) {
-            block = new PageAdapter(blockSync, blockPlayoutInfo, page);
-            if (runPredicate(isWantedCallback, block, false)) {
-                stream = new Stream(new Generic(), this);
-                streams.put(serial, stream);
-                runConsumer(onBeginOfStreamCallback, stream);
+            @Nullable Class<? extends Generic> clazz = null;
+
+            for (final @NotNull Class<? extends Generic> mapping : mappings) {
+                try {
+                    if ((boolean)mapping.getMethod("test", Page.class).invoke(null, page)) {
+                        clazz = mapping;
+                        break;
+                    }
+                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
+                }
+            }
+
+            if (clazz != null) {
+                block = new PageAdapter(blockSync, blockPlayoutInfo, page);
+                if (runPredicate(isWantedCallback, block, false)) {
+                    try {
+                        stream = new Stream(clazz.newInstance(), this);
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                    streams.put(serial, stream);
+                    runConsumer(onBeginOfStreamCallback, stream);
+                } else {
+                    stream = null;
+                }
             } else {
                 stream = null;
             }
