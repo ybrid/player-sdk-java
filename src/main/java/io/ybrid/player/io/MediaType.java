@@ -57,6 +57,10 @@ public final class MediaType {
      * PCM stream as stream of blocks of {@code short[]}.
      */
     public static final @NotNull String PCM_STREAM_SHORT = "!_block-stream/pcm-java-short-array";
+    /**
+     * Demuxed Opus stream.
+     */
+    public static final @NotNull String BLOCK_STREAM_OPUS = "!_block-stream/opus";
 
     /* --------[ Methods ]-------- */
     public static boolean isInternal(@NotNull String mediaType) {

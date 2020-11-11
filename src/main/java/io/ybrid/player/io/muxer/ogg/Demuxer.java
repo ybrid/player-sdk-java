@@ -31,6 +31,7 @@ import io.ybrid.player.io.container.ogg.Page;
 import io.ybrid.player.io.container.ogg.Sync;
 import io.ybrid.player.io.mapping.ogg.Generic;
 import io.ybrid.player.io.muxer.StreamInfo;
+import io.ybrid.player.io.mapping.ogg.opus.Mapping;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +43,7 @@ import java.util.Set;
 
 public class Demuxer extends io.ybrid.player.io.muxer.Demuxer<Stream, PacketAdapter> {
     @SuppressWarnings("unchecked")
-    private final Class<? extends Generic>[] mappings = new Class[]{Generic.class};
+    private final Class<? extends Generic>[] mappings = new Class[]{Mapping.class};
     private final @NotNull Sync sync = new Sync();
     private final Map<Integer, @Nullable Stream> streams = new HashMap<>();
     private io.ybrid.api.metadata.Sync blockSync = new io.ybrid.api.metadata.Sync.Builder(new Source(SourceType.FORMAT)).build();
