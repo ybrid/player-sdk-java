@@ -24,11 +24,7 @@ package io.ybrid.player.io.mapping.ogg;
 
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.mapping.Mapping;
-import org.jetbrains.annotations.NotNull;
+import io.ybrid.player.io.muxer.ogg.PacketAdapter;
 
-public class Generic implements Mapping<DataBlock, DataBlock> {
-    @Override
-    public @NotNull DataBlock process(@NotNull DataBlock block) {
-        return block;
-    }
+public abstract class Generic implements Mapping<PacketAdapter, DataBlock> {
 }
