@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public class Stream extends io.ybrid.player.io.muxer.Stream<Stream, Header, DataBlock, DataBlock> {
+public class Stream extends io.ybrid.player.io.muxer.Stream<Stream, Header, DataBlock, PacketAdapter> {
     private io.ybrid.player.io.container.ogg.Stream stream;
 
     public void consume(@NotNull PageAdapter block) {
@@ -48,7 +48,7 @@ public class Stream extends io.ybrid.player.io.muxer.Stream<Stream, Header, Data
         }
     }
 
-    public Stream(@NotNull Mapping<DataBlock, ?> mapping, @NotNull Demuxer demuxer) {
+    public Stream(@NotNull Mapping<PacketAdapter, ?> mapping, @NotNull Demuxer demuxer) {
         super(mapping, demuxer);
     }
 

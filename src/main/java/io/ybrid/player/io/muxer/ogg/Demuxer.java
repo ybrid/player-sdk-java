@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Demuxer extends io.ybrid.player.io.muxer.Demuxer<Stream, DataBlock> {
+public class Demuxer extends io.ybrid.player.io.muxer.Demuxer<Stream, PacketAdapter> {
     @SuppressWarnings("unchecked")
     private final Class<? extends Generic>[] mappings = new Class[]{Generic.class};
     private final @NotNull Sync sync = new Sync();
