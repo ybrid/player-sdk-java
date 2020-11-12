@@ -24,6 +24,7 @@ package io.ybrid.player.io.mapping;
 
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.muxer.StreamUsage;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -31,6 +32,8 @@ import java.util.Set;
 public interface Mapping<I extends DataBlock, O extends DataBlock> {
     @NotNull O process(@NotNull I block);
 
+    @Contract(pure = true)
     @NotNull StreamUsage getPrimaryStreamUsage();
+    @Contract(pure = true)
     @NotNull Set<StreamUsage> getStreamUsage();
 }

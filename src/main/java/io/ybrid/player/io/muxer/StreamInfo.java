@@ -23,6 +23,7 @@
 package io.ybrid.player.io.muxer;
 
 import io.ybrid.player.io.mapping.Mapping;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -38,10 +39,12 @@ public class StreamInfo {
         return mapping;
     }
 
+    @Contract(pure = true)
     public @NotNull StreamUsage getPrimaryStreamUsage() {
         return mapping.getPrimaryStreamUsage();
     }
 
+    @Contract(pure = true)
     public @NotNull Set<StreamUsage> getStreamUsage() {
         return mapping.getStreamUsage();
     }
