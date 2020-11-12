@@ -39,35 +39,15 @@ import java.util.Objects;
 public class DemuxerDecoder implements Decoder {
     private final @NotNull ByteDataSource source;
     private final @NotNull DecoderFactory decoderFactory;
-    private @Nullable Demuxer<?, ?> demuxer;
+    private @NotNull final Demuxer<?, ?> demuxer;
     private @Nullable Decoder decoder;
     private long accumulatedSkippedSamples = 0;
-
-    private void assertDemuxer() throws IOException {
-        if (demuxer != null)
-            return;
-
-        if (!source.isValid())
-            throw new IllegalStateException("Source is not valid");
-
-        switch (Objects.requireNonNull(source.getContentType())) {
-            // TODO: Add any supported MediaType. Also see below!
-            default:
-                throw new IOException("Input format not supported: " + source.getContentType());
-        }
-
-        // TODO: enable this as soon as we support any MediaType in the switch above.
-        //demuxer.setAutofillSource(source);
-    }
 
     private void assertDecoder() throws IOException {
         final @NotNull Stream<?, ?, ?, ?>[] stream = new Stream[1];
 
         if (decoder != null)
             return;
-
-        assertDemuxer();
-        assert demuxer != null;
 
         //noinspection ConstantConditions
         demuxer.setIsWantedCallback(s -> stream[0] == null && s.getPrimaryStreamUsage().equals(StreamUsage.AUDIO));
@@ -92,9 +72,21 @@ public class DemuxerDecoder implements Decoder {
         decoder = null;
     }
 
-    public DemuxerDecoder(@NotNull ByteDataSource source, @NotNull DecoderFactory decoderFactory) {
+    public DemuxerDecoder(@NotNull ByteDataSource source, @NotNull DecoderFactory decoderFactory) throws IOException {
         this.source = source;
         this.decoderFactory = decoderFactory;
+
+        if (!source.isValid())
+            throw new IllegalStateException("Source is not valid");
+
+        switch (Objects.requireNonNull(source.getContentType())) {
+            // TODO: Add any supported MediaType. Also see below!
+            default:
+                throw new IOException("Input format not supported: " + source.getContentType());
+        }
+
+        // TODO: enable this as soon as we support any MediaType in the switch above.
+        //demuxer.setAutofillSource(source);
     }
 
     @Override
@@ -120,16 +112,11 @@ public class DemuxerDecoder implements Decoder {
 
     @Override
     public boolean isValid() {
-        if (demuxer == null) {
-            return source.isValid();
-        } else {
-            return !demuxer.isEofOnAutofill();
-        }
+        return !demuxer.isEofOnAutofill();
     }
 
     @Override
     public void close() throws IOException {
-        demuxer = null;
         closeDecoder();
         source.close();
     }
