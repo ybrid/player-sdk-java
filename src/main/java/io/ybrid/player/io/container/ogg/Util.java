@@ -25,7 +25,7 @@ package io.ybrid.player.io.container.ogg;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-final class Util {
+public final class Util {
     /**
      * Read a 64 bit little endian value as long.
      * @param raw Buffer with input data.
@@ -34,7 +34,7 @@ final class Util {
      */
     @Contract(pure = true)
     @SuppressWarnings("MagicNumber")
-    static long readLE64(@NotNull byte[] raw, int offset) {
+    public static long readLE64(@NotNull byte[] raw, int offset) {
         long ret = 0;
         for (int i = 0; i < 8; i++) {
             ret += (raw[offset + i] & 0xFF) << (8 * i);
@@ -50,7 +50,7 @@ final class Util {
      */
     @Contract(pure = true)
     @SuppressWarnings("MagicNumber")
-    static int readLE32(@NotNull byte[] raw, int offset) {
+    public static int readLE32(@NotNull byte[] raw, int offset) {
         int ret = 0;
         for (int i = 0; i < 4; i++) {
             ret += (raw[offset + i] & 0xFF) << (8 * i);
@@ -66,7 +66,7 @@ final class Util {
      * @return The extracted subarray.
      */
     @Contract(pure = true)
-    static @NotNull byte[] extractBytes(@NotNull byte[] raw, int offset, int length) {
+    public static @NotNull byte[] extractBytes(@NotNull byte[] raw, int offset, int length) {
         final @NotNull byte[] ret = new byte[length];
         System.arraycopy(raw, offset, ret, 0, length);
         return ret;
@@ -81,7 +81,7 @@ final class Util {
      * @return The newly constructed array.
      */
     @Contract(pure = true)
-    static @NotNull byte[] appendSubArray(@NotNull byte[] base, @NotNull byte[] addition, int offset, int length) {
+    public static @NotNull byte[] appendSubArray(@NotNull byte[] base, @NotNull byte[] addition, int offset, int length) {
         final @NotNull byte[] n = new byte[base.length + length];
         System.arraycopy(base, 0, n, 0, base.length);
         System.arraycopy(addition, offset, n, base.length, length);
