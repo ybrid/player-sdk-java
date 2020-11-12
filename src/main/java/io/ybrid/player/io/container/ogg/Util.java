@@ -59,6 +59,18 @@ public final class Util {
     }
 
     /**
+     * Read a 16 bit little endian value as int.
+     * @param raw Buffer with input data.
+     * @param offset Offset of the value within the buffer.
+     * @return The value in native byte order.
+     */
+    @Contract(pure = true)
+    @SuppressWarnings("MagicNumber")
+    public static int readLE16(@NotNull byte[] raw, int offset) {
+        return (raw[offset] & 0xFF) + ((raw[offset+1] & 0xFF) << 8);
+    }
+
+    /**
      * Extracts a subarray.
      * @param raw The base array.
      * @param offset The offset to start extracting from.
