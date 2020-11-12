@@ -22,6 +22,7 @@
 
 package io.ybrid.player.io.mapping.ogg.opus;
 
+import io.ybrid.player.io.container.ogg.Util;
 import io.ybrid.player.io.muxer.ogg.PacketAdapter;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,70 @@ class OpusHead extends Header {
     @NonNls
     static final byte[] MAGIC = "OpusHead".getBytes(StandardCharsets.UTF_8);
 
+    private final @NotNull PacketAdapter block;
+    private final @NotNull Version version;
+    private final int channelCount;
+    private final int preSkip;
+    private final int inputSampleRate;
+    private final int outputGainQ78;
+    private final @NotNull ChannelMapping channelMapping;
+
     public OpusHead(@NotNull PacketAdapter block) {
         super(block.getSync(), block.getPlayoutInfo());
+        final @NotNull byte[] raw = block.getData();
+
+        this.block = block;
+        this.version = new Version(raw[8]);
+        this.channelCount = raw[9] & 0xFF;
+        this.preSkip = Util.readLE16(raw, 10);
+        this.inputSampleRate = Util.readLE32(raw, 12);
+        this.outputGainQ78 = Util.readLE16(raw, 16);
+        this.channelMapping = new ChannelMapping(channelCount, raw, 18);
+    }
+
+    public @NotNull byte[] getRaw() {
+        return block.getData();
+    }
+
+    public @NotNull Version getVersion() {
+        return version;
+    }
+
+    public int getChannelCount() {
+        return channelCount;
+    }
+
+    public int getPreSkip() {
+        return preSkip;
+    }
+
+    public int getInputSampleRate() {
+        return inputSampleRate;
+    }
+
+    public int getOutputGainQ78() {
+        return outputGainQ78;
+    }
+
+    public double getOutputGain() {
+        //noinspection MagicNumber
+        return outputGainQ78 / 256.;
+    }
+
+    public @NotNull ChannelMapping getChannelMapping() {
+        return channelMapping;
+    }
+
+    @Override
+    public String toString() {
+        //noinspection HardCodedStringLiteral
+        return "OpusHead{" +
+                "version=" + version +
+                ", channelCount=" + channelCount +
+                ", preSkip=" + preSkip +
+                ", inputSampleRate=" + inputSampleRate +
+                ", outputGainQ78=" + outputGainQ78 + " (" + getOutputGain() + "dB)" +
+                ", channelMapping=" + channelMapping +
+                "}";
     }
 }
