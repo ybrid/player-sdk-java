@@ -22,7 +22,7 @@
 
 package io.ybrid.player.player;
 
-public final class NullMetadataConsumer implements MetadataConsumer {
+final class NullMetadataConsumer implements MetadataConsumer {
     private static final MetadataConsumer instance = new NullMetadataConsumer();
 
     private NullMetadataConsumer() {

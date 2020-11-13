@@ -26,6 +26,7 @@ import io.ybrid.api.*;
 import io.ybrid.api.bouquet.Bouquet;
 import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
+import io.ybrid.player.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ import java.time.Instant;
 /**
  * This interface is implemented by objects that control a session.
  */
-public interface SessionClient extends KnowsSubInfoState {
+public interface SessionClient extends Player, KnowsSubInfoState {
     /* --- Object Status --- */
 
     /**
