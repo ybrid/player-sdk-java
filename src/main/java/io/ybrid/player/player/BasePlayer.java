@@ -63,7 +63,7 @@ public class BasePlayer extends PlayerStub {
 
             @Override
             public @NotNull Map<String, Double> getAcceptedMediaFormats() {
-                return externalDecoderFactory.getSupportedFormats();
+                return decoderFactory.getSupportedFormats();
             }
 
             @Override
@@ -75,7 +75,7 @@ public class BasePlayer extends PlayerStub {
                  * server sending EOF and us adding the new buffer.
                  */
                 muxer.setInputEOFCallback(null);
-                decoder = externalDecoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceByTransportDescription(transportDescription)));
+                decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceByTransportDescription(transportDescription)));
                 if (decoder == null) {
                     LOGGER.warning("Can not create decoder for new input.");
                 } else {
