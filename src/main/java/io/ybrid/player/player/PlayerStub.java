@@ -27,7 +27,7 @@ import io.ybrid.api.session.Command;
 import io.ybrid.api.session.Request;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.player.AudioBackendFactory;
-import io.ybrid.player.DecoderFactory;
+import io.ybrid.player.io.decoder.DecoderFactory;
 import io.ybrid.player.io.audio.BufferMuxer;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
 import org.jetbrains.annotations.NotNull;

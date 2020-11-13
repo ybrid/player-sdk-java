@@ -22,7 +22,6 @@
 
 package io.ybrid.player.io.decoder;
 
-import io.ybrid.player.Decoder;
 import io.ybrid.player.io.muxer.Stream;
 import org.jetbrains.annotations.NotNull;
 
