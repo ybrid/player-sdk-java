@@ -59,6 +59,6 @@ public class Stream extends io.ybrid.player.io.muxer.Stream<Stream, Header, Data
 
     @Override
     public void close() throws IOException {
-        // TODO
+        // TODO, only signal we are no longer interested in this stream.
     }
 }
