@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2020 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,10 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player;
+package io.ybrid.player.player;
 
+import io.ybrid.player.MetadataProvider;
+import io.ybrid.player.SessionClient;
 import io.ybrid.player.io.audio.BufferStatusProvider;
 
 import java.io.Closeable;

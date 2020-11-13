@@ -22,6 +22,8 @@
 
 package io.ybrid.player;
 
+import io.ybrid.player.player.Player;
+
 /**
  * The PlayerState enum allows communication of the current state of the player.
  * It is especially useful for updating the user interface.
