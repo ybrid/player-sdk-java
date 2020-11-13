@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2020 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,15 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player;
+package io.ybrid.player.player;
 
-/**
- * This interface is implemented by classes that can provide Ybrid {@link io.ybrid.api.metadata.Metadata}.
- */
-public interface MetadataProvider {
-    /**
-     * Sets the consumer for the {@link io.ybrid.api.metadata.Metadata}.
-     * @param metadataConsumer The consumer to send the {@link io.ybrid.api.metadata.Metadata} to,
-     */
-    void setMetadataConsumer(MetadataConsumer metadataConsumer);
+public final class NullMetadataConsumer implements MetadataConsumer {
+    private static final MetadataConsumer instance = new NullMetadataConsumer();
+
+    private NullMetadataConsumer() {
+    }
+
+    public static MetadataConsumer getInstance() {
+        return instance;
+    }
 }

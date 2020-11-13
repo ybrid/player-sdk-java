@@ -22,7 +22,6 @@
 
 package io.ybrid.player.player;
 
-import io.ybrid.player.MetadataProvider;
 import io.ybrid.player.SessionClient;
 import io.ybrid.player.io.audio.BufferStatusProvider;
 
