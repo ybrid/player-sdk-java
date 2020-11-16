@@ -141,4 +141,9 @@ public abstract class Stream<T extends Stream<T, H, D, I>, H extends Header, D e
         } while (demuxer.canAutofill());
         throw new IllegalStateException("No data in queue and autofill not enabled.");
     }
+
+    @Override
+    public @Nullable String getContentType() {
+        return streamInfo.getContentType();
+    }
 }

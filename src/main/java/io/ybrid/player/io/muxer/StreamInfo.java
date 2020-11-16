@@ -25,6 +25,7 @@ package io.ybrid.player.io.muxer;
 import io.ybrid.player.io.mapping.Mapping;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -49,6 +50,15 @@ public class StreamInfo {
         return mapping.getStreamUsage();
     }
 
+    /**
+     * Return the content-type of the stream.
+     *
+     * @return The content-type or {@code null}.
+     */
+    @Nullable String getContentType() {
+        return mapping.getContentType();
+    }
+
     @Override
     public String toString() {
         //noinspection HardCodedStringLiteral
@@ -56,6 +66,7 @@ public class StreamInfo {
                 "mapping=" + mapping +
                 ", getPrimaryStreamUsage()=" + getPrimaryStreamUsage() +
                 ", getStreamUsage()=" + getStreamUsage() +
+                ", getContentType()=" + getContentType() +
                 "}";
     }
 }
