@@ -22,7 +22,6 @@
 
 package io.ybrid.player.io.decoder;
 
-import io.ybrid.player.io.ByteDataSource;
 import io.ybrid.player.io.DataSource;
 import io.ybrid.player.io.MediaType;
 import org.jetbrains.annotations.NotNull;
@@ -43,22 +42,19 @@ public class DecoderFactorySelector implements DecoderFactory {
 
     @Override
     public Decoder getDecoder(@NotNull DataSource dataSource) {
-        // if we have a ByteDataSource we can try to find the best one by the ContentType.
-        if (dataSource instanceof ByteDataSource) {
-            final @Nullable String contentType = ((ByteDataSource) dataSource).getContentType();
-            if (contentType != null) {
-                final @NotNull TreeMap<@NotNull Double, @NotNull DecoderFactory> map = new TreeMap<>(Comparator.reverseOrder());
-                for (final @NotNull DecoderFactory factory : factories) {
-                    final @Nullable Double quality = factory.getSupportedFormats().get(contentType);
-                    if (quality != null)
-                        map.put(quality, factory);
-                }
+        final @Nullable String contentType = dataSource.getContentType();
+        if (contentType != null) {
+            final @NotNull TreeMap<@NotNull Double, @NotNull DecoderFactory> map = new TreeMap<>(Comparator.reverseOrder());
+            for (final @NotNull DecoderFactory factory : factories) {
+                final @Nullable Double quality = factory.getSupportedFormats().get(contentType);
+                if (quality != null)
+                    map.put(quality, factory);
+            }
 
-                for (final @NotNull Map.Entry<@NotNull Double, @NotNull DecoderFactory> entry : map.entrySet()) {
-                    final @Nullable Decoder decoder = entry.getValue().getDecoder(dataSource);
-                    if (decoder != null)
-                        return decoder;
-                }
+            for (final @NotNull Map.Entry<@NotNull Double, @NotNull DecoderFactory> entry : map.entrySet()) {
+                final @Nullable Decoder decoder = entry.getValue().getDecoder(dataSource);
+                if (decoder != null)
+                    return decoder;
             }
         }
 
