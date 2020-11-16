@@ -23,7 +23,6 @@
 package io.ybrid.player.io;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -40,14 +39,4 @@ public interface ByteDataSource extends DataSource {
     @Override
     @NotNull
     ByteDataBlock read() throws IOException;
-
-    /**
-     * Return the content-type of the current stream.
-     *
-     * Calling this may connect if this source is {@link io.ybrid.api.util.Connectable}.
-     *
-     * @return The content-type or null.
-     */
-    @Nullable
-    String getContentType();
 }

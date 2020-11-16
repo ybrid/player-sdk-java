@@ -57,4 +57,10 @@ public interface PCMDataSource extends DataSource {
     default long getSkippedSamples() {
         return 0;
     }
+
+    @Override
+    @NotNull
+    default String getContentType() {
+        return MediaType.PCM_STREAM_SHORT;
+    }
 }

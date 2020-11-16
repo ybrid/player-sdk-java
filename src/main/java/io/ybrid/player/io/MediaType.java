@@ -51,4 +51,15 @@ public final class MediaType {
      * MP3.
      */
     public static final @NotNull String AUDIO_MPEG = "audio/mpeg";
+
+    /* --------[ Internal Media Types ]-------- */
+    /**
+     * PCM stream as stream of blocks of {@code short[]}.
+     */
+    public static final @NotNull String PCM_STREAM_SHORT = "!_block-stream/pcm-java-short-array";
+
+    /* --------[ Methods ]-------- */
+    public static boolean isInternal(@NotNull String mediaType) {
+        return mediaType.startsWith("!_");
+    }
 }

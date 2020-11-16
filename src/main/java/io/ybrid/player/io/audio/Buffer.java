@@ -25,7 +25,6 @@ package io.ybrid.player.io.audio;
 import io.ybrid.api.util.Identifier;
 import io.ybrid.api.util.hasIdentifier;
 import io.ybrid.player.io.DataBlock;
-import io.ybrid.player.io.DataSource;
 import io.ybrid.player.io.PCMDataBlock;
 import io.ybrid.player.io.PCMDataSource;
 import org.jetbrains.annotations.NotNull;
@@ -146,7 +145,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
         }
     }
 
-    private static class BufferThread extends Thread implements DataSource, BufferStatusProvider {
+    private static class BufferThread extends Thread implements PCMDataSource, BufferStatusProvider {
         private static final long POLL_TIMEOUT = 123; /* [ms] */
         private static final int SLEEP_TIME = 371; /* [ms] */
 
@@ -275,6 +274,11 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
         @Override
         public boolean isValid() {
             return !buffer.isEmpty() || exception == null;
+        }
+
+        @Override
+        public @NotNull String getContentType() {
+            return backend.getContentType();
         }
 
         @Override
