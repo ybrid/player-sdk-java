@@ -35,6 +35,8 @@ public class ChannelMapping {
     public enum Family {
         RTP(0),
         VORBIS(1),
+        AMBISONICS_2(2), // RFC 8486 Section 3.1
+        AMBISONICS_3(3), // RFC 8486 Section 3.2
         UNDEFINED_MEANING(255);
 
         private static final @NotNull Map<@NotNull Byte, Family> values = new HashMap<>();
@@ -81,24 +83,32 @@ public class ChannelMapping {
         if (outputChannelCount < 1)
             throw new IllegalArgumentException("Output channel count must not be < 1 but is " + outputChannelCount);
 
-        if (this.family.equals(Family.RTP)) {
-            this.streamCount = 1;
-            switch (outputChannelCount) {
-                case 1:
-                    this.coupledStreamCount = 0;
-                    this.matrix = new byte[]{0};
-                    break;
-                case 2:
-                    this.coupledStreamCount = 1;
-                    this.matrix = new byte[]{0, 1};
-                    break;
-                default:
-                    throw new IllegalArgumentException("outputChannelCount must not be > 2 but is " + outputChannelCount);
-            }
-        } else {
-            this.streamCount = raw[offset + 1] & 0xFF;
-            this.coupledStreamCount = raw[offset + 2] & 0xFF;
-            this.matrix = Util.extractBytes(raw, offset + 3, outputChannelCount);
+        switch (this.family) {
+            case RTP:
+                this.streamCount = 1;
+                switch (outputChannelCount) {
+                    case 1:
+                        this.coupledStreamCount = 0;
+                        this.matrix = new byte[]{0};
+                        break;
+                    case 2:
+                        this.coupledStreamCount = 1;
+                        this.matrix = new byte[]{0, 1};
+                        break;
+                    default:
+                        throw new IllegalArgumentException("outputChannelCount must not be > 2 but is " + outputChannelCount);
+                }
+                break;
+            case VORBIS:
+            case UNDEFINED_MEANING:
+            case AMBISONICS_2:
+            case AMBISONICS_3:
+                this.streamCount = raw[offset + 1] & 0xFF;
+                this.coupledStreamCount = raw[offset + 2] & 0xFF;
+                this.matrix = Util.extractBytes(raw, offset + 3, outputChannelCount);
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported mapping family: " + this.family);
         }
     }
 
