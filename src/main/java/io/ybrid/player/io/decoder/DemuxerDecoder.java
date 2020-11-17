@@ -23,15 +23,19 @@
 package io.ybrid.player.io.decoder;
 
 import io.ybrid.player.io.ByteDataSource;
+import io.ybrid.player.io.MediaType;
 import io.ybrid.player.io.PCMDataBlock;
 import io.ybrid.player.io.muxer.Demuxer;
 import io.ybrid.player.io.muxer.Stream;
 import io.ybrid.player.io.muxer.StreamUsage;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class DemuxerDecoder implements Decoder {
@@ -62,6 +66,14 @@ public class DemuxerDecoder implements Decoder {
         accumulatedSkippedSamples += decoder.getSkippedSamples();
         decoder.close();
         decoder = null;
+    }
+
+    public static @NotNull Map<String, Double> getSupportedFormats() {
+        @NonNls final Map<String, Double> list = new HashMap<>();
+
+        list.put(MediaType.ANY, 0.);
+
+        return list;
     }
 
     public DemuxerDecoder(@NotNull ByteDataSource source, @NotNull DecoderFactory decoderFactory) throws IOException {
