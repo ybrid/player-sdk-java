@@ -29,6 +29,16 @@ import org.jetbrains.annotations.NotNull;
  */
 @SuppressWarnings("HardCodedStringLiteral")
 public final class MediaType {
+    /* --------[ Special Media Types ]-------- */
+    /**
+     * Any Media type, used for {@code Accept:}-Headers.
+     */
+    public static final @NotNull String ANY = "*/*";
+    /* --------[ Official Media Types ]-------- */
+    /**
+     * Any stream of octets. Often used as fallback.
+     */
+    public static final @NotNull String APPLICATION_OCTET_STREAM = "application/octet-stream";
     /**
      * Ogg with any content.
      */
