@@ -31,7 +31,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-class OpusTags extends Header {
+public class OpusTags extends Header {
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
     @NonNls
     static final byte[] MAGIC = "OpusTags".getBytes(StandardCharsets.UTF_8);

@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 
-class OpusHead extends Header {
+public class OpusHead extends Header {
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
     @NonNls
     static final byte[] MAGIC = "OpusHead".getBytes(StandardCharsets.UTF_8);
