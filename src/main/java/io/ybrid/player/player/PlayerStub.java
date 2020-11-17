@@ -31,6 +31,7 @@ import io.ybrid.player.io.decoder.DecoderFactory;
 import io.ybrid.player.io.audio.BufferMuxer;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
 import io.ybrid.player.io.decoder.DecoderFactorySelector;
+import io.ybrid.player.io.decoder.DemuxerDecoderFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,6 +57,7 @@ abstract class PlayerStub implements Player {
 
         this.muxer = new BufferMuxer(session);
         this.decoderFactory = new DecoderFactorySelector();
+        this.decoderFactory.add(new DemuxerDecoderFactory(this.decoderFactory));
         this.decoderFactory.add(externalDecoderFactory);
         setMetadataConsumer(null);
     }
