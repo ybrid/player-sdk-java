@@ -106,7 +106,7 @@ public class ChannelMapping {
         return outputChannelCount;
     }
 
-    public Family getFamily() {
+    public @NotNull Family getFamily() {
         return family;
     }
 
