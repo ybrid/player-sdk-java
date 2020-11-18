@@ -33,17 +33,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Mapping extends Generic {
+    private @Nullable OpusHead opusHead = null;
+
     @Override
     public @NotNull DataBlock process(@NotNull PacketAdapter block) {
         if (Header.isHeader(block, OpusHead.MAGIC)) {
-            return new OpusHead(block);
+            opusHead = new OpusHead(block);
+            return opusHead;
         } else if (Header.isHeader(block, OpusTags.MAGIC)) {
             return new OpusTags(block);
         } else {
-            return block;
+            return new OpusDataBlock(Objects.requireNonNull(opusHead), block);
         }
     }
 
