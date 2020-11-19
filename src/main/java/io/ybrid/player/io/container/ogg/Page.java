@@ -33,7 +33,7 @@ import java.util.*;
 /**
  * This class represents a single Ogg page as per RFC 3533.
  */
-public class Page implements hasGranularPosition {
+public final class Page implements hasGranularPosition {
     private static final int READ_REQUEST = 4096; // [B], request reading 4kB at once.
     private static final int MIN_OGG_HEADER_LENGTH = 27; // [B]
     private static final byte[] MAGIC = new byte[]{'O', 'g', 'g', 'S', 0};

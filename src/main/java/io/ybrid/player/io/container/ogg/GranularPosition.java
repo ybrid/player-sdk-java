@@ -31,7 +31,7 @@ import java.util.Objects;
  * This is a helper class representing a granule position as defined by RFC 3533 Section 6.
  * The exact meaning of a granule position depends on the mapping used.
  */
-public class GranularPosition {
+public final class GranularPosition {
     /**
      * The invalid position.
      */

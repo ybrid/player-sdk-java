@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * This represents a Ogg packet as defined by RFC 3533.
  */
-public class Packet implements hasGranularPosition {
+public final class Packet implements hasGranularPosition {
     private final @NotNull GranularPosition granularPosition;
     private final @NotNull EnumSet<Flag> flags;
     private final @NotNull byte[] body;

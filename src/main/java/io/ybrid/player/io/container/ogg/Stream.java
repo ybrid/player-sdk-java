@@ -32,7 +32,7 @@ import java.util.Queue;
 /**
  * This implements the extraction layer for {@link Packet packets}.
  */
-public class Stream {
+public final class Stream {
     private final @NotNull Queue<Packet> readyPackets = new LinkedList<>();
     private final @NotNull EnumSet<Flag> seenFlags = EnumSet.noneOf(Flag.class);
     private final int serial;

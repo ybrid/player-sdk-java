@@ -33,7 +33,7 @@ import java.io.InputStream;
  * This class implements a buffer allowing to read Ogg {@link Page pages} from
  * a data source providing raw bytes.
  */
-public class Sync {
+public final class Sync {
     private static final int MAX_RETRY = 3;
 
     private @NotNull  byte[] buffer = new byte[0];
