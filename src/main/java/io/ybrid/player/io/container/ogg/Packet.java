@@ -30,12 +30,24 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+/**
+ * This represents a Ogg packet as defined by RFC 3533.
+ */
 public class Packet implements hasGranularPosition {
     private final @NotNull GranularPosition granularPosition;
     private final @NotNull EnumSet<Flag> flags;
     private final @NotNull byte[] body;
     private final boolean afterHole;
 
+    /**
+     * Constructs a new Packet.
+     *
+     * @param granularPosition The granular position.
+     * @param flags The flags for the new packet. This can be none, {@link Flag#BOS}, {@link Flag#EOS}, or both.
+     * @param body The raw body of the packet.
+     * @param afterHole Whether the packet is the first one fully decoded after a hole in a Ogg physical stream.
+     *                  When creating new streams this must be {@code false}.
+     */
     public Packet(@NotNull GranularPosition granularPosition, @NotNull Set<Flag> flags, @NotNull byte[] body, boolean afterHole) {
         this.afterHole = afterHole;
         if (flags.contains(Flag.CONTINUED))
@@ -51,14 +63,26 @@ public class Packet implements hasGranularPosition {
         return granularPosition;
     }
 
+    /**
+     * Gets the flags set on this packet.
+     * @return The flags on this packet.
+     */
     public @NotNull @UnmodifiableView Set<Flag> getFlags() {
         return Collections.unmodifiableSet(flags);
     }
 
+    /**
+     * Gets the raw body of this packet.
+     * @return The raw body.
+     */
     public byte[] getBody() {
         return body;
     }
 
+    /**
+     * Gets whether this packet is the first to be decoded after a hole in a Ogg physical stream.
+     * @return Whether a hole directly precedes this packet.
+     */
     public boolean isAfterHole() {
         return afterHole;
     }

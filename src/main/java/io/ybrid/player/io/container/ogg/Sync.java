@@ -29,6 +29,10 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * This class implements a buffer allowing to read Ogg {@link Page pages} from
+ * a data source providing raw bytes.
+ */
 public class Sync {
     private static final int MAX_RETRY = 3;
 
@@ -37,6 +41,14 @@ public class Sync {
     private @Nullable InputStream autoFullSource = null;
     private boolean eofOnAutoFill = false;
 
+    /**
+     * Fills the buffer with additional data by appending it at the end.
+     *
+     * @param raw The source array to take bytes from.
+     * @param offset The offset in the source array to start reading bytes from.
+     * @param length The length to read starting at the given offset.
+     * @see #setAutoFullSource(InputStream)
+     */
     public void fill(byte[] raw, int offset, int length) {
         final @NotNull byte[] n = new byte[buffer.length - bufferOffset + length];
         System.arraycopy(buffer, bufferOffset, n, 0, buffer.length - bufferOffset);
@@ -70,15 +82,39 @@ public class Sync {
         autoFill(request.getRead());
     }
 
+    /**
+     * Returns whether the auto fill source signaled EOF.
+     * @return The EOF state of the autofill source.
+     * @see #setAutoFullSource(InputStream)
+     */
     public boolean isEofOnAutoFill() {
         return eofOnAutoFill;
     }
 
+    /**
+     * Sets a data source for auto filling.
+     * In auto filling mode calls to {@link #read()} will automatically read from this source
+     * and append the data to the internal buffer as if {@link #fill(byte[], int, int)} was called
+     * to fill the buffer when the request for a page can not be satisfied with the current buffer.
+     * <P>
+     * It is uncommon but valid to set a new source at any time including after EOF has been reached and
+     * signaled by {@link #isEofOnAutoFill()}. The EOF flag is reset by calling this method.
+     *
+     * @param autoFullSource The source to set.
+     * @see #fill(byte[], int, int)
+     * @see #isEofOnAutoFill()
+     */
     public void setAutoFullSource(@Nullable InputStream autoFullSource) {
         this.autoFullSource = autoFullSource;
         this.eofOnAutoFill = false;
     }
 
+    /**
+     * Reads a {@link Page} from the buffer. If no {@link Page} can be read {@code null} is returned.
+     * This may read from auto fill sources if any are set.
+     * @return The newly parsed {@link Page} or {@code null}.
+     * @throws IOException As thrown by reading from backends.
+     */
     public @Nullable Page read() throws IOException {
         for (int retry = 0; retry < MAX_RETRY; retry++) {
             final @NotNull SyncRequest request = Page.verify(buffer, bufferOffset);

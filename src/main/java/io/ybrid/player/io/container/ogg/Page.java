@@ -30,6 +30,9 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * This class represents a single Ogg page as per RFC 3533.
+ */
 public class Page implements hasGranularPosition {
     private static final int READ_REQUEST = 4096; // [B], request reading 4kB at once.
     private static final int MIN_OGG_HEADER_LENGTH = 27; // [B]
@@ -115,6 +118,11 @@ public class Page implements hasGranularPosition {
         return new SyncRequest(raw.length - MAGIC.length, READ_REQUEST, null);
     }
 
+    /**
+     * Constructs a page object from a array of raw bytes.
+     * @param raw The bytes to read from.
+     * @param offset The offset to use.
+     */
     @SuppressWarnings("MagicNumber")
     public Page(@NotNull byte[] raw, int offset) {
         final @NotNull SyncRequest request = verify(raw, offset);
@@ -140,10 +148,18 @@ public class Page implements hasGranularPosition {
         body = Util.extractBytes(raw, offset + 27 + segments, bodyLength);
     }
 
+    /**
+     * Gets the {@link OggVersion} of the current page.
+     * @return The version of the current page.
+     */
     public @NotNull OggVersion getVersion() {
         return version;
     }
 
+    /**
+     * Gets the {@link Flag flags} set on this page.
+     * @return The set flags.
+     */
     public @NotNull @UnmodifiableView Set<Flag> getFlags() {
         return Collections.unmodifiableSet(flags);
     }
@@ -153,31 +169,72 @@ public class Page implements hasGranularPosition {
         return granularPosition;
     }
 
+    /**
+     * Gets the serial number of the bitstream from the page.
+     * @return The serial number.
+     */
     @Contract(pure = true)
     public int getSerial() {
         return serial;
     }
 
+    /**
+     * Gets the sequence number of the page.
+     * @return The sequence number.
+     */
     @Contract(pure = true)
     public int getSequence() {
         return sequence;
     }
 
+    /**
+     * Gets the number of segments from the page.
+     *
+     * This is generally not very useful. {@link Stream} should be used
+     * to extract {@link Packet packets} from pages.
+     *
+     * @return The number of segments in this page.
+     */
     @Contract(pure = true)
     public int getSegments() {
         return segments;
     }
 
+    /**
+     * Gets the raw segment table.
+     *
+     * This is generally not very useful. {@link Stream} should be used
+     * to extract {@link Packet packets} from pages.
+     *
+     * @return The raw segment tabe.
+     */
     @Contract(pure = true)
     public byte[] getSegmentTable() {
         return segmentTable;
     }
 
+    /**
+     * Gets the raw body from the page.
+     *
+     * This is generally not very useful. {@link Stream} should be used
+     * to extract {@link Packet packets} from pages.
+     *
+     * @return The raw body.
+     */
     @Contract(pure = true)
     public byte[] getBody() {
         return body;
     }
 
+    /**
+     * Finds an array of bytes within the page.
+     * This is only useful for checking a {@link Flag#BOS} page
+     * for a given magic in order to select a mapping.
+     *
+     * @param offset The offset in the body to look for the needle at.
+     * @param needle The needle to look for.
+     * @return Whether the needle is found at the offset within the body of the page.
+     */
     public boolean bodyContains(int offset, @NotNull byte[] needle) {
         return arrayBeginsWith(body, offset, needle);
     }

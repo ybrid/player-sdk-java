@@ -29,6 +29,9 @@ import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * This implements the extraction layer for {@link Packet packets}.
+ */
 public class Stream {
     private final @NotNull Queue<Packet> readyPackets = new LinkedList<>();
     private final @NotNull EnumSet<Flag> seenFlags = EnumSet.noneOf(Flag.class);
@@ -121,6 +124,12 @@ public class Stream {
             handleSegment(body, segmentBodyOffset, segmentTotalLength, afterHole, continued, true, page.getSegments() - 1, page);
     }
 
+    /**
+     * Constructs a new Stream object with the given {@link Flag#BOS} {@link Page}.
+     * The {@link Page} is added to the stream and does not need to be added with {@link #add(Page)}.
+     *
+     * @param page The {@link Flag#BOS} {@link Page} of the stream to open.
+     */
     public Stream(@NotNull Page page) {
         if (!page.getFlags().contains(Flag.BOS))
             throw new IllegalArgumentException("Stream does not begin with BOS page");
@@ -129,6 +138,10 @@ public class Stream {
         add(page);
     }
 
+    /**
+     * This adds a new Page to the internal buffer for processing.
+     * @param page The {@link Page} to add.
+     */
     public void add(@NotNull Page page) {
         final boolean hole;
 
@@ -140,6 +153,10 @@ public class Stream {
         extractSegements(page, hole);
     }
 
+    /**
+     * Reads a {@link Packet} from the stream.
+     * @return The next {@link Packet} or {@code null} if there is none waiting to be collected.
+     */
     public @Nullable Packet read() {
         return readyPackets.poll();
     }
