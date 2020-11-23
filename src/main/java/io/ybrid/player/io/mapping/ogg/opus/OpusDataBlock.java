@@ -39,6 +39,10 @@ public class OpusDataBlock extends ByteDataBlock {
         this.tableOfContents = new TableOfContents(packet.getData(), 0);
     }
 
+    /**
+     * Gets the {@link TableOfContents} for the Opus frame contained within.
+     * @return The {@link TableOfContents}.
+     */
     public @NotNull TableOfContents getTableOfContents() {
         return tableOfContents;
     }
