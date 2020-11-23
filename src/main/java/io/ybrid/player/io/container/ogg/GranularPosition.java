@@ -55,12 +55,62 @@ public final class GranularPosition {
     }
 
     /**
+     * Adds a given amount to a GranularPosition.
+     * @param val The amount to add.
+     * @return The new GranularPosition or {@link #INVALID}.
+     * @throws IllegalArgumentException Thrown if {@code val} is invalid.
+     */
+    @Contract(pure = true)
+    public @NotNull GranularPosition add(long val) throws IllegalArgumentException {
+        if (val < 0)
+            throw new IllegalArgumentException("val is less than zero: " + val);
+
+        if (this.isValid())
+            return new GranularPosition(this.raw + val);
+
+        return INVALID;
+    }
+
+    /**
+     * Substracts a given amount to a GranularPosition.
+     * @param val The amount to subtract.
+     * @return The new GranularPosition or {@link #INVALID}.
+     * @throws IllegalArgumentException Thrown if {@code val} is invalid.
+     */
+    @Contract(pure = true)
+    public @NotNull GranularPosition subtract(long val) throws IllegalArgumentException {
+        if (val < 0)
+            throw new IllegalArgumentException("val is less than zero: " + val);
+
+        if (this.isValid()) {
+            if ((this.raw - val) < 0)
+                throw new IllegalArgumentException("val is too big for subtraction: " + val);
+
+            return new GranularPosition(this.raw - val);
+        }
+
+        return INVALID;
+    }
+
+    /**
      * Checks whether the value is valid.
      * This is equal to calling {@link #equals(Object)} on the object passing {@link #INVALID} as argument.
      * @return Whether the value is valid.
      */
     public boolean isValid() {
         return raw != -1;
+    }
+
+    /**
+     * Gets the GranularPosition in units of a target clock.
+     * @param outputClockFrequency The target clock's frequency.
+     * @param inputClockFrequency The source clock's frequency as provided by the Mapping.
+     * @return The value of the GranularPosition in target units.
+     */
+    public long get(long outputClockFrequency, long inputClockFrequency) {
+        if (!isValid())
+            throw new IllegalArgumentException("Can not get value from invalid GranularPosition");
+        return raw * outputClockFrequency / inputClockFrequency;
     }
 
     @Override
