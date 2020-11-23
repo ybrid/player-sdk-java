@@ -22,8 +22,20 @@
 
 package io.ybrid.player.io.muxer;
 
+/**
+ * This enum is used to give possible values of usage of a stream.
+ */
 public enum StreamUsage {
+    /**
+     * The stream is used as audio transport.
+     */
     AUDIO,
+    /**
+     * The stream is used for transport of metadata.
+     */
     METADATA,
+    /**
+     * The stream is used for other data.
+     */
     OTHER;
 }
