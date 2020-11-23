@@ -24,20 +24,48 @@ package io.ybrid.player.io.mapping.ogg.opus;
 
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.MediaType;
+import io.ybrid.player.io.container.ogg.GranularPosition;
 import io.ybrid.player.io.container.ogg.Page;
 import io.ybrid.player.io.mapping.ogg.Generic;
 import io.ybrid.player.io.muxer.StreamInfo;
 import io.ybrid.player.io.muxer.StreamUsage;
 import io.ybrid.player.io.muxer.ogg.PacketAdapter;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Logger;
 
 public class Mapping extends Generic {
+    static final @NonNls Logger LOGGER = Logger.getLogger(Mapping.class.getName());
+
     private @Nullable OpusHead opusHead = null;
+    private @NotNull GranularPosition granularPosition = GranularPosition.INVALID;
+    private @Nullable Deque<OpusDataBlock> stack = new ArrayDeque<>();
+
+    private void processStack(@NotNull OpusDataBlock block) {
+        @NotNull GranularPosition granularPosition;
+
+        if (stack == null)
+            return;
+
+        granularPosition = block.getGranularPosition();
+        if (granularPosition.isValid()) {
+            try {
+                granularPosition = granularPosition.subtract(block.getTableOfContents().getAudioFrameCount());
+                for (Iterator<OpusDataBlock> iterator = stack.descendingIterator(); iterator.hasNext(); ) {
+                    OpusDataBlock e = iterator.next();
+                    e.setGranularPosition(granularPosition);
+                    granularPosition = granularPosition.subtract(block.getTableOfContents().getAudioFrameCount());
+                }
+            } catch (Throwable ignored) {
+            }
+            stack = null;
+        } else {
+            stack.addLast(block);
+        }
+    }
 
     @Override
     public @NotNull DataBlock process(@NotNull PacketAdapter block) {
@@ -47,7 +75,22 @@ public class Mapping extends Generic {
         } else if (Header.isHeader(block, OpusTags.MAGIC)) {
             return new OpusTags(block);
         } else {
-            return new OpusDataBlock(Objects.requireNonNull(opusHead), block);
+            final @NotNull OpusDataBlock ret;
+            final @NotNull GranularPosition fromBlock = block.getPacket().getGranularPosition();
+
+            if (fromBlock.isValid()) {
+                if (granularPosition.isValid()) {
+                    if (!granularPosition.equals(fromBlock)) {
+                        LOGGER.severe("Jump in granularPosition from " + granularPosition + " to " + fromBlock);
+                    }
+                }
+                granularPosition = fromBlock;
+            }
+
+            ret = new OpusDataBlock(Objects.requireNonNull(opusHead), block, granularPosition);
+            processStack(ret);
+            granularPosition = granularPosition.add(ret.getTableOfContents().getAudioFrameCount());
+            return ret;
         }
     }
 
