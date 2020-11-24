@@ -41,6 +41,7 @@ public abstract class Stream<T extends Stream<T, H, D, I>, H extends Header, D e
     protected final @NotNull StreamInfo streamInfo;
     protected final @NotNull Demuxer<T, I> demuxer;
     protected boolean headersComplete = false;
+    protected boolean reachedEOF = false;
     protected @Nullable Consumer<@NotNull T> onBeginOfStreamCallback;
     protected @Nullable Consumer<@NotNull T> onEndOfStreamCallback;
     protected @Nullable Consumer<@NotNull T> onHeaderReadyCallback;
@@ -105,6 +106,10 @@ public abstract class Stream<T extends Stream<T, H, D, I>, H extends Header, D e
         }
     }
 
+    protected void signalEOF() {
+        reachedEOF = true;
+    }
+
     @UnmodifiableView
     public @NotNull List<? extends H> getHeaders() {
         return Collections.unmodifiableList(headers);
@@ -112,9 +117,15 @@ public abstract class Stream<T extends Stream<T, H, D, I>, H extends Header, D e
 
     public @Nullable D read(boolean autofill) throws IOException {
         @Nullable D packet = readyPackets.poll();
-        if (packet == null && autofill) {
-            demuxer.iter();
-            packet = readyPackets.poll();
+        if (packet == null) {
+            if (reachedEOF) {
+                runCallback(onEndOfStreamCallback);
+                throw new EOFException();
+            }
+            if (autofill) {
+                demuxer.iter();
+                packet = readyPackets.poll();
+            }
         }
         return packet;
     }
