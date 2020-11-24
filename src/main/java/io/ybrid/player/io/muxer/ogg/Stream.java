@@ -23,6 +23,7 @@
 package io.ybrid.player.io.muxer.ogg;
 
 import io.ybrid.player.io.DataBlock;
+import io.ybrid.player.io.container.ogg.Flag;
 import io.ybrid.player.io.container.ogg.Packet;
 import io.ybrid.player.io.mapping.Header;
 import io.ybrid.player.io.muxer.StreamInfo;
@@ -45,6 +46,8 @@ public class Stream extends io.ybrid.player.io.muxer.Stream<Stream, Header, Data
 
         while ((packet = stream.read()) != null) {
             consume(new PacketAdapter(block.getSync(), block.getPlayoutInfo(), packet));
+            if (packet.getFlags().contains(Flag.EOS))
+                signalEOF();
         }
     }
 
