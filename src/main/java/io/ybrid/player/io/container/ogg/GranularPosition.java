@@ -113,6 +113,21 @@ public final class GranularPosition {
         return raw * outputClockFrequency / inputClockFrequency;
     }
 
+    /**
+     * Compares this to {@code other}. Returns whether this is less or equal than {@code other}.
+     * @param other The other GranularPosition to compare to.
+     * @return The result of the comparison.
+     */
+    public boolean isLessOrEqualThan(@NotNull GranularPosition other) {
+        if (this == other || (!isValid() && !other.isValid()))
+            return true;
+
+        if (!isValid() || !other.isValid())
+            throw new IllegalArgumentException("One but not both GranularPosition are not valid: this is " + this + " and the other is " + other);
+
+        return get(1, 1) <= other.get(1, 1);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
