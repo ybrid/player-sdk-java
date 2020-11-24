@@ -25,6 +25,7 @@ package io.ybrid.player.io.container.ogg;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 /**
@@ -35,11 +36,11 @@ public final class GranularPosition {
     /**
      * The invalid position.
      */
-    static public final @NotNull GranularPosition INVALID = new GranularPosition(-1);
+    static public final @NotNull GranularPosition INVALID = new GranularPosition(BigInteger.valueOf(-1));
 
-    private final long raw;
+    private final BigInteger raw;
 
-    private GranularPosition(long raw) {
+    private GranularPosition(@NotNull BigInteger raw) {
         this.raw = raw;
     }
 
@@ -51,7 +52,14 @@ public final class GranularPosition {
      */
     @Contract(pure = true)
     public GranularPosition(@NotNull byte[] raw, int offset) {
-        this.raw = Util.readLE64(raw, offset);
+        final @NotNull byte[] buf = new byte[9];
+        buf[0] = 0;
+
+        for (int i = 0; i < 8; i++) {
+            buf[8 - i] = raw[offset + i];
+        }
+
+        this.raw = new BigInteger(buf);
     }
 
     /**
@@ -66,7 +74,7 @@ public final class GranularPosition {
             throw new IllegalArgumentException("val is less than zero: " + val);
 
         if (this.isValid())
-            return new GranularPosition(this.raw + val);
+            return new GranularPosition(raw.add(BigInteger.valueOf(val)));
 
         return INVALID;
     }
@@ -83,10 +91,11 @@ public final class GranularPosition {
             throw new IllegalArgumentException("val is less than zero: " + val);
 
         if (this.isValid()) {
-            if ((this.raw - val) < 0)
+            final @NotNull BigInteger n = raw.subtract(BigInteger.valueOf(val));
+            if (n.signum() < 0)
                 throw new IllegalArgumentException("val is too big for subtraction: " + val);
 
-            return new GranularPosition(this.raw - val);
+            return new GranularPosition(n);
         }
 
         return INVALID;
@@ -98,7 +107,7 @@ public final class GranularPosition {
      * @return Whether the value is valid.
      */
     public boolean isValid() {
-        return raw != -1;
+        return raw.signum() >= 0;
     }
 
     /**
@@ -110,7 +119,7 @@ public final class GranularPosition {
     public long get(long outputClockFrequency, long inputClockFrequency) {
         if (!isValid())
             throw new IllegalArgumentException("Can not get value from invalid GranularPosition");
-        return raw * outputClockFrequency / inputClockFrequency;
+        return raw.multiply(BigInteger.valueOf(outputClockFrequency)).divide(BigInteger.valueOf(inputClockFrequency)).longValue();
     }
 
     /**
@@ -125,7 +134,7 @@ public final class GranularPosition {
         if (!isValid() || !other.isValid())
             throw new IllegalArgumentException("One but not both GranularPosition are not valid: this is " + this + " and the other is " + other);
 
-        return get(1, 1) <= other.get(1, 1);
+        return raw.compareTo(other.raw) <= 0;
     }
 
     @Override
@@ -133,7 +142,7 @@ public final class GranularPosition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GranularPosition that = (GranularPosition) o;
-        return raw == that.raw;
+        return raw.equals(that.raw);
     }
 
     @Override
