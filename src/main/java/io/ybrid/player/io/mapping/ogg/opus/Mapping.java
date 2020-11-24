@@ -24,6 +24,7 @@ package io.ybrid.player.io.mapping.ogg.opus;
 
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.MediaType;
+import io.ybrid.player.io.container.ogg.Flag;
 import io.ybrid.player.io.container.ogg.GranularPosition;
 import io.ybrid.player.io.container.ogg.Page;
 import io.ybrid.player.io.mapping.ogg.Generic;
@@ -81,7 +82,9 @@ public class Mapping extends Generic {
             if (fromBlock.isValid()) {
                 if (granularPosition.isValid()) {
                     if (!granularPosition.equals(fromBlock)) {
-                        LOGGER.severe("Jump in granularPosition from " + granularPosition + " to " + fromBlock);
+                        if (!(block.getPacket().getFlags().contains(Flag.EOS) && fromBlock.isLessOrEqualThan(granularPosition))) {
+                            LOGGER.severe("Jump in granularPosition from " + granularPosition + " to " + fromBlock);
+                        }
                     }
                 }
                 granularPosition = fromBlock;
