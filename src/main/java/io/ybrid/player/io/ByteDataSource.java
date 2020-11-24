@@ -44,7 +44,7 @@ public interface ByteDataSource extends DataSource {
     /**
      * Return the content-type of the current stream.
      *
-     * Calling this may connect if this source is {@link io.ybrid.api.Connectable}.
+     * Calling this may connect if this source is {@link io.ybrid.api.util.Connectable}.
      *
      * @return The content-type or null.
      */

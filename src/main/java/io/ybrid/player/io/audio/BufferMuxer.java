@@ -25,7 +25,7 @@ package io.ybrid.player.io.audio;
 import io.ybrid.api.Session;
 import io.ybrid.api.Workaround;
 import io.ybrid.api.transaction.Transaction;
-import io.ybrid.api.transport.TransportDescription;
+import io.ybrid.api.transport.ServiceTransportDescription;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.DataBlockMetadataUpdateThread;
 import io.ybrid.player.io.PCMDataBlock;
@@ -50,11 +50,11 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
 
     private static class Entry {
         private final @NotNull Buffer buffer;
-        private final @NotNull TransportDescription transportDescription;
+        private final @NotNull ServiceTransportDescription transportDescription;
         private final @NotNull PCMDataSource source;
         private final @Nullable PCMDataSource silenceEliminator;
 
-        public Entry(@NotNull PCMDataSource source, @NotNull DataBlockConsumer consumer, @NotNull TransportDescription transportDescription) {
+        public Entry(@NotNull PCMDataSource source, @NotNull DataBlockConsumer consumer, @NotNull ServiceTransportDescription transportDescription) {
             final @NotNull PCMDataSource usedSource;
 
             this.source = source;
@@ -161,7 +161,7 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
         metadataUpdateThread.start();
     }
 
-    public void addBuffer(@NotNull PCMDataSource source, @NotNull TransportDescription transportDescription) {
+    public void addBuffer(@NotNull PCMDataSource source, @NotNull ServiceTransportDescription transportDescription) {
         final @NotNull Entry newEntry = new Entry(source, ((dataBlock, entry) -> {
             if (entry == selectedBuffer)
                 metadataUpdateThread.accept(dataBlock);

@@ -36,7 +36,7 @@ import io.ybrid.api.session.Command;
 import io.ybrid.api.session.PlayerControl;
 import io.ybrid.api.session.Request;
 import io.ybrid.api.transaction.Transaction;
-import io.ybrid.api.transport.TransportDescription;
+import io.ybrid.api.transport.ServiceTransportDescription;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.PCMDataBlock;
@@ -213,7 +213,7 @@ public class YbridPlayer implements Player {
             }
 
             @Override
-            public void connectTransport(@NotNull TransportDescription transportDescription) throws Exception {
+            public void connectTransport(@NotNull ServiceTransportDescription transportDescription) throws Exception {
                 final @Nullable Decoder decoder;
 
                 /*

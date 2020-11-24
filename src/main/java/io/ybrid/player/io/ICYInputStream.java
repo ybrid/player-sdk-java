@@ -26,8 +26,8 @@ import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
 import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.Sync;
+import io.ybrid.api.transport.ServiceURITransportDescription;
 import io.ybrid.api.transport.TransportConnectionState;
-import io.ybrid.api.transport.URITransportDescription;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +53,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     private static final int MAX_METATDATA_INTERVAL = 128*1024;
     private static final int READ_BUFFER_LENGTH = 2048;
     private static final int ICY_METADATA_BLOCK_MULTIPLAYER = 16;
-    private final @NotNull URITransportDescription transportDescription;
+    private final @NotNull ServiceURITransportDescription transportDescription;
     private Socket socket;
     private InputStream inputStream;
     private HashMap<String, String> replyHeaders;
@@ -73,7 +73,7 @@ class ICYInputStream implements Closeable, ByteDataSource {
     }
 
     @SuppressWarnings("HardCodedStringLiteral")
-    public ICYInputStream(@NotNull URITransportDescription transportDescription) throws MalformedURLException {
+    public ICYInputStream(@NotNull ServiceURITransportDescription transportDescription) throws MalformedURLException {
         uri = transportDescription.getURI();
 
         this.transportDescription = transportDescription;

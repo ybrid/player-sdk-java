@@ -22,8 +22,8 @@
 
 package io.ybrid.player.io.audio;
 
-import io.ybrid.api.Identifier;
-import io.ybrid.api.hasIdentifier;
+import io.ybrid.api.util.Identifier;
+import io.ybrid.api.util.hasIdentifier;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -22,8 +22,8 @@
 
 package io.ybrid.player.io.audio;
 
-import io.ybrid.api.Identifier;
-import io.ybrid.api.hasIdentifier;
+import io.ybrid.api.util.Identifier;
+import io.ybrid.api.util.hasIdentifier;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.DataSource;
 import io.ybrid.player.io.PCMDataBlock;

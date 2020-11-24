@@ -26,9 +26,7 @@ import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
 import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.Sync;
-import io.ybrid.api.transport.TransportConnectionState;
-import io.ybrid.api.transport.TransportDescription;
-import io.ybrid.api.transport.URITransportDescription;
+import io.ybrid.api.transport.*;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +49,7 @@ public final class DataSourceFactory {
     static final Logger LOGGER = Logger.getLogger(DataSourceFactory.class.getName());
 
     private static class URLSource implements ByteDataSource {
-        private final @NotNull URITransportDescription transportDescription;
+        private final @NotNull ServiceURITransportDescription transportDescription;
         private final @NotNull Sync sync;
         private final InputStream inputStream;
         private final String contentType;
@@ -85,7 +83,7 @@ public final class DataSourceFactory {
             return ret;
         }
 
-        public URLSource(@NotNull URITransportDescription transportDescription) throws IOException {
+        public URLSource(@NotNull ServiceURITransportDescription transportDescription) throws IOException {
             @NonNls URLConnection connection = transportDescription.getURI().toURL().openConnection();
             final @Nullable MessageBody messageBody = transportDescription.getRequestBody();
 
@@ -156,15 +154,15 @@ public final class DataSourceFactory {
     }
 
     /**
-     * This builds a {@link ByteDataSource} for the audio stream based on a {@link TransportDescription}.
+     * This builds a {@link ByteDataSource} for the audio stream based on a {@link ServiceTransportDescription}.
      *
-     * @param transportDescription The {@link TransportDescription} to use.
+     * @param transportDescription The {@link ServiceTransportDescription} to use.
      * @return The {@link ByteDataSource} for the stream.
      * @throws IOException I/O-Errors as thrown by the used backends.
      */
-    public static ByteDataSource getSourceByTransportDescription(@NotNull TransportDescription transportDescription) throws IOException {
-        if (transportDescription instanceof URITransportDescription) {
-            final @NotNull URI uri = ((URITransportDescription) transportDescription).getURI();
+    public static ByteDataSource getSourceByTransportDescription(@NotNull ServiceTransportDescription transportDescription) throws IOException {
+        if (transportDescription instanceof ServiceURITransportDescription) {
+            final @NotNull URI uri = ((ServiceURITransportDescription) transportDescription).getURI();
             final @NotNull String scheme = uri.getScheme();
 
             LOGGER.log(Level.INFO, "getSourceByTransportDescription(session=" + transportDescription + "): uri=" + uri); //NON-NLS
@@ -172,12 +170,12 @@ public final class DataSourceFactory {
             //noinspection SpellCheckingInspection
             if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS
                 try {
-                    return new ICYInputStream((URITransportDescription)transportDescription);
+                    return new ICYInputStream((ServiceURITransportDescription)transportDescription);
                 } catch (MalformedURLException ignored) {
                 }
             }
 
-            return new URLSource((URITransportDescription)transportDescription);
+            return new URLSource((ServiceURITransportDescription)transportDescription);
         } else {
             throw new IllegalArgumentException("Unsupported transport description: " + transportDescription);
         }
