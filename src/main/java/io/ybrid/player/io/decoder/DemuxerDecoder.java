@@ -42,25 +42,19 @@ public class DemuxerDecoder implements Decoder {
     private @NotNull final Demuxer<?, ?> demuxer;
     private @Nullable Decoder decoder;
     private long accumulatedSkippedSamples = 0;
+    private @Nullable Stream<?, ?, ?, ?> currentStream = null;
 
     private void assertDecoder() throws IOException {
-        final @NotNull Stream<?, ?, ?, ?>[] stream = new Stream[1];
-
         if (decoder != null)
             return;
 
-        //noinspection ConstantConditions
-        demuxer.setIsWantedCallback(s -> stream[0] == null && s.getPrimaryStreamUsage().equals(StreamUsage.AUDIO));
-        demuxer.setOnBeginOfStreamCallback(s -> stream[0] = s);
-
-        //noinspection ConstantConditions
         do {
             demuxer.iter();
             if (demuxer.isEofOnAutofill())
                 throw new EOFException();
-        } while (stream[0] == null);
+        } while (currentStream == null);
 
-        decoder = decoderFactory.getDecoder(stream[0]);
+        decoder = decoderFactory.getDecoder(currentStream);
     }
 
     private void closeDecoder() throws IOException {
@@ -85,8 +79,13 @@ public class DemuxerDecoder implements Decoder {
                 throw new IOException("Input format not supported: " + source.getContentType());
         }
 
-        // TODO: enable this as soon as we support any MediaType in the switch above.
-        //demuxer.setAutofillSource(source);
+        /* TODO: enable this as soon as we support any MediaType in the switch above.
+        demuxer.setAutofillSource(source);
+
+        demuxer.setIsWantedCallback(s -> currentStream == null && s.getPrimaryStreamUsage().equals(StreamUsage.AUDIO));
+        demuxer.setOnBeginOfStreamCallback(s -> currentStream = s);
+        demuxer.setOnEndOfStreamCallback(s -> currentStream = currentStream == s ? null : currentStream);
+         */
     }
 
     @Override
