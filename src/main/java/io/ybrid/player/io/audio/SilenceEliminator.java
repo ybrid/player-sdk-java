@@ -32,7 +32,7 @@ import java.io.IOException;
 /**
  * This class is a filter {@link PCMDataSource}. It removes silence at start of a stream.
  */
-public final class SilenceEliminator implements PCMDataSource {
+public final class SilenceEliminator extends FilterPCMDataSource<PCMDataSource> {
     /**
      * This enum contains different types of silence.
      */
@@ -62,7 +62,6 @@ public final class SilenceEliminator implements PCMDataSource {
         }
     }
 
-    private final @NotNull PCMDataSource backend;
     private final @NotNull SilenceType silenceType;
     private boolean skipComplete = false;
     private long skippedSamples = 0;
@@ -75,7 +74,7 @@ public final class SilenceEliminator implements PCMDataSource {
      */
     @Contract(pure = true)
     public SilenceEliminator(@NotNull PCMDataSource backend, @NotNull SilenceType silenceType) {
-        this.backend = backend;
+        super(backend);
         this.silenceType = silenceType;
     }
 
@@ -147,17 +146,8 @@ public final class SilenceEliminator implements PCMDataSource {
     }
 
     @Override
-    public boolean isValid() {
-        return backend.isValid();
-    }
-
-    @Override
     public long getSkippedSamples() {
         return skippedSamples;
     }
 
-    @Override
-    public void close() throws IOException {
-        backend.close();
-    }
 }
