@@ -31,6 +31,7 @@ import io.ybrid.player.io.PCMDataSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 public class Generator implements PCMDataSource {
@@ -54,8 +55,12 @@ public class Generator implements PCMDataSource {
 
     @Override
     public @NotNull PCMDataBlock read() throws IOException {
-        final short[] data = function.generate(state, sampleRate, channels, blockSize);
-        return new PCMDataBlock(sync, playoutInfo, data, sampleRate, channels);
+        if (valid) {
+            final short[] data = function.generate(state, sampleRate, channels, blockSize);
+            return new PCMDataBlock(sync, playoutInfo, data, sampleRate, channels);
+        } else {
+            throw new EOFException();
+        }
     }
 
     @Override
