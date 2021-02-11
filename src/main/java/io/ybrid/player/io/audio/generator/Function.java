@@ -47,19 +47,19 @@ public abstract class Function {
         };
     }
 
-    static public @NotNull Function createCos(double frequency) {
+    static public @NotNull Function createCos(double frequency, double amplitude, double initialPhase) {
         return new Function() {
             @SuppressWarnings("InnerClassTooDeeplyNested")
             class CosState implements State {
-                private double phase = 0;
+                private double phase = initialPhase;
 
                 public double getPhaseAndAdvance(int sampleRate) {
                     final double oldPhase = phase;
 
-                    phase += 2.*Math.PI * frequency / (double)sampleRate;
-
                     while (phase > Math.PI)
                         phase -= 2.*Math.PI;
+
+                    phase += 2.*Math.PI * frequency / (double)sampleRate;
 
                     return oldPhase;
                 }
@@ -74,7 +74,7 @@ public abstract class Function {
                 short[] out = new short[channels*frames];
 
                 for (int i = 0; i < frames; i++) {
-                    short value = (short)(Short.MAX_VALUE * Math.cos(((CosState)state).getPhaseAndAdvance(sampleRate)));
+                    short value = (short)(Short.MAX_VALUE * amplitude * Math.cos(((CosState)state).getPhaseAndAdvance(sampleRate)));
 
                     for (int c = 0; c < channels; c++) {
                         out[i * channels + c] = value;
