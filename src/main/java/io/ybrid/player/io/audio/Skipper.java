@@ -35,9 +35,9 @@ import java.util.ArrayDeque;
  * from the beginning, and the end of a stream.
  */
 public abstract class Skipper extends FilterPCMDataSource<PCMDataSource> {
-    protected long read = 0;
-    protected long written = 0;
-    protected long skipped = 0;
+    private long read = 0;
+    private long written = 0;
+    private long skipped = 0;
     /**
      * Number of frames to skip at the beginning of the stream.
      */
@@ -58,8 +58,8 @@ public abstract class Skipper extends FilterPCMDataSource<PCMDataSource> {
      * {@link #getSkippedSamples()}.
      */
     protected boolean accountSkipped = true;
-    protected boolean reachedEOF = false;
-    protected final @NotNull ArrayDeque<PCMDataBlock> queue = new ArrayDeque<>();
+    private boolean reachedEOF = false;
+    private final @NotNull ArrayDeque<PCMDataBlock> queue = new ArrayDeque<>();
 
     /**
      * To be implemented by implementing classes.
@@ -67,7 +67,7 @@ public abstract class Skipper extends FilterPCMDataSource<PCMDataSource> {
      * {@link #preSkip}, and {@link #postSkip}.
      * @param block The block read off the backend.
      */
-    abstract void examine(@NotNull PCMDataBlock block);
+    abstract protected void examine(@NotNull PCMDataBlock block);
 
     private @NotNull PCMDataBlock readFromBackend() throws IOException {
         try {

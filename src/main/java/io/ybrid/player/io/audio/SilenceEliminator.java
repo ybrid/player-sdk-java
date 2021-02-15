@@ -75,7 +75,7 @@ public final class SilenceEliminator extends Skipper {
     }
 
     @Override
-    void examine(@NotNull PCMDataBlock block) {
+    protected void examine(@NotNull PCMDataBlock block) {
         if (!preSkipDone) {
             final short maxValue = silenceType.getMaxValue();
 
