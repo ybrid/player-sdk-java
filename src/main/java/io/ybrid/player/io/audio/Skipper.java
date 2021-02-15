@@ -30,17 +30,43 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayDeque;
 
+/**
+ * The Skipper implements a {@link FilterPCMDataSource} that allows skipping frames
+ * from the beginning, and the end of a stream.
+ */
 public abstract class Skipper extends FilterPCMDataSource<PCMDataSource> {
     protected long read = 0;
     protected long written = 0;
     protected long skipped = 0;
+    /**
+     * Number of frames to skip at the beginning of the stream.
+     */
     protected long preSkip = 0;
+    /**
+     * Number of frames to skip at the end of the stream.
+     */
     protected long postSkip = 0;
+    /**
+     * Whether the pre-skip has completed.
+     * This can be used to speed up checks in {@link #examine(PCMDataBlock)}.
+     * <P>
+     * Note: This value must not be written.
+     */
     protected boolean preSkipDone = false;
+    /**
+     * Whether skipped frames should be accounted for in the return value of
+     * {@link #getSkippedSamples()}.
+     */
     protected boolean accountSkipped = true;
     protected boolean reachedEOF = false;
     protected final @NotNull ArrayDeque<PCMDataBlock> queue = new ArrayDeque<>();
 
+    /**
+     * To be implemented by implementing classes.
+     * This inspects a block read from the input and updates
+     * {@link #preSkip}, and {@link #postSkip}.
+     * @param block The block read off the backend.
+     */
     abstract void examine(@NotNull PCMDataBlock block);
 
     private @NotNull PCMDataBlock readFromBackend() throws IOException {
