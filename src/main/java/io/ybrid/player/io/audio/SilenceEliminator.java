@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2021 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,10 @@ import io.ybrid.player.io.PCMDataSource;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
 /**
- * This class is a filter {@link PCMDataSource}. It removes silence at start of a stream.
+ * This class is a {@link Skipper} that removes silence at start of a stream.
  */
-public final class SilenceEliminator extends FilterPCMDataSource<PCMDataSource> {
+public final class SilenceEliminator extends Skipper {
     /**
      * This enum contains different types of silence.
      */
@@ -63,8 +61,6 @@ public final class SilenceEliminator extends FilterPCMDataSource<PCMDataSource> 
     }
 
     private final @NotNull SilenceType silenceType;
-    private boolean skipComplete = false;
-    private long skippedSamples = 0;
 
     /**
      * Main constructor.
@@ -78,76 +74,28 @@ public final class SilenceEliminator extends FilterPCMDataSource<PCMDataSource> 
         this.silenceType = silenceType;
     }
 
-    private void assertSkipComplete() {
-        if (!skipComplete)
-            throw new IllegalStateException("Skip not yet complete");
-    }
+    @Override
+    void examine(@NotNull PCMDataBlock block) {
+        if (!preSkipDone) {
+            final short maxValue = silenceType.getMaxValue();
 
-    private @NotNull PCMDataBlock skipSilence() throws IOException {
-        final short maxValue = silenceType.getMaxValue();
-
-        while (true) {
-            final @NotNull PCMDataBlock block = backend.read();
-            final @NotNull short[] data = block.getData();
+            final short[] data = block.getData();
             final int numberOfChannels = block.getNumberOfChannels();
-            int toSkip = 0;
-            boolean isSilence;
 
-            if (data.length == 0)
-                continue;
-
-            do {
-                if (toSkip == data.length)
-                    break;
-
-                isSilence = true;
+            for (int toSkip = 0; toSkip < data.length; toSkip += numberOfChannels) {
+                boolean isSilence = true;
                 for (int i = 0; i < numberOfChannels; i++) {
                     if (data[toSkip + i] < -maxValue || data[toSkip + i] > maxValue) {
                         isSilence = false;
                         break;
                     }
                 }
-                if (isSilence)
-                    toSkip += numberOfChannels;
-            } while (isSilence);
-
-            skippedSamples += toSkip;
-
-            if (toSkip == 0) {
-                skipComplete = true;
-                return block;
-            } else if (toSkip != data.length) {
-                final short[] newData = new short[data.length - toSkip];
-                System.arraycopy(data, toSkip, newData, 0, data.length - toSkip);
-                skipComplete = true;
-                return new PCMDataBlock(block.getSync(), block.getPlayoutInfo(), newData, block.getSampleRate(), numberOfChannels);
+                if (isSilence) {
+                    preSkip++;
+                } else {
+                    break;
+                }
             }
         }
     }
-
-    @Override
-    public @NotNull PCMDataBlock read() throws IOException {
-        if (skipComplete)
-            return backend.read();
-
-        return skipSilence();
-    }
-
-    @Override
-    public void mark() {
-        assertSkipComplete();
-        backend.mark();
-    }
-
-    @Override
-    public void reset() {
-        assertSkipComplete();
-        backend.reset();
-    }
-
-    @Override
-    public long getSkippedSamples() {
-        return skippedSamples;
-    }
-
 }
