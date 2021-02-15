@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * This class is a {@link Skipper} that removes silence at start of a stream.
  */
-public final class SilenceEliminator extends Skipper {
+public final class SilenceEliminator<T extends PCMDataSource> extends Skipper<T> {
     /**
      * This enum contains different types of silence.
      */
@@ -69,7 +69,7 @@ public final class SilenceEliminator extends Skipper {
      * @param silenceType The type of silence to detect.
      */
     @Contract(pure = true)
-    public SilenceEliminator(@NotNull PCMDataSource backend, @NotNull SilenceType silenceType) {
+    public SilenceEliminator(@NotNull T backend, @NotNull SilenceType silenceType) {
         super(backend);
         this.silenceType = silenceType;
     }

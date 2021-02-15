@@ -34,7 +34,7 @@ import java.util.ArrayDeque;
  * The Skipper implements a {@link FilterPCMDataSource} that allows skipping frames
  * from the beginning, and the end of a stream.
  */
-public abstract class Skipper extends FilterPCMDataSource<PCMDataSource> {
+public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSource<T> {
     private long read = 0;
     private long written = 0;
     private long skipped = 0;
@@ -106,7 +106,7 @@ public abstract class Skipper extends FilterPCMDataSource<PCMDataSource> {
      *
      * @param backend The backend to use.
      */
-    public Skipper(@NotNull PCMDataSource backend) {
+    public Skipper(@NotNull T backend) {
         super(backend);
     }
 
