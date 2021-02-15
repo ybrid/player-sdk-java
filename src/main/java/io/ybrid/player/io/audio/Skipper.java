@@ -87,7 +87,7 @@ public abstract class Skipper extends FilterPCMDataSource<PCMDataSource> {
     private @NotNull PCMDataBlock readWithPreSkip() throws IOException {
         while (!preSkipDone) {
             final @NotNull PCMDataBlock block = readFromBackend();
-            if (read < preSkip) {
+            if (read <= preSkip) {
                 skipBlock(block);
             } else if ((read - block.getData().length) == preSkip) {
                 preSkipDone = true;
