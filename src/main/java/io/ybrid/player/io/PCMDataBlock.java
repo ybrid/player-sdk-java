@@ -24,6 +24,7 @@ package io.ybrid.player.io;
 
 import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.metadata.Sync;
+import io.ybrid.player.io.audio.MultiChannelSignalInformation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * This implements a {@link DataBlock} that holds PCM samples.
  */
-public class PCMDataBlock extends DataBlock {
+public class PCMDataBlock extends DataBlock implements MultiChannelSignalInformation {
     /**
      * Internal storage for PCM data.
      */
@@ -77,6 +78,7 @@ public class PCMDataBlock extends DataBlock {
      *
      * @return Returns the sample rate in [Hz].
      */
+    @Override
     public int getSampleRate() {
         return sampleRate;
     }
@@ -86,6 +88,7 @@ public class PCMDataBlock extends DataBlock {
      *
      * @return Returns the number of channels.
      */
+    @Override
     public int getNumberOfChannels() {
         return numberOfChannels;
     }
@@ -94,9 +97,26 @@ public class PCMDataBlock extends DataBlock {
      * This returns the length of the block as units of time.
      *
      * @return The length of this block in [s].
+     * @deprecated Use {@link #getLength()} instead.
      */
+    @Deprecated
     public double getBlockLength() {
         return (double)getData().length / (double)(getSampleRate() * getNumberOfChannels());
+    }
+
+    /**
+     * This returns the length as units of frames.
+     *
+     * @return The length in [frame].
+     */
+    @Override
+    public int getLengthAsFrames() {
+        final int samples = getData().length;
+
+        if ((samples % getNumberOfChannels()) != 0)
+            throw new IllegalArgumentException("Number of samples is not a multiple of number of channels");
+
+        return samples / getNumberOfChannels();
     }
 
     /**
