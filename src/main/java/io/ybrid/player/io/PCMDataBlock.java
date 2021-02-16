@@ -25,6 +25,7 @@ package io.ybrid.player.io;
 import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.player.io.audio.MultiChannelSignalInformation;
+import io.ybrid.player.io.audio.analysis.result.Block;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -149,5 +150,14 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
     public void audible() {
         if (onAudible != null)
             onAudible.run();
+    }
+
+    /**
+     * Analyse the current block and return the result.
+     *
+     * @return The analyse result.
+     */
+    public @NotNull Block analyse() {
+        return new Block(this);
     }
 }
