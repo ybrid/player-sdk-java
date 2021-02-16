@@ -248,11 +248,14 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
          */
         public double getBufferLength() {
             final long skipped = backend.getSkippedSamples();
+            Duration duration = Duration.ZERO;
             double ret = 0;
 
             for (PCMDataBlock block : buffer) {
-                ret += block.getBlockLength();
+                duration = duration.plus(block.getLength());
             }
+
+            ret = duration.getSeconds() + (duration.getNano() / 1000000000.);
 
             state.setCurrent(ret, samplesRead + skipped, samplesForwarded > 0 ? samplesForwarded + skipped : 0);
 
