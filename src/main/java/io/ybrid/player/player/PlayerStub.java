@@ -58,10 +58,18 @@ abstract class PlayerStub implements Player {
         setMetadataConsumer(null);
     }
 
+    /**
+     * Gets whether auto reconnect is enabled.
+     * @return Whether auto reconnect is enabled.
+     */
     public boolean isAutoReconnect() {
         return autoReconnect;
     }
 
+    /**
+     * Sets whether auto reconnect should be enabled.
+     * @param autoReconnect Whether auto reconnect should be enabled.
+     */
     public void setAutoReconnect(boolean autoReconnect) {
         this.autoReconnect = autoReconnect;
     }
@@ -83,6 +91,12 @@ abstract class PlayerStub implements Player {
         muxer.removeBufferStatusConsumer(consumer);
     }
 
+    /**
+     * Execute the given request as a transaction on this player.
+     *
+     * @param request The request to execute.
+     * @throws IOException Thrown as by the transaction.
+     */
     protected void executeRequestAsTransaction(@NotNull Request request) throws IOException {
         final @NotNull Transaction transaction = session.createTransaction(request);
         final @Nullable Throwable error;
@@ -99,10 +113,33 @@ abstract class PlayerStub implements Player {
         throw new IOException(error);
     }
 
+    /**
+     * Execute the given command as a transaction on this player.
+     *
+     * This is the same as running {@link #executeRequestAsTransaction(Request)} with
+     * the result of {@code command.makeRequest()}.
+     *
+     * @param command The command to execute.
+     * @throws IOException Thrown as by the transaction.
+     * @see #executeRequestAsTransaction(Request)
+     * @see Command#makeRequest()
+     */
     protected void executeRequestAsTransaction(@NotNull Command command) throws IOException {
         executeRequestAsTransaction(command.makeRequest());
     }
 
+    /**
+     * Execute the given command as a transaction on this player.
+     *
+     * This is the same as running {@link #executeRequestAsTransaction(Request)} with
+     * the result of {@code command.makeRequest(argument)}.
+     *
+     * @param command The command to execute.
+     * @param argument The argument to pass to the transaction.
+     * @throws IOException Thrown as by the transaction.
+     * @see #executeRequestAsTransaction(Request)
+     * @see Command#makeRequest(Object)
+     */
     protected void executeRequestAsTransaction(@NotNull Command command, @Nullable Object argument) throws IOException {
         executeRequestAsTransaction(command.makeRequest(argument));
     }
