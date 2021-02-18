@@ -43,7 +43,7 @@ public interface Player extends MetadataProvider, BufferStatusProvider, Closeabl
     /**
      * Starts playback.
      *
-     * If not called before this heaves as if it would call {@link #prepare()} before being called.
+     * If not called before this behaves as if it would call {@link #prepare()} before being called.
      *
      * @throws IOException Thrown when there is any problem with the I/O.
      */
