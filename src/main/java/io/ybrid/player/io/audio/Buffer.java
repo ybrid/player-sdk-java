@@ -185,7 +185,13 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
         }
 
         private void pump() throws IOException, InterruptedException {
-            PCMDataBlock block = backend.read();
+            final @NotNull PCMDataBlock block;
+
+            try {
+                block = backend.read();
+            } catch (RuntimeException e) {
+                throw new IOException(e);
+            }
 
             try {
                 if (inputConsumer != null)
