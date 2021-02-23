@@ -75,7 +75,7 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
             read += block.getData().length;
             examine(block);
             return block;
-        } catch (EOFException e) {
+        } catch (Throwable e) {
             reachedEOF = true;
             throw e;
         }
