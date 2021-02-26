@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2020 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player;
+package io.ybrid.player.player;
 
 import io.ybrid.player.io.audio.BufferStatusProvider;
 
@@ -30,7 +30,7 @@ import java.io.IOException;
 /**
  * This interface is implemented by Ybrid capable players.
  */
-public interface Player extends MetadataProvider, SessionClient, Closeable, BufferStatusProvider {
+public interface Player extends MetadataProvider, BufferStatusProvider, Closeable {
     /**
      * Prepare the player for playback.
      *
@@ -43,7 +43,7 @@ public interface Player extends MetadataProvider, SessionClient, Closeable, Buff
     /**
      * Starts playback.
      *
-     * If not called before this heaves as if it would call {@link #prepare()} before being called.
+     * If not called before this behaves as if it would call {@link #prepare()} before being called.
      *
      * @throws IOException Thrown when there is any problem with the I/O.
      */
@@ -57,4 +57,9 @@ public interface Player extends MetadataProvider, SessionClient, Closeable, Buff
      * @throws IOException Thrown when there is any problem with the I/O.
      */
     void stop() throws IOException;
+
+    @Override
+    default void close() throws IOException {
+        stop();
+    }
 }

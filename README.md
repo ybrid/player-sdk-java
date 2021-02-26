@@ -43,7 +43,7 @@ The player implements the full protocol and can then be controlled using its API
 import io.ybrid.api.Alias;
 import io.ybrid.api.Session;
 import io.ybrid.api.session.Command;
-import io.ybrid.player.Player;
+import io.ybrid.player.player.Player;
 import io.ybrid.player.YbridPlayer;
 
 import java.io.IOException;

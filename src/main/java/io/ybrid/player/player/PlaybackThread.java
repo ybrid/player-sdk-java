@@ -1,0 +1,195 @@
+/*
+ * Copyright (c) 2020 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package io.ybrid.player.player;
+
+import io.ybrid.api.PlayoutInfo;
+import io.ybrid.api.Session;
+import io.ybrid.api.metadata.Sync;
+import io.ybrid.api.session.Command;
+import io.ybrid.api.transaction.Transaction;
+import io.ybrid.player.AudioBackend;
+import io.ybrid.player.AudioBackendFactory;
+import io.ybrid.player.io.DataBlock;
+import io.ybrid.player.io.PCMDataBlock;
+import io.ybrid.player.io.audio.BufferMuxer;
+import io.ybrid.player.io.audio.BufferStatus;
+import io.ybrid.player.io.audio.BufferStatusConsumer;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
+
+public class PlaybackThread extends Thread {
+    private static final @NonNls Logger LOGGER = Logger.getLogger(PlaybackThread.class.getName());
+    private static final double AUDIO_BUFFER_MAX_BEFORE_REBUFFER = 0.01; // [s]. Must be > 0.
+    private static final double AUDIO_BUFFER_DEFAULT_GOAL = 10.0; // [s].
+
+    private final @NotNull BlockingQueue<BufferStatus> bufferStateQueue = new LinkedBlockingQueue<>();
+    // We need to store this in a variable so add and remove gets the same one:
+    private final @NotNull BufferStatusConsumer bufferStatusConsumer = bufferStateQueue::offer;
+    private final @NotNull Session session;
+    private final @NotNull BufferMuxer muxer;
+    private final @NotNull AudioBackendFactory audioBackendFactory;
+    private final @NotNull Consumer<@NotNull PlayerState> playerStateConsumer;
+    private final @NotNull BiConsumer<@NotNull DataBlock, @Nullable PlayoutInfo> metadataConsumer;
+    private @Nullable AudioBackend audioBackend = null;
+    private @Nullable PCMDataBlock initialAudioBlock = null;
+    private double bufferGoal = AUDIO_BUFFER_DEFAULT_GOAL;
+    private @Nullable Sync lastSentSync = null;
+    private @Nullable PlayoutInfo lastSentPlayoutInfo = null;
+    private @Nullable BufferStatus lastBufferStatus = null;
+
+    public PlaybackThread(@NotNull @NonNls String name, @NotNull Session session, @NotNull BufferMuxer muxer, @NotNull AudioBackendFactory audioBackendFactory, @NotNull Consumer<@NotNull PlayerState> playerStateConsumer, @NotNull BiConsumer<@NotNull DataBlock, @Nullable PlayoutInfo> metadataConsumer) {
+        super(name);
+        this.session = session;
+        this.muxer = muxer;
+        this.audioBackendFactory = audioBackendFactory;
+        this.playerStateConsumer = playerStateConsumer;
+        this.metadataConsumer = metadataConsumer;
+    }
+
+    private void setPlayerState(@NotNull PlayerState state) {
+        playerStateConsumer.accept(state);
+    }
+
+    private void sendMetadata(@NotNull DataBlock block) {
+        final @Nullable PlayoutInfo playoutInfoToForward;
+
+        if (Objects.equals(lastSentSync, block.getSync()) && Objects.equals(lastSentPlayoutInfo, block.getPlayoutInfo()))
+            return;
+        lastSentSync = block.getSync();
+        lastSentPlayoutInfo = block.getPlayoutInfo();
+
+        if (lastSentPlayoutInfo != null && lastBufferStatus != null) {
+            playoutInfoToForward = lastSentPlayoutInfo.adjustTimeToNextItem(Duration.ofMillis((long) (1000 * lastBufferStatus.getCurrent())));
+        } else {
+            playoutInfoToForward = lastSentPlayoutInfo;
+        }
+        metadataConsumer.accept(block, playoutInfoToForward);
+    }
+
+    public void prepare() throws IOException {
+        final @NotNull Transaction transaction;
+
+        if (audioBackend != null)
+            return;
+
+        setPlayerState(PlayerState.PREPARING);
+        transaction = session.createTransaction(Command.CONNECT_INITIAL_TRANSPORT.makeRequest());
+        transaction.run();
+
+        if (transaction.getError() != null) {
+            final @NotNull Throwable error = transaction.getError();
+
+            if (error instanceof IOException)
+                throw (IOException) error;
+            throw new IOException(error);
+        }
+
+        audioBackend = audioBackendFactory.getAudioBackend();
+        initialAudioBlock = muxer.read();
+        audioBackend.prepare(initialAudioBlock);
+    }
+
+    public void setBufferGoal(double bufferGoal) {
+        this.bufferGoal = bufferGoal;
+    }
+
+    private void buffer() {
+        setPlayerState(PlayerState.BUFFERING);
+        try {
+            while (!isInterrupted() && muxer.isValid()) {
+                lastBufferStatus = bufferStateQueue.take();
+                if (lastBufferStatus.getCurrent() > bufferGoal) {
+                    break;
+                }
+            }
+        } catch (InterruptedException ignored) {
+        }
+        setPlayerState(PlayerState.PLAYING);
+    }
+
+    @Override
+    public void run() {
+        @NotNull PCMDataBlock block;
+
+        try {
+            prepare();
+        } catch (IOException e) {
+            setPlayerState(PlayerState.ERROR);
+            return;
+        }
+        assert audioBackend != null;
+        block = Objects.requireNonNull(initialAudioBlock);
+
+        muxer.addBufferStatusConsumer(bufferStatusConsumer);
+        buffer();
+        audioBackend.play();
+        while (!isInterrupted()) {
+            try {
+                audioBackend.write(block);
+                try {
+                    block.audible();
+                } catch (Throwable e) {
+                    LOGGER.warning("on audible handler for PCM block " + block + " failed with " + e);
+                }
+            } catch (IOException e) {
+                setPlayerState(PlayerState.ERROR);
+                break;
+            }
+
+            sendMetadata(block);
+
+            while (!bufferStateQueue.isEmpty())
+                lastBufferStatus = bufferStateQueue.poll();
+
+            if (lastBufferStatus != null && lastBufferStatus.getCurrent() < AUDIO_BUFFER_MAX_BEFORE_REBUFFER && !muxer.isInHandover()) {
+                buffer();
+            }
+
+            try {
+                block = muxer.read();
+            } catch (IOException e) {
+                setPlayerState(PlayerState.ERROR);
+                break;
+            }
+        }
+        muxer.removeBufferStatusConsumer(bufferStatusConsumer);
+
+        try {
+            audioBackend.close();
+        } catch (IOException ignored) {
+        }
+        audioBackend = null;
+
+        setPlayerState(PlayerState.STOPPED);
+    }
+}
