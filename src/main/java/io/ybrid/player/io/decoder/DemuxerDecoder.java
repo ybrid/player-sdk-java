@@ -27,6 +27,7 @@ import io.ybrid.player.io.MediaType;
 import io.ybrid.player.io.PCMDataBlock;
 import io.ybrid.player.io.muxer.Demuxer;
 import io.ybrid.player.io.muxer.Stream;
+import io.ybrid.player.io.muxer.StreamUsage;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,6 +71,8 @@ public class DemuxerDecoder implements Decoder {
     public static @NotNull Map<String, Double> getSupportedFormats() {
         @NonNls final Map<String, Double> list = new HashMap<>();
 
+        list.put(MediaType.APPLICATION_OGG, 1.);
+        list.put(MediaType.AUDIO_OGG, 1.);
         list.put(MediaType.ANY, 0.);
 
         return list;
@@ -83,18 +86,19 @@ public class DemuxerDecoder implements Decoder {
             throw new IllegalStateException("Source is not valid");
 
         switch (Objects.requireNonNull(source.getContentType())) {
-            // TODO: Add any supported MediaType. Also see below!
+            case MediaType.APPLICATION_OGG:
+            case MediaType.AUDIO_OGG:
+                demuxer = new io.ybrid.player.io.muxer.ogg.Demuxer();
+                break;
             default:
                 throw new IOException("Input format not supported: " + source.getContentType());
         }
 
-        /* TODO: enable this as soon as we support any MediaType in the switch above.
         demuxer.setAutofillSource(source);
 
         demuxer.setIsWantedCallback(s -> currentStream == null && s.getPrimaryStreamUsage().equals(StreamUsage.AUDIO));
         demuxer.setOnBeginOfStreamCallback(s -> currentStream = s);
         demuxer.setOnEndOfStreamCallback(s -> currentStream = currentStream == s ? null : currentStream);
-         */
     }
 
     @Override
