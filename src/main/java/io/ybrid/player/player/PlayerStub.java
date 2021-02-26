@@ -27,9 +27,11 @@ import io.ybrid.api.session.Command;
 import io.ybrid.api.session.Request;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.player.AudioBackendFactory;
-import io.ybrid.player.DecoderFactory;
+import io.ybrid.player.io.decoder.DecoderFactory;
 import io.ybrid.player.io.audio.BufferMuxer;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
+import io.ybrid.player.io.decoder.DecoderFactorySelector;
+import io.ybrid.player.io.decoder.DemuxerDecoderFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,17 +46,19 @@ import java.io.IOException;
 abstract class PlayerStub implements Player {
     protected final @NotNull Session session;
     protected final @NotNull BufferMuxer muxer;
-    protected final @NotNull DecoderFactory externalDecoderFactory;
+    protected final @NotNull DecoderFactorySelector decoderFactory;
     protected final @NotNull AudioBackendFactory externalAudioBackendFactory;
     protected MetadataConsumer metadataConsumer = null;
     protected boolean autoReconnect = true;
 
     public PlayerStub(@NotNull Session session, @NotNull DecoderFactory externalDecoderFactory, @NotNull AudioBackendFactory externalAudioBackendFactory) {
         this.session = session;
-        this.externalDecoderFactory = externalDecoderFactory;
         this.externalAudioBackendFactory = externalAudioBackendFactory;
 
         this.muxer = new BufferMuxer(session);
+        this.decoderFactory = new DecoderFactorySelector();
+        this.decoderFactory.add(new DemuxerDecoderFactory(this.decoderFactory));
+        this.decoderFactory.add(externalDecoderFactory);
         setMetadataConsumer(null);
     }
 

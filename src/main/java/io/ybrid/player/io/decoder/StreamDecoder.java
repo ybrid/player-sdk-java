@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2020 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,31 +20,27 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player;
+package io.ybrid.player.io.decoder;
 
-import io.ybrid.player.io.DataSource;
+import io.ybrid.player.io.muxer.Stream;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+import java.io.IOException;
 
-/**
- * This interface is implemented by factory classes that build {@link Decoder} instances.
- */
-public interface DecoderFactory {
-    /**
-     * Build a new {@link Decoder} based on the dataSource provided.
-     *
-     * This must not call {@link DataSource#read()} on the provided {@link DataSource}.
-     *
-     * @param dataSource The {@link DataSource} used to read data from.
-     * @return The {@link Decoder} that has been build.
-     */
-    Decoder getDecoder(@NotNull DataSource dataSource);
+public abstract class StreamDecoder<T extends Stream<?, ?, ?, ?>> implements Decoder {
+    protected final @NotNull T stream;
 
-    /**
-     * Query formats supported by the decoder and their corresponding weights.
-     *
-     * @return The list of supported formats.
-     */
-    @NotNull Map<String, Double> getSupportedFormats();
+    protected StreamDecoder(@NotNull T stream) {
+        this.stream = stream;
+    }
+
+    @Override
+    public boolean isValid() {
+        return stream.isValid();
+    }
+
+    @Override
+    public void close() throws IOException {
+        stream.close();
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2020 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,36 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player;
+package io.ybrid.player.io.decoder;
 
-import io.ybrid.player.io.PCMDataSource;
+import io.ybrid.player.io.ByteDataSource;
+import io.ybrid.player.io.DataSource;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * This interface is implemented by classes used to decode data into PCM data.
- * Instances of this interface are normally created using a {@link DecoderFactory}.
- */
-public interface Decoder extends PCMDataSource {
+import java.io.IOException;
+import java.util.Map;
+
+public class DemuxerDecoderFactory implements DecoderFactory {
+    private final @NotNull DecoderFactory rootFactory;
+
+    public DemuxerDecoderFactory(@NotNull DecoderFactory rootFactory) {
+        this.rootFactory = rootFactory;
+    }
+
+    @Override
+    public Decoder getDecoder(@NotNull DataSource dataSource) {
+        if (!(dataSource instanceof ByteDataSource))
+            return null;
+
+        try {
+            return new DemuxerDecoder((ByteDataSource)dataSource, rootFactory);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public @NotNull Map<String, Double> getSupportedFormats() {
+        return DemuxerDecoder.getSupportedFormats();
+    }
 }
