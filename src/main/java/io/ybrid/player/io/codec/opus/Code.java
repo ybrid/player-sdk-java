@@ -20,50 +20,53 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player.io;
+package io.ybrid.player.io.codec.opus;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * This helper class provides constants for common media types.
+ * Frame packing code as defined by RFC 6716 Section 3.2. See also Section 3.
  */
-@SuppressWarnings("HardCodedStringLiteral")
-public final class MediaType {
-    /* --------[ Special Media Types ]-------- */
+public enum Code {
     /**
-     * Any Media type, used for {@code Accept:}-Headers.
+     * Code 0: One Frame is encoded.
      */
-    public static final @NotNull String ANY = "*/*";
-    /* --------[ Official Media Types ]-------- */
+    ONE_FRAME(0),
     /**
-     * Any stream of octets. Often used as fallback.
+     * Code 1: Two equal sized frames are encoded.
      */
-    public static final @NotNull String APPLICATION_OCTET_STREAM = "application/octet-stream";
+    TWO_EQUAL_SIZED_FRAMES(1),
     /**
-     * Ogg with any content.
+     * Code 2: Two frames are encoded each of a different size.
      */
-    public static final @NotNull String APPLICATION_OGG = "application/ogg";
+    TWO_DIFFERENT_SIZED_FRAMES(2),
     /**
-     * Ogg with audio content.
+     * Code 3: A arbitrary number of frames are encoded.
      */
-    public static final @NotNull String AUDIO_OGG = "audio/ogg";
-    /**
-     * MP3.
-     */
-    public static final @NotNull String AUDIO_MPEG = "audio/mpeg";
+    ARBITRARY_NUMBER_OF_FRAMES(3);
 
-    /* --------[ Internal Media Types ]-------- */
-    /**
-     * PCM stream as stream of blocks of {@code short[]}.
-     */
-    public static final @NotNull String PCM_STREAM_SHORT = "!_block-stream/pcm-java-short-array";
-    /**
-     * Demuxed Opus stream.
-     */
-    public static final @NotNull String BLOCK_STREAM_OPUS = "!_block-stream/opus";
+    private static final @NotNull Map<Integer, Code> values = new HashMap<>();
 
-    /* --------[ Methods ]-------- */
-    public static boolean isInternal(@NotNull String mediaType) {
-        return mediaType.startsWith("!_");
+    private final int number;
+
+    static {
+        for (final @NotNull Code code : values())
+            values.put(code.number, code);
+    }
+
+    /**
+     * Gets the Code based on it's number. See RFC 6716 Section 3.2 for valid numbers.
+     * @param val The code number.
+     * @return The corresponding code.
+     */
+    public static @NotNull Code valueOf(int val) {
+        return values.get(val);
+    }
+
+    Code(int number) {
+        this.number = number;
     }
 }
