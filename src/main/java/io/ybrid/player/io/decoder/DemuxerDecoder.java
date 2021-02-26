@@ -27,7 +27,6 @@ import io.ybrid.player.io.MediaType;
 import io.ybrid.player.io.PCMDataBlock;
 import io.ybrid.player.io.muxer.Demuxer;
 import io.ybrid.player.io.muxer.Stream;
-import io.ybrid.player.io.muxer.StreamUsage;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
