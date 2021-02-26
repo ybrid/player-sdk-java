@@ -40,6 +40,11 @@
             <artifactId>api-sdk-java</artifactId>
             <version>1.0.2-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>19.0.0</version>
+        </dependency>
     </dependencies>
 
     <repositories>
