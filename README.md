@@ -57,7 +57,7 @@ class myPlayer {
         final Session session = mediaEndpoint.createSession();
 
         /* Connect the session to the server. */
-        session.createTransaction(Command.CONNECT.makeRequest()).run();
+        session.connect();
 
         /* We create a player using the Decoder and AudioBackend we provide */
         Player player = new YbridPlayer(session, myDecoderFactory.getInstance(), myAudioBackendFactory.getInstance());
