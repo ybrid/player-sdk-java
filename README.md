@@ -90,4 +90,4 @@ class myPlayer {
 ```
 
 ## Copyright
-Copyright (c) 2019 nacamar GmbH, Germany. See [MIT License](LICENSE) for details.
+Copyright (c) 2019-2021 nacamar GmbH, Germany. See [MIT License](LICENSE) for details.
