@@ -44,7 +44,7 @@ import io.ybrid.api.Alias;
 import io.ybrid.api.Session;
 import io.ybrid.api.session.Command;
 import io.ybrid.player.player.Player;
-import io.ybrid.player.YbridPlayer;
+import io.ybrid.player.player.YbridPlayer;
 
 import java.io.IOException;
 import java.net.URL;
@@ -79,8 +79,8 @@ class myPlayer {
         player.stop();
 
         /* Closing the player is required and will free all resources
-        * After close() returned the player must not be reused.
-        */
+         * After close() returned the player must not be reused.
+         */
         player.close();
 
         /* After the player finished close the session. */
