@@ -59,6 +59,7 @@ abstract class PlayerStub implements Player {
 
         this.decoderFactory = new DecoderFactorySelector();
         this.decoderFactory.add(new DemuxerDecoderFactory(this.decoderFactory));
+        this.decoderFactory.add(new io.ybrid.player.io.codec.mp3.DecoderFactory());
         if (externalDecoderFactory != null)
             this.decoderFactory.add(externalDecoderFactory);
 
