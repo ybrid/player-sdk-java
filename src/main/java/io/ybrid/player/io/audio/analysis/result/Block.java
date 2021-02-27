@@ -22,7 +22,7 @@
 
 package io.ybrid.player.io.audio.analysis.result;
 
-import io.ybrid.player.io.PCMDataBlock;
+import io.ybrid.player.io.audio.PCMDataBlock;
 import io.ybrid.player.io.audio.MultiChannelSignalInformation;
 import org.jetbrains.annotations.NotNull;
 

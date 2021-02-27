@@ -26,8 +26,8 @@ import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.metadata.source.Source;
 import io.ybrid.api.metadata.source.SourceType;
-import io.ybrid.player.io.PCMDataBlock;
-import io.ybrid.player.io.PCMDataSource;
+import io.ybrid.player.io.audio.PCMDataBlock;
+import io.ybrid.player.io.audio.PCMDataSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

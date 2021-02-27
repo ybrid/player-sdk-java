@@ -22,7 +22,7 @@
 
 package io.ybrid.player.io.decoder;
 
-import io.ybrid.player.io.PCMDataSource;
+import io.ybrid.player.io.audio.PCMDataSource;
 
 /**
  * This interface is implemented by classes used to decode data into PCM data.

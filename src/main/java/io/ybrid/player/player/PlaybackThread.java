@@ -30,7 +30,7 @@ import io.ybrid.api.transaction.Transaction;
 import io.ybrid.player.AudioBackend;
 import io.ybrid.player.AudioBackendFactory;
 import io.ybrid.player.io.DataBlock;
-import io.ybrid.player.io.PCMDataBlock;
+import io.ybrid.player.io.audio.PCMDataBlock;
 import io.ybrid.player.io.audio.BufferMuxer;
 import io.ybrid.player.io.audio.BufferStatus;
 import io.ybrid.player.io.audio.BufferStatusConsumer;

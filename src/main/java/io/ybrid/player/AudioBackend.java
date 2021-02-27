@@ -22,7 +22,7 @@
 
 package io.ybrid.player;
 
-import io.ybrid.player.io.PCMDataBlock;
+import io.ybrid.player.io.audio.PCMDataBlock;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;

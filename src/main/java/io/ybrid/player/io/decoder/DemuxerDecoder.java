@@ -24,7 +24,7 @@ package io.ybrid.player.io.decoder;
 
 import io.ybrid.player.io.ByteDataSource;
 import io.ybrid.player.io.MediaType;
-import io.ybrid.player.io.PCMDataBlock;
+import io.ybrid.player.io.audio.PCMDataBlock;
 import io.ybrid.player.io.muxer.Demuxer;
 import io.ybrid.player.io.muxer.Stream;
 import io.ybrid.player.io.muxer.StreamUsage;
