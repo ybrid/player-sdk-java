@@ -61,7 +61,7 @@ public class FileByteDataSource implements ByteDataSource {
      * @throws FileNotFoundException Thrown as per {@link FileInputStream#FileInputStream(String)}.
      */
     public FileByteDataSource(@NotNull String filename) throws FileNotFoundException {
-        this(filename, "application/octet-stream"); //NON-NLS
+        this(filename, MediaType.APPLICATION_OCTET_STREAM);
     }
 
     @Override
