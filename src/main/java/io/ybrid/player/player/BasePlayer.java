@@ -122,7 +122,7 @@ public class BasePlayer extends PlayerStub {
         // no-op.
     }
 
-    public BasePlayer(@NotNull Session session, @NotNull DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory externalAudioBackendFactory) {
+    public BasePlayer(@NotNull Session session, @Nullable DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory externalAudioBackendFactory) {
         super(session, externalDecoderFactory, externalAudioBackendFactory);
         this.playbackThread = new PlaybackThread("YbridPlayer Playback Thread", session, muxer, externalAudioBackendFactory, this::onPlayerStateChange, this::onMetadataChange);
         this.playerControl = buildPlayerControl();

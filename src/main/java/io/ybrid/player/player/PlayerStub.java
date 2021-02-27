@@ -51,14 +51,17 @@ abstract class PlayerStub implements Player {
     protected MetadataConsumer metadataConsumer = null;
     protected boolean autoReconnect = true;
 
-    public PlayerStub(@NotNull Session session, @NotNull DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory externalAudioBackendFactory) {
+    public PlayerStub(@NotNull Session session, @Nullable DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory externalAudioBackendFactory) {
         this.session = session;
         this.externalAudioBackendFactory = externalAudioBackendFactory;
 
         this.muxer = new BufferMuxer(session);
+
         this.decoderFactory = new DecoderFactorySelector();
         this.decoderFactory.add(new DemuxerDecoderFactory(this.decoderFactory));
-        this.decoderFactory.add(externalDecoderFactory);
+        if (externalDecoderFactory != null)
+            this.decoderFactory.add(externalDecoderFactory);
+
         setMetadataConsumer(null);
     }
 
