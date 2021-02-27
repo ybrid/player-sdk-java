@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2021 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player;
+package io.ybrid.player.io.audio.output;
 
 import io.ybrid.player.io.audio.PCMDataBlock;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +31,7 @@ import java.io.IOException;
 /**
  * This interface is implemented by classes that allow the output of audio data.
  *
- * The general workflow is that after creation of an instance by means of a {@link AudioBackendFactory}
+ * The general workflow is that after creation of an instance by means of a {@link AudioOutputFactory}
  * the {@link #prepare(PCMDataBlock)} is called. This opens the actual output device.
  * After {@link #prepare(PCMDataBlock)} {@link #play()} is called to set the backend into playback mode.
  * {@link #write(PCMDataBlock)} is called for each audio data block including the block passed to {@link #prepare(PCMDataBlock)}
@@ -39,7 +39,7 @@ import java.io.IOException;
  * The interface user will call {@link #close()} when done.
  *
  */
-public interface AudioBackend extends Closeable {
+public interface AudioOutput extends Closeable {
     /**
      * Prepares the backend for playback.
      *

@@ -32,6 +32,8 @@ import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.session.Command;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.audio.BufferStatusProvider;
+import io.ybrid.player.io.audio.output.AudioOutput;
+import io.ybrid.player.io.audio.output.AudioOutputFactory;
 import io.ybrid.player.io.decoder.Decoder;
 import io.ybrid.player.io.decoder.DecoderFactory;
 import io.ybrid.player.player.BasePlayer;
@@ -63,9 +65,9 @@ public class YbridPlayer extends BasePlayer implements SessionClient, BufferStat
      *
      * @param session The {@link Session} to use for retrieval and interaction with the stream.
      * @param decoderFactory The {@link DecoderFactory} used to create a {@link Decoder} for the stream.
-     * @param audioBackendFactory The {@link AudioBackendFactory} used to create a {@link AudioBackend} to interact with the host audio output.
+     * @param audioBackendFactory The {@link AudioOutputFactory} used to create a {@link AudioOutput} to interact with the host audio output.
      */
-    public YbridPlayer(Session session, DecoderFactory decoderFactory, AudioBackendFactory audioBackendFactory) {
+    public YbridPlayer(Session session, DecoderFactory decoderFactory, AudioOutputFactory audioBackendFactory) {
         super(session, decoderFactory, audioBackendFactory);
         this.playbackThread.setBufferGoal(AUDIO_BUFFER_PREBUFFER);
     }

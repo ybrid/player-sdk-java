@@ -26,7 +26,7 @@ import io.ybrid.api.Session;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.session.Request;
 import io.ybrid.api.transaction.Transaction;
-import io.ybrid.player.AudioBackendFactory;
+import io.ybrid.player.io.audio.output.AudioOutputFactory;
 import io.ybrid.player.io.decoder.DecoderFactory;
 import io.ybrid.player.io.audio.BufferMuxer;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
@@ -47,11 +47,11 @@ abstract class PlayerStub implements Player {
     protected final @NotNull Session session;
     protected final @NotNull BufferMuxer muxer;
     protected final @NotNull DecoderFactorySelector decoderFactory;
-    protected final @NotNull AudioBackendFactory externalAudioBackendFactory;
+    protected final @NotNull AudioOutputFactory externalAudioBackendFactory;
     protected MetadataConsumer metadataConsumer = null;
     protected boolean autoReconnect = true;
 
-    public PlayerStub(@NotNull Session session, @NotNull DecoderFactory externalDecoderFactory, @NotNull AudioBackendFactory externalAudioBackendFactory) {
+    public PlayerStub(@NotNull Session session, @NotNull DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory externalAudioBackendFactory) {
         this.session = session;
         this.externalAudioBackendFactory = externalAudioBackendFactory;
 

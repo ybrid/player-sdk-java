@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2021 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,19 +20,19 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player;
+package io.ybrid.player.io.audio.output;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * This interface is implemented by factory classes that allow to build a {@link AudioBackend}.
+ * This interface is implemented by factory classes that allow to build a {@link AudioOutput}.
  */
-public interface AudioBackendFactory {
+public interface AudioOutputFactory {
     /**
-     * Build a new {@link AudioBackend}.
+     * Build a new {@link AudioOutput}.
      *
-     * @return The new {@link AudioBackend}.
+     * @return The new {@link AudioOutput}.
      */
     @NotNull
-    AudioBackend getAudioBackend();
+    AudioOutput getAudioOutput();
 }

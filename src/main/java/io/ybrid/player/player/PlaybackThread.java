@@ -27,8 +27,8 @@ import io.ybrid.api.Session;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.transaction.Transaction;
-import io.ybrid.player.AudioBackend;
-import io.ybrid.player.AudioBackendFactory;
+import io.ybrid.player.io.audio.output.AudioOutput;
+import io.ybrid.player.io.audio.output.AudioOutputFactory;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.audio.PCMDataBlock;
 import io.ybrid.player.io.audio.BufferMuxer;
@@ -57,17 +57,17 @@ public class PlaybackThread extends Thread {
     private final @NotNull BufferStatusConsumer bufferStatusConsumer = bufferStateQueue::offer;
     private final @NotNull Session session;
     private final @NotNull BufferMuxer muxer;
-    private final @NotNull AudioBackendFactory audioBackendFactory;
+    private final @NotNull AudioOutputFactory audioBackendFactory;
     private final @NotNull Consumer<@NotNull PlayerState> playerStateConsumer;
     private final @NotNull BiConsumer<@NotNull DataBlock, @Nullable PlayoutInfo> metadataConsumer;
-    private @Nullable AudioBackend audioBackend = null;
+    private @Nullable AudioOutput audioOutput = null;
     private @Nullable PCMDataBlock initialAudioBlock = null;
     private double bufferGoal = AUDIO_BUFFER_DEFAULT_GOAL;
     private @Nullable Sync lastSentSync = null;
     private @Nullable PlayoutInfo lastSentPlayoutInfo = null;
     private @Nullable BufferStatus lastBufferStatus = null;
 
-    public PlaybackThread(@NotNull @NonNls String name, @NotNull Session session, @NotNull BufferMuxer muxer, @NotNull AudioBackendFactory audioBackendFactory, @NotNull Consumer<@NotNull PlayerState> playerStateConsumer, @NotNull BiConsumer<@NotNull DataBlock, @Nullable PlayoutInfo> metadataConsumer) {
+    public PlaybackThread(@NotNull @NonNls String name, @NotNull Session session, @NotNull BufferMuxer muxer, @NotNull AudioOutputFactory audioBackendFactory, @NotNull Consumer<@NotNull PlayerState> playerStateConsumer, @NotNull BiConsumer<@NotNull DataBlock, @Nullable PlayoutInfo> metadataConsumer) {
         super(name);
         this.session = session;
         this.muxer = muxer;
@@ -99,7 +99,7 @@ public class PlaybackThread extends Thread {
     public void prepare() throws IOException {
         final @NotNull Transaction transaction;
 
-        if (audioBackend != null)
+        if (audioOutput != null)
             return;
 
         setPlayerState(PlayerState.PREPARING);
@@ -114,9 +114,9 @@ public class PlaybackThread extends Thread {
             throw new IOException(error);
         }
 
-        audioBackend = audioBackendFactory.getAudioBackend();
+        audioOutput = audioBackendFactory.getAudioOutput();
         initialAudioBlock = muxer.read();
-        audioBackend.prepare(initialAudioBlock);
+        audioOutput.prepare(initialAudioBlock);
     }
 
     public void setBufferGoal(double bufferGoal) {
@@ -147,15 +147,15 @@ public class PlaybackThread extends Thread {
             setPlayerState(PlayerState.ERROR);
             return;
         }
-        assert audioBackend != null;
+        assert audioOutput != null;
         block = Objects.requireNonNull(initialAudioBlock);
 
         muxer.addBufferStatusConsumer(bufferStatusConsumer);
         buffer();
-        audioBackend.play();
+        audioOutput.play();
         while (!isInterrupted()) {
             try {
-                audioBackend.write(block);
+                audioOutput.write(block);
                 try {
                     block.audible();
                 } catch (Throwable e) {
@@ -185,10 +185,10 @@ public class PlaybackThread extends Thread {
         muxer.removeBufferStatusConsumer(bufferStatusConsumer);
 
         try {
-            audioBackend.close();
+            audioOutput.close();
         } catch (IOException ignored) {
         }
-        audioBackend = null;
+        audioOutput = null;
 
         setPlayerState(PlayerState.STOPPED);
     }

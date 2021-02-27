@@ -29,7 +29,7 @@ import io.ybrid.api.session.Command;
 import io.ybrid.api.session.PlayerControl;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transport.ServiceTransportDescription;
-import io.ybrid.player.AudioBackendFactory;
+import io.ybrid.player.io.audio.output.AudioOutputFactory;
 import io.ybrid.player.io.decoder.Decoder;
 import io.ybrid.player.io.decoder.DecoderFactory;
 import io.ybrid.player.io.BufferedByteDataSource;
@@ -122,7 +122,7 @@ public class BasePlayer extends PlayerStub {
         // no-op.
     }
 
-    public BasePlayer(@NotNull Session session, @NotNull DecoderFactory externalDecoderFactory, @NotNull AudioBackendFactory externalAudioBackendFactory) {
+    public BasePlayer(@NotNull Session session, @NotNull DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory externalAudioBackendFactory) {
         super(session, externalDecoderFactory, externalAudioBackendFactory);
         this.playbackThread = new PlaybackThread("YbridPlayer Playback Thread", session, muxer, externalAudioBackendFactory, this::onPlayerStateChange, this::onMetadataChange);
         this.playerControl = buildPlayerControl();
