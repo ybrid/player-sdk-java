@@ -64,7 +64,7 @@ public class YbridPlayer extends BasePlayer implements SessionClient, BufferStat
      * @param decoderFactory The {@link DecoderFactory} used to create a {@link Decoder} for the stream.
      * @param audioBackendFactory The {@link AudioOutputFactory} used to create a {@link AudioOutput} to interact with the host audio output.
      */
-    public YbridPlayer(Session session, @Nullable DecoderFactory decoderFactory, AudioOutputFactory audioBackendFactory) {
+    public YbridPlayer(@NotNull Session session, @Nullable DecoderFactory decoderFactory, @NotNull AudioOutputFactory audioBackendFactory) {
         super(session, decoderFactory, audioBackendFactory);
         this.playbackThread.setBufferGoal(AUDIO_BUFFER_PREBUFFER);
     }
