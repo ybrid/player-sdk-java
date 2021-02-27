@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
+ * Copyright (c) 2021 nacamar GmbH - Ybrid®, a Hybrid Dynamic Live Audio Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player.io;
+package io.ybrid.player.io.protocol;
 
 import io.ybrid.api.TemporalValidity;
 import io.ybrid.api.bouquet.source.ICEBasedService;
@@ -28,10 +28,10 @@ import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.transport.ServiceURITransportDescription;
 import io.ybrid.api.transport.TransportConnectionState;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import io.ybrid.player.io.ByteDataBlock;
+import io.ybrid.player.io.ByteDataSource;
+import io.ybrid.player.io.RealBlockingInputStream;
+import org.jetbrains.annotations.*;
 
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
@@ -46,7 +46,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
-class ICYInputStream implements Closeable, ByteDataSource {
+@ApiStatus.Internal
+public class ICYInputStream implements Closeable, ByteDataSource {
     static final @NonNls Logger LOGGER = Logger.getLogger(ICYInputStream.class.getName());
     private static final String HEADER_ICY_METAINT = "icy-metaint"; //NON-NLS
     private static final int MAX_READ_LENGTH = 4*1024;

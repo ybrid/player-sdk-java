@@ -22,23 +22,14 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.TemporalValidity;
-import io.ybrid.api.bouquet.source.ICEBasedService;
-import io.ybrid.api.message.MessageBody;
-import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.transport.*;
-import org.jetbrains.annotations.NonNls;
+import io.ybrid.player.io.protocol.ICYInputStream;
+import io.ybrid.player.io.protocol.URLSource;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,111 +38,6 @@ import java.util.logging.Logger;
  */
 public final class DataSourceFactory {
     static final Logger LOGGER = Logger.getLogger(DataSourceFactory.class.getName());
-
-    private static class URLSource implements ByteDataSource {
-        private final @NotNull ServiceURITransportDescription transportDescription;
-        private final @NotNull Sync sync;
-        private final InputStream inputStream;
-        private final String contentType;
-
-        private static void acceptListToHeader(@NotNull URLConnection connection, @NonNls @NotNull String header, @Nullable Map<String, Double> list) {
-            @NonNls StringBuilder ret = new StringBuilder();
-
-            if (list == null || list.isEmpty())
-                return;
-
-            for (Map.Entry<String, Double> entry : list.entrySet()) {
-                if (ret.length() > 0)
-                    ret.append(", ");
-                ret.append(entry.getKey()).append("; q=").append(entry.getValue());
-            }
-
-            connection.setRequestProperty(header, ret.toString());
-        }
-
-        private @NotNull Map<@NotNull String, @NotNull String> getHeadersAsMap(@NotNull URLConnection connection) {
-            final @NotNull Map<@NotNull String, @NotNull String> ret = new HashMap<>();
-
-            for (int i = 0; ; i++) {
-                final @Nullable String key = connection.getHeaderFieldKey(i);
-                final @Nullable String value = connection.getHeaderField(i);
-                if (key == null || value == null)
-                    break;
-                ret.put(key, value);
-            }
-
-            return ret;
-        }
-
-        public URLSource(@NotNull ServiceURITransportDescription transportDescription) throws IOException {
-            @NonNls URLConnection connection = transportDescription.getURI().toURL().openConnection();
-            final @Nullable MessageBody messageBody = transportDescription.getRequestBody();
-
-            this.transportDescription = transportDescription;
-
-            transportDescription.signalConnectionState(TransportConnectionState.CONNECTING);
-
-            try {
-                connection.setDoInput(true);
-                connection.setDoOutput(messageBody != null);
-
-                acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
-                acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
-                connection.setRequestProperty("Accept-Charset", "utf-8, *; q=0");
-
-                if (messageBody != null) {
-                    final @NotNull OutputStream outputStream;
-
-                    connection.setRequestProperty(HttpHelper.HEADER_CONTENT_TYPE, messageBody.getMediaType());
-
-                    outputStream = connection.getOutputStream();
-                    outputStream.write(messageBody.getBytes());
-                    outputStream.close();
-                }
-
-                connection.connect();
-
-                inputStream = connection.getInputStream();
-                contentType = connection.getContentType();
-            } catch (Exception e) {
-                transportDescription.signalConnectionState(TransportConnectionState.ERROR);
-                throw e;
-            }
-
-            transportDescription.signalConnectionState(TransportConnectionState.CONNECTED);
-
-            {
-                final @NotNull Sync.Builder builder = new Sync.Builder(transportDescription.getSource());
-                builder.setCurrentService(new ICEBasedService(transportDescription.getSource(), transportDescription.getInitialService().getIdentifier(), getHeadersAsMap(connection)));
-                builder.setTemporalValidity(TemporalValidity.INDEFINITELY_VALID);
-                sync = builder.build();
-                transportDescription.getMetadataMixer().accept(sync);
-            }
-        }
-
-        @Override
-        public @NotNull ByteDataBlock read() throws IOException {
-            //noinspection MagicNumber
-            return new ByteDataBlock(sync, null, inputStream, 1024*2);
-        }
-
-        @Override
-        public String getContentType() {
-            return contentType;
-        }
-
-        @Override
-        public boolean isValid() {
-            return true;
-        }
-
-        @Override
-        public void close() throws IOException {
-            transportDescription.signalConnectionState(TransportConnectionState.DISCONNECTING);
-            inputStream.close();
-            transportDescription.signalConnectionState(TransportConnectionState.DISCONNECTED);
-        }
-    }
 
     /**
      * This builds a {@link ByteDataSource} for the audio stream based on a {@link ServiceTransportDescription}.
