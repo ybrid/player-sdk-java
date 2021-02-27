@@ -40,21 +40,21 @@ Once a session was created a player can be created using a decoder factory and a
 The player implements the full protocol and can then be controlled using its API.
 
 ```java
-import io.ybrid.api.Alias;
+import io.ybrid.api.MediaEndpoint;
 import io.ybrid.api.Session;
 import io.ybrid.api.session.Command;
 import io.ybrid.player.player.Player;
 import io.ybrid.player.player.YbridPlayer;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.logging.Logger;
 
 class myPlayer {
     private void run() throws IOException {
         /* First create a Alias object and a Session. */
-        final Alias alias = new Alias(Logger.getLogger(new URL("https://.../...")));
-        final Session session = alias.createSession();
+        final MediaEndpoint mediaEndpoint = new MediaEndpoint(new URI("https://stagecast.ybrid.io/adaptive-demo"));
+        final Session session = mediaEndpoint.createSession();
 
         /* Connect the session to the server. */
         session.createTransaction(Command.CONNECT.makeRequest()).run();
