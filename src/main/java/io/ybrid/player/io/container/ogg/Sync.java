@@ -47,7 +47,7 @@ public final class Sync {
      * @param raw The source array to take bytes from.
      * @param offset The offset in the source array to start reading bytes from.
      * @param length The length to read starting at the given offset.
-     * @see #setAutoFullSource(InputStream)
+     * @see #setAutoFillSource(InputStream)
      */
     public void fill(byte[] raw, int offset, int length) {
         final @NotNull byte[] n = new byte[buffer.length - bufferOffset + length];
@@ -85,7 +85,7 @@ public final class Sync {
     /**
      * Returns whether the auto fill source signaled EOF.
      * @return The EOF state of the autofill source.
-     * @see #setAutoFullSource(InputStream)
+     * @see #setAutoFillSource(InputStream)
      */
     public boolean isEofOnAutoFill() {
         return eofOnAutoFill;
@@ -104,7 +104,7 @@ public final class Sync {
      * @see #fill(byte[], int, int)
      * @see #isEofOnAutoFill()
      */
-    public void setAutoFullSource(@Nullable InputStream autoFullSource) {
+    public void setAutoFillSource(@Nullable InputStream autoFullSource) {
         this.autoFullSource = autoFullSource;
         this.eofOnAutoFill = false;
     }
