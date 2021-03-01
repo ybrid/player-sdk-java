@@ -219,7 +219,7 @@ public class ICYInputStream implements Closeable, ByteDataSource {
         this.inputStream = inputStream;
     }
 
-    synchronized void connect() throws IOException {
+    private synchronized void connect() throws IOException {
         if (inputStream != null)
             return;
 
