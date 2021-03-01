@@ -299,6 +299,8 @@ public class ICYInputStream implements Closeable, ByteDataSource {
         if (length == 0)
             return;
 
+        LOGGER.info("Metadata Length header value: " + length + " (" + length*16 + " byte)");
+
         length *= ICY_METADATA_BLOCK_MULTIPLAYER;
         rawMetadata = new byte[length];
         ret = inputStream.read(rawMetadata);
