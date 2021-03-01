@@ -25,16 +25,21 @@ package io.ybrid.player.io.audio;
 import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.player.io.DataBlock;
-import io.ybrid.player.io.audio.MultiChannelSignalInformation;
 import io.ybrid.player.io.audio.analysis.result.Block;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This implements a {@link DataBlock} that holds PCM samples.
  */
 public class PCMDataBlock extends DataBlock implements MultiChannelSignalInformation {
+    static final @NonNls Logger LOGGER = Logger.getLogger(PCMDataBlock.class.getName());
+
     /**
      * Internal storage for PCM data.
      */
@@ -64,6 +69,10 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
         this.data = data;
         this.sampleRate = sampleRate;
         this.numberOfChannels = numberOfChannels;
+
+        if ((data.length % numberOfChannels) != 0) {
+            LOGGER.log(Level.WARNING, "Creating questionable PCMDataBlock: Number of samples (" + data.length + ") is not a multiple of number of channels (" + numberOfChannels + ")", new IllegalArgumentException());
+        }
     }
 
     /**
@@ -116,7 +125,7 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
         final int samples = getData().length;
 
         if ((samples % getNumberOfChannels()) != 0)
-            throw new IllegalArgumentException("Number of samples is not a multiple of number of channels");
+            throw new IllegalArgumentException("Number of samples (" + samples + ") is not a multiple of number of channels (" + getNumberOfChannels() + ")");
 
         return samples / getNumberOfChannels();
     }
