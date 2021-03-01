@@ -343,7 +343,7 @@ public class ICYInputStream implements Closeable, ByteDataSource {
     }
 
     @Override
-    public @NotNull ByteDataBlock read() throws IOException {
+    public synchronized @NotNull ByteDataBlock read() throws IOException {
         ByteDataBlock block;
         int todo;
 
