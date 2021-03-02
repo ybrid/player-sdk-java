@@ -170,4 +170,40 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
     public @NotNull Block analyse() {
         return new Block(this);
     }
+
+    /**
+     * Creates a new block that is a sub block of this.
+     * @param start The first frame to include in [frame].
+     * @param end The last frame to include in [frame].
+     * @return The resulting block.
+     * @see #trim(int, int)
+     */
+    @Contract(pure = true)
+    public @NotNull PCMDataBlock subBlock(int start, int end) {
+        final int length = getLengthAsFrames();
+        final short[] n;
+
+        if (end < start || start < 0 || start > length || end > length)
+            throw new IllegalArgumentException("start (" + start + ") or end (" + end + ") invalid. Total length is " + length);
+
+        start *= numberOfChannels;
+        end *= numberOfChannels;
+
+        n = new short[end - start];
+        System.arraycopy(data, start, n, 0, n.length);
+
+        return new PCMDataBlock(getSync(), getPlayoutInfo(), n, sampleRate, numberOfChannels);
+    }
+
+    /**
+     * Creates a new block that is a sub block of this.
+     * @param startTrim How many frames to trim from the start in [frame].
+     * @param endTrim How many frames to trim from the end in [frame].
+     * @return The resulting block.
+     * @see #subBlock(int, int)
+     */
+    @Contract(pure = true)
+    public @NotNull PCMDataBlock trim(int startTrim, int endTrim) {
+        return subBlock(startTrim, getLengthAsFrames() - endTrim);
+    }
 }

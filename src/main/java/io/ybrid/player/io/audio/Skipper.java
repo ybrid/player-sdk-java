@@ -70,7 +70,7 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
     private @NotNull PCMDataBlock readFromBackend() throws IOException {
         try {
             final @NotNull PCMDataBlock block = backend.read();
-            read += block.getData().length;
+            read += block.getLengthAsFrames();
             examine(block);
             return block;
         } catch (Throwable e) {
@@ -80,23 +80,12 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
     }
 
     private @NotNull PCMDataBlock writeToFrontend(@NotNull PCMDataBlock block) {
-        written += block.getData().length;
+        written += block.getLengthAsFrames();
         return block;
     }
 
     private void skipBlock(@NotNull PCMDataBlock block) {
-        skipped += block.getData().length;
-    }
-
-    private @NotNull PCMDataBlock skipBlockParts(@NotNull PCMDataBlock block, @NotNull short[] data) {
-        final int oldLength = block.getData().length;
-        final int newLength = data.length;
-
-        if (newLength >= oldLength)
-            throw new IllegalArgumentException("new length (" + newLength + ") is not shorter than old length (" + oldLength + ")");
-
-        skipped += oldLength - newLength;
-        return new PCMDataBlock(block.getSync(), block.getPlayoutInfo(), data, block.getSampleRate(), block.getNumberOfChannels());
+        skipped += block.getLengthAsFrames();
     }
 
     /**
@@ -113,14 +102,12 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
             final @NotNull PCMDataBlock block = readFromBackend();
             if (read <= preSkip) {
                 skipBlock(block);
-            } else if ((read - block.getData().length) == preSkip) {
+            } else if ((read - block.getLengthAsFrames()) == preSkip) {
                 preSkipDone = true;
                 return block;
             } else {
-                final short[] newData = new short[(int)(read - preSkip)];
-                System.arraycopy(block.getData(), block.getData().length - newData.length, newData, 0, newData.length);
                 preSkipDone = true;
-                return skipBlockParts(block, newData);
+                return block.subBlock(block.getLengthAsFrames() - (int)(read - preSkip), block.getLengthAsFrames());
             }
         }
 
@@ -135,7 +122,7 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
                 return;
             }
 
-            if ((written + queue.element().getData().length) <= (read - preSkip - postSkip))
+            if ((written + queue.element().getLengthAsFrames()) <= (read - preSkip - postSkip))
                 break;
         }
     }
@@ -150,7 +137,7 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
             throw new EOFException();
 
         block = queue.remove();
-        currentEndPosition = written + preSkip + block.getData().length;
+        currentEndPosition = written + preSkip + block.getLengthAsFrames();
 
         if (currentEndPosition <= (read - postSkip))
             return block;
@@ -160,9 +147,7 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
             throw new IOException("Invalid queue state.");
 
         left = (int)((read - postSkip) - (written + preSkip));
-        final short[] newData = new short[left];
-        System.arraycopy(block.getData(), 0, newData, 0, newData.length);
-        return skipBlockParts(block, newData);
+        return block.subBlock(0, left);
     }
 
     @Override

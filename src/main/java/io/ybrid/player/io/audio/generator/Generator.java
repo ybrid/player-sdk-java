@@ -43,6 +43,7 @@ public class Generator implements PCMDataSource {
     private int sampleRate = 48000;
     private int channels = 1;
     private int blockSize = 1024;
+    private @Nullable Integer blocksLeft;
 
     public Generator() {
         setFunction(Function.createSilence());
@@ -55,6 +56,14 @@ public class Generator implements PCMDataSource {
 
     @Override
     public @NotNull PCMDataBlock read() throws IOException {
+        if (blocksLeft != null) {
+            if (blocksLeft == 0) {
+                throw new EOFException();
+            } else if (valid) {
+                blocksLeft--;
+            }
+        }
+
         if (valid) {
             final short[] data = function.generate(state, sampleRate, channels, blockSize);
             return new PCMDataBlock(sync, playoutInfo, data, sampleRate, channels);
@@ -116,6 +125,14 @@ public class Generator implements PCMDataSource {
 
     public @NotNull Function getFunction() {
         return function;
+    }
+
+    public @Nullable Integer getBlocksLeft() {
+        return blocksLeft;
+    }
+
+    public void setBlocksLeft(@Nullable Integer blocksLeft) {
+        this.blocksLeft = blocksLeft;
     }
 
     public void setFunction(@NotNull Function function) {
