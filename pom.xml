@@ -35,16 +35,21 @@
     </properties>
 
     <dependencies>
+        <!-- API Framework -->
         <dependency>
             <groupId>io.ybrid</groupId>
             <artifactId>api-sdk-java</artifactId>
             <version>1.0.2-SNAPSHOT</version>
         </dependency>
+
+        <!-- Annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>19.0.0</version>
         </dependency>
+
+        <!-- Codecs -->
         <dependency>
             <groupId>com.googlecode.soundlibs</groupId>
             <artifactId>jlayer</artifactId>
