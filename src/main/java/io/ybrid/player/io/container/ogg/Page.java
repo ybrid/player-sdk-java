@@ -206,7 +206,7 @@ public final class Page implements hasGranularPosition {
      * This is generally not very useful. {@link Stream} should be used
      * to extract {@link Packet packets} from pages.
      *
-     * @return The raw segment tabe.
+     * @return The raw segment table.
      */
     @Contract(pure = true)
     public byte[] getSegmentTable() {

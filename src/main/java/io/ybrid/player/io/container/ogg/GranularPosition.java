@@ -80,7 +80,7 @@ public final class GranularPosition {
     }
 
     /**
-     * Substracts a given amount to a GranularPosition.
+     * Subtracts a given amount to a GranularPosition.
      * @param val The amount to subtract.
      * @return The new GranularPosition or {@link #INVALID}.
      * @throws IllegalArgumentException Thrown if {@code val} is invalid.

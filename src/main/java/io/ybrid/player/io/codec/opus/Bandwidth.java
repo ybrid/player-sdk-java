@@ -27,7 +27,7 @@ package io.ybrid.player.io.codec.opus;
  */
 public enum Bandwidth {
     /**
-     * Narrowband, 4kHz bandwidth.
+     * narrowband, 4kHz bandwidth.
      */
     NB,
     /**
