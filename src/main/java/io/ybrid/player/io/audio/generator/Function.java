@@ -57,9 +57,9 @@ public abstract class Function {
                     final double oldPhase = phase;
 
                     while (phase > Math.PI)
-                        phase -= 2.*Math.PI;
+                        phase -= 2*Math.PI;
 
-                    phase += 2.*Math.PI * frequency / (double)sampleRate;
+                    phase += 2*Math.PI * frequency / (double)sampleRate;
 
                     return oldPhase;
                 }

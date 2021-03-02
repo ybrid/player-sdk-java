@@ -28,6 +28,7 @@ import io.ybrid.api.metadata.MetadataMixer;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.transaction.Transaction;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +42,7 @@ public class DataBlockMetadataUpdateThread extends Thread implements Consumer<Da
     private final @NotNull BlockingQueue<DataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
     private final @NotNull Session session;
 
-    public DataBlockMetadataUpdateThread(String name, @NotNull Session session) {
+    public DataBlockMetadataUpdateThread(@NonNls String name, @NotNull Session session) {
         super(name);
         this.session = session;
     }

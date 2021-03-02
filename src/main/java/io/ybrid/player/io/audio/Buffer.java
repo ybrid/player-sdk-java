@@ -246,7 +246,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
         public double getBufferLength() {
             final long skipped = backend.getSkippedSamples();
             Duration duration = Duration.ZERO;
-            double ret = 0;
+            double ret;
 
             for (PCMDataBlock block : buffer) {
                 duration = duration.plus(block.getLength());

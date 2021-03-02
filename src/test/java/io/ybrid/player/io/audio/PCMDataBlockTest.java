@@ -56,7 +56,7 @@ public class PCMDataBlockTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         final @NotNull Sync sync = Sync.Builder.buildEmpty(new Source(SourceType.SESSION));
         block = new PCMDataBlock(sync, null, data, SAMPLE_RATE, CHANNELS);
     }

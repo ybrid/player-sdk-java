@@ -150,10 +150,11 @@ public final class GranularPosition {
         return Objects.hash(raw, 928308210218021809L);
     }
 
+    @SuppressWarnings("HardCodedStringLiteral")
     @Override
     public String toString() {
         return "GranularPosition{" +
                 "raw=" + raw +
-                '}';
+                "}";
     }
 }

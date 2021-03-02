@@ -239,6 +239,7 @@ public final class Page implements hasGranularPosition {
         return arrayBeginsWith(body, offset, needle);
     }
 
+    @SuppressWarnings("HardCodedStringLiteral")
     @Override
     public String toString() {
         return "Page{" +
@@ -251,6 +252,6 @@ public final class Page implements hasGranularPosition {
                 ", segments=" + segments +
                 ", segmentTable=" + Arrays.toString(segmentTable) +
                 ", body=" + (body[0] == 'O' ? new String(body, StandardCharsets.UTF_8) : "<binary>") +
-                '}';
+                "}";
     }
 }

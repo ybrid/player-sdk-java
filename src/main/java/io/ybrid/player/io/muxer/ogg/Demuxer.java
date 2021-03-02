@@ -52,7 +52,7 @@ public class Demuxer extends io.ybrid.player.io.muxer.Demuxer<Stream, PacketAdap
     private void handle(@NotNull Page page) {
         final @NotNull Set<Flag> flags = page.getFlags();
         final int serial = page.getSerial();
-        @Nullable PageAdapter block = null;
+        @Nullable PageAdapter block;
         final @Nullable Stream stream;
 
         if (flags.contains(Flag.BOS)) {

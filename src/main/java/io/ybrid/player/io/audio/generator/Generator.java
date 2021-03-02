@@ -73,7 +73,7 @@ public class Generator implements PCMDataSource {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         valid = false;
     }
 

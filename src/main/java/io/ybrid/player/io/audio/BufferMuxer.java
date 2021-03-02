@@ -59,7 +59,7 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
             this.transportDescription = transportDescription;
 
             if (transportDescription.getActiveWorkarounds().get(Workaround.WORKAROUND_SKIP_SILENCE).toBool(true)) {
-                silenceEliminator = new SilenceEliminator(source, SilenceEliminator.SilenceType.ANALOG);
+                silenceEliminator = new SilenceEliminator<>(source, SilenceEliminator.SilenceType.ANALOG);
                 usedSource = silenceEliminator;
             } else {
                 silenceEliminator = null;

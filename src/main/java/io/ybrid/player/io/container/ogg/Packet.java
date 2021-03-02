@@ -87,6 +87,7 @@ public final class Packet implements hasGranularPosition {
         return afterHole;
     }
 
+    @SuppressWarnings("HardCodedStringLiteral")
     @Override
     public String toString() {
         return "Packet{" +
@@ -94,6 +95,6 @@ public final class Packet implements hasGranularPosition {
                 ", flags=" + flags +
                 ", afterHole=" + afterHole +
                 ", body=" + (body[0] == 'O' ? new String(body, StandardCharsets.UTF_8) : "<binary>") +
-                '}';
+                "}";
     }
 }
