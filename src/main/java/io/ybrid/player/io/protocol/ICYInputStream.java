@@ -73,7 +73,6 @@ public class ICYInputStream implements Closeable, ByteDataSource {
         return port;
     }
 
-    @SuppressWarnings("HardCodedStringLiteral")
     public ICYInputStream(@NotNull ServiceURITransportDescription transportDescription) throws MalformedURLException {
         uri = transportDescription.getURI();
 
