@@ -88,17 +88,6 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
         skipped += block.getLengthAsFrames();
     }
 
-    private @NotNull PCMDataBlock skipBlockParts(@NotNull PCMDataBlock block, @NotNull short[] data) {
-        final int oldLength = block.getData().length;
-        final int newLength = data.length;
-
-        if (newLength >= oldLength)
-            throw new IllegalArgumentException("new length (" + newLength + ") is not shorter than old length (" + oldLength + ")");
-
-        skipped += oldLength - newLength;
-        return new PCMDataBlock(block.getSync(), block.getPlayoutInfo(), data, block.getSampleRate(), block.getNumberOfChannels());
-    }
-
     /**
      * The main constructor.
      *
@@ -117,10 +106,8 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
                 preSkipDone = true;
                 return block;
             } else {
-                final short[] newData = new short[(int)(read - preSkip) * block.getNumberOfChannels()];
-                System.arraycopy(block.getData(), block.getData().length - newData.length, newData, 0, newData.length);
                 preSkipDone = true;
-                return skipBlockParts(block, newData);
+                return block.subBlock(block.getLengthAsFrames() - (int)(read - preSkip), block.getLengthAsFrames());
             }
         }
 
@@ -160,9 +147,7 @@ public abstract class Skipper<T extends PCMDataSource> extends FilterPCMDataSour
             throw new IOException("Invalid queue state.");
 
         left = (int)((read - postSkip) - (written + preSkip));
-        final short[] newData = new short[left * block.getNumberOfChannels()];
-        System.arraycopy(block.getData(), 0, newData, 0, newData.length);
-        return skipBlockParts(block, newData);
+        return block.subBlock(0, left);
     }
 
     @Override
