@@ -100,13 +100,12 @@ abstract class PlayerStub implements Player {
     }
 
     /**
-     * Execute the given request as a transaction on this player.
+     * Execute the given transaction on this player.
      *
-     * @param request The request to execute.
+     * @param transaction The transaction to execute.
      * @throws IOException Thrown as by the transaction.
      */
-    protected void executeRequestAsTransaction(@NotNull Request request) throws IOException {
-        final @NotNull Transaction transaction = session.createTransaction(request);
+    protected void executeTransaction(@NotNull Transaction transaction) throws IOException {
         final @Nullable Throwable error;
 
         transaction.run();
@@ -119,6 +118,16 @@ abstract class PlayerStub implements Player {
             throw (IOException)error;
 
         throw new IOException(error);
+    }
+
+    /**
+     * Execute the given request as a transaction on this player.
+     *
+     * @param request The request to execute.
+     * @throws IOException Thrown as by the transaction.
+     */
+    protected void executeRequestAsTransaction(@NotNull Request request) throws IOException {
+        executeTransaction(session.createTransaction(request));
     }
 
     /**
