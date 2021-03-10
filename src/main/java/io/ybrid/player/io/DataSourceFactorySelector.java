@@ -102,6 +102,7 @@ public final class DataSourceFactorySelector implements DataSourceFactory {
         final @Nullable SimpleProvider provider;
 
         LOGGER.log(Level.INFO, "getSourceByFallback(transportDescription=" + transportDescription + "): uri=" + uri);
+        LOGGER.info("Supported schemes: " + schemes.keySet() + " (We have " + (fallbackSource != null ? "a" : "no") + " fallbackSource)");
 
         provider = schemes.get(scheme);
         if (provider != null)
