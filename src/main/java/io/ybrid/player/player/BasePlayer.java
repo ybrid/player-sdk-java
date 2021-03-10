@@ -26,7 +26,10 @@ import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.Session;
 import io.ybrid.api.SubInfo;
 import io.ybrid.api.player.Control;
+import io.ybrid.api.player.SimpleCommand;
 import io.ybrid.api.session.Command;
+import io.ybrid.api.transaction.Request;
+import io.ybrid.api.transaction.RequestBasedTransaction;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transport.ServiceTransportDescription;
 import io.ybrid.player.io.BufferedByteDataSource;
@@ -83,6 +86,29 @@ public class BasePlayer extends PlayerStub {
                 }
                 muxer.setInputEOFCallback(() -> onInputEOF());
             }
+
+            @Override
+            public <C extends io.ybrid.api.player.Command<C>> void executeTransaction(@NotNull RequestBasedTransaction<Request<C>> transaction) throws Exception {
+                final @NotNull Request<C> request = transaction.getRequest();
+                final @NotNull C command = request.getCommand();
+
+                LOGGER.info("Trying: " + request + " with " + command);
+
+                if (command.equals(SimpleCommand.PREPARE)) {
+                    playbackThread.prepare();
+                } else if (command.equals(SimpleCommand.PLAY)) {
+                    playbackThread.start();
+                } else if (command.equals(SimpleCommand.STOP)) {
+                    playbackThread.interrupt();
+                    try {
+                        muxer.close();
+                    } catch (IOException ignored) {
+                    }
+                    session.detachPlayer(control);
+                } else {
+                    throw new UnsupportedOperationException("Unknown request " + request + " with command " + command);
+                }
+            }
         };
     }
 
@@ -131,21 +157,16 @@ public class BasePlayer extends PlayerStub {
 
     @Override
     public void prepare() throws IOException {
-        playbackThread.prepare();
+        executeRequestAsTransaction(SimpleCommand.PREPARE);
     }
 
     @Override
     public void play() throws IOException {
-        playbackThread.start();
+        executeRequestAsTransaction(SimpleCommand.PLAY);
     }
 
     @Override
-    public void stop() {
-        playbackThread.interrupt();
-        try {
-            muxer.close();
-        } catch (IOException ignored) {
-        }
-        session.detachPlayer(control);
+    public void stop() throws IOException {
+        executeRequestAsTransaction(SimpleCommand.STOP);
     }
 }
