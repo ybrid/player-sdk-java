@@ -26,6 +26,7 @@ import io.ybrid.api.transport.ServiceTransportDescription;
 import io.ybrid.api.transport.ServiceURITransportDescription;
 import io.ybrid.player.io.protocol.ICYInputStream;
 import io.ybrid.player.io.protocol.URLSource;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +42,7 @@ import java.util.logging.Logger;
  * This class implements a {@link DataSourceFactory} that selects the correct factory based on the passed {@link ServiceTransportDescription}.
  */
 public final class DataSourceFactorySelector implements DataSourceFactory {
-    private final @NotNull Logger LOGGER = Logger.getLogger(DataSourceFactorySelector.class.getName());
+    private final @NotNull @NonNls Logger LOGGER = Logger.getLogger(DataSourceFactorySelector.class.getName());
 
     /**
      * This interface is used for references to simple providers.
@@ -91,7 +92,7 @@ public final class DataSourceFactorySelector implements DataSourceFactory {
      * @param scheme The scheme to register for.
      * @param provider The {@link SimpleProvider} to register. Normally this is a reference to a class' constructor.
      */
-    public void register(@NotNull String scheme, @NotNull SimpleProvider provider) {
+    public void register(@NotNull @NonNls String scheme, @NotNull SimpleProvider provider) {
         schemes.put(scheme.toLowerCase(Locale.ROOT), provider);
     }
 
@@ -100,7 +101,7 @@ public final class DataSourceFactorySelector implements DataSourceFactory {
         final @NotNull String scheme = uri.getScheme().toLowerCase(Locale.ROOT);
         final @Nullable SimpleProvider provider;
 
-        LOGGER.log(Level.INFO, "getSourceByFallback(transportDescription=" + transportDescription + "): uri=" + uri); //NON-NLS
+        LOGGER.log(Level.INFO, "getSourceByFallback(transportDescription=" + transportDescription + "): uri=" + uri);
 
         provider = schemes.get(scheme);
         if (provider != null)
