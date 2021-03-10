@@ -134,7 +134,7 @@ public class BasePlayer extends PlayerStub {
         }
 
         try {
-            executeRequestAsTransaction(Command.REFRESH, EnumSet.of(SubInfo.VALIDITY));
+            executeTransaction(Command.REFRESH, EnumSet.of(SubInfo.VALIDITY));
         } catch (IOException e) {
             LOGGER.warning("Validating session failed.");
         }
@@ -157,16 +157,16 @@ public class BasePlayer extends PlayerStub {
 
     @Override
     public void prepare() throws IOException {
-        executeRequestAsTransaction(SimpleCommand.PREPARE);
+        executeTransaction(SimpleCommand.PREPARE);
     }
 
     @Override
     public void play() throws IOException {
-        executeRequestAsTransaction(SimpleCommand.PLAY);
+        executeTransaction(SimpleCommand.PLAY);
     }
 
     @Override
     public void stop() throws IOException {
-        executeRequestAsTransaction(SimpleCommand.STOP);
+        executeTransaction(SimpleCommand.STOP);
     }
 }

@@ -116,42 +116,42 @@ public class YbridPlayer extends BasePlayer implements SessionClient, BufferStat
 
     @Override
     public void windToLive() throws IOException {
-        executeRequestAsTransaction(Command.WIND_TO_LIVE);
+        executeTransaction(Command.WIND_TO_LIVE);
     }
 
     @Override
     public void windTo(@NotNull Instant timestamp) throws IOException {
-        executeRequestAsTransaction(Command.WIND_TO, timestamp);
+        executeTransaction(Command.WIND_TO, timestamp);
     }
 
     @Override
     public void wind(@NotNull Duration duration) throws IOException {
-        executeRequestAsTransaction(Command.WIND_BY, duration);
+        executeTransaction(Command.WIND_BY, duration);
     }
 
     @Override
     public void skipForwards(ItemType itemType) throws IOException {
-        executeRequestAsTransaction(Command.SKIP_FORWARD, itemType);
+        executeTransaction(Command.SKIP_FORWARD, itemType);
     }
 
     @Override
     public void skipBackwards(ItemType itemType) throws IOException {
-        executeRequestAsTransaction(Command.SKIP_BACKWARD, itemType);
+        executeTransaction(Command.SKIP_BACKWARD, itemType);
     }
 
     @Override
     public void swapItem(SwapMode mode) throws IOException {
-        executeRequestAsTransaction(Command.SWAP_ITEM, mode);
+        executeTransaction(Command.SWAP_ITEM, mode);
     }
 
     @Override
     public void swapService(@NotNull Service service) throws IOException {
-        executeRequestAsTransaction(Command.SWAP_SERVICE, service);
+        executeTransaction(Command.SWAP_SERVICE, service);
     }
 
     @Override
     public void swapToMain() throws IOException {
-        executeRequestAsTransaction(Command.SWAP_TO_MAIN_SERVICE);
+        executeTransaction(Command.SWAP_TO_MAIN_SERVICE);
     }
 
     @Override
