@@ -55,22 +55,13 @@ abstract class PlayerStub implements Player {
     protected MetadataConsumer metadataConsumer = null;
     protected boolean autoReconnect = true;
 
-    /**
-     * This constructor creates a new Player with using defaults.
-     * @param session The {@link Session} to attach to.
-     * @param audioOutputFactory The {@link AudioOutputFactory} to use.
-     */
-    public PlayerStub(@NotNull Session session, @NotNull AudioOutputFactory audioOutputFactory) {
-        this(session, null, audioOutputFactory, DataSourceFactorySelector.createWithDefaults());
-    }
-
-    public PlayerStub(@NotNull Session session, @Nullable DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory externalAudioBackendFactory) {
-        this(session, externalDecoderFactory, externalAudioBackendFactory, DataSourceFactorySelector.createWithDefaults());
-    }
-
-    public PlayerStub(@NotNull Session session, @Nullable DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory externalAudioBackendFactory, @NotNull DataSourceFactory dataSourceFactory) {
+    public PlayerStub(@NotNull Session session, @Nullable DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory audioOutputFactory, @Nullable DataSourceFactory dataSourceFactory) {
         this.session = session;
-        this.externalAudioBackendFactory = externalAudioBackendFactory;
+        this.externalAudioBackendFactory = audioOutputFactory;
+
+        if (dataSourceFactory == null)
+            dataSourceFactory = DataSourceFactorySelector.createWithDefaults();
+
         this.dataSourceFactory = dataSourceFactory;
 
         this.muxer = new BufferMuxer(session);

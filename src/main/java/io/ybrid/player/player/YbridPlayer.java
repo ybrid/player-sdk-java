@@ -31,6 +31,7 @@ import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.session.Command;
 import io.ybrid.player.io.DataBlock;
+import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.audio.BufferStatusProvider;
 import io.ybrid.player.io.audio.output.AudioOutput;
 import io.ybrid.player.io.audio.output.AudioOutputFactory;
@@ -61,11 +62,33 @@ public class YbridPlayer extends BasePlayer implements SessionClient, BufferStat
      * Creates a new instance of the player.
      *
      * @param session The {@link Session} to use for retrieval and interaction with the stream.
-     * @param decoderFactory The {@link DecoderFactory} used to create a {@link Decoder} for the stream.
-     * @param audioBackendFactory The {@link AudioOutputFactory} used to create a {@link AudioOutput} to interact with the host audio output.
+     * @param audioOutputFactory The {@link AudioOutputFactory} used to create a {@link AudioOutput} to interact with the host audio output.
      */
-    public YbridPlayer(@NotNull Session session, @Nullable DecoderFactory decoderFactory, @NotNull AudioOutputFactory audioBackendFactory) {
-        super(session, decoderFactory, audioBackendFactory);
+    public YbridPlayer(@NotNull Session session, @NotNull AudioOutputFactory audioOutputFactory) {
+        this(session, null, audioOutputFactory, null);
+    }
+
+    /**
+     * Creates a new instance of the player.
+     *
+     * @param session The {@link Session} to use for retrieval and interaction with the stream.
+     * @param externalDecoderFactory The {@link DecoderFactory} used to create a {@link Decoder} for the stream.
+     * @param audioOutputFactory The {@link AudioOutputFactory} used to create a {@link AudioOutput} to interact with the host audio output.
+     */
+    public YbridPlayer(@NotNull Session session, @Nullable DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory audioOutputFactory) {
+        this(session, externalDecoderFactory, audioOutputFactory, null);
+    }
+
+    /**
+     * Creates a new instance of the player.
+     *
+     * @param session The {@link Session} to use for retrieval and interaction with the stream.
+     * @param externalDecoderFactory The {@link DecoderFactory} used to create a {@link Decoder} for the stream.
+     * @param audioOutputFactory The {@link AudioOutputFactory} used to create a {@link AudioOutput} to interact with the host audio output.
+     * @param dataSourceFactory The {@link DataSourceFactory} used to connect to the services.
+     */
+    public YbridPlayer(@NotNull Session session, @Nullable DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory audioOutputFactory, @Nullable DataSourceFactory dataSourceFactory) {
+        super(session, externalDecoderFactory, audioOutputFactory, dataSourceFactory);
         this.playbackThread.setBufferGoal(AUDIO_BUFFER_PREBUFFER);
     }
 
