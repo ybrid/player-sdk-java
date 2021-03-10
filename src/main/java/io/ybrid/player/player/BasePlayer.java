@@ -55,13 +55,18 @@ public class BasePlayer extends PlayerStub {
 
     private @NotNull Control buildPlayerControl() {
         return new Control() {
+            private void stop() {
+                playbackThread.interrupt();
+                try {
+                    muxer.close();
+                } catch (IOException ignored) {
+                }
+                session.detachPlayer(control);
+            }
+
             @Override
             public void onDetach(@NotNull Session unused) {
-                try {
-                    close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                stop();
             }
 
             @Override
@@ -99,12 +104,7 @@ public class BasePlayer extends PlayerStub {
                 } else if (command.equals(SimpleCommand.PLAY)) {
                     playbackThread.start();
                 } else if (command.equals(SimpleCommand.STOP)) {
-                    playbackThread.interrupt();
-                    try {
-                        muxer.close();
-                    } catch (IOException ignored) {
-                    }
-                    session.detachPlayer(control);
+                    stop();
                 } else {
                     throw new UnsupportedOperationException("Unknown request " + request + " with command " + command);
                 }
