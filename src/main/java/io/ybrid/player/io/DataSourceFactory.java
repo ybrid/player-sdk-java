@@ -48,20 +48,20 @@ public final class DataSourceFactory {
      */
     public static ByteDataSource getSourceByTransportDescription(@NotNull ServiceTransportDescription transportDescription) throws IOException {
         if (transportDescription instanceof ServiceURITransportDescription) {
-            final @NotNull URI uri = ((ServiceURITransportDescription) transportDescription).getURI();
+            final @NotNull ServiceURITransportDescription uriTransportDescription = (ServiceURITransportDescription) transportDescription;
+            final @NotNull URI uri = uriTransportDescription.getURI();
             final @NotNull String scheme = uri.getScheme();
 
-            LOGGER.log(Level.INFO, "getSourceByTransportDescription(session=" + transportDescription + "): uri=" + uri); //NON-NLS
+            LOGGER.log(Level.INFO, "getSourceByTransportDescription(transportDescription=" + transportDescription + "): uri=" + uri); //NON-NLS
 
-            //noinspection SpellCheckingInspection
             if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS
                 try {
-                    return new ICYInputStream((ServiceURITransportDescription)transportDescription);
+                    return new ICYInputStream(uriTransportDescription);
                 } catch (MalformedURLException ignored) {
                 }
             }
 
-            return new URLSource((ServiceURITransportDescription)transportDescription);
+            return new URLSource(uriTransportDescription);
         } else {
             throw new IllegalArgumentException("Unsupported transport description: " + transportDescription);
         }
