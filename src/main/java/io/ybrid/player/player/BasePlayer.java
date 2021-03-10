@@ -34,7 +34,6 @@ import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transport.ServiceTransportDescription;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataBlock;
-import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.audio.output.AudioOutputFactory;
 import io.ybrid.player.io.decoder.Decoder;
 import io.ybrid.player.io.decoder.DecoderFactory;
@@ -78,7 +77,7 @@ public class BasePlayer extends PlayerStub {
                  * server sending EOF and us adding the new buffer.
                  */
                 muxer.setInputEOFCallback(null);
-                decoder = decoderFactory.getDecoder(new BufferedByteDataSource(DataSourceFactory.getSourceByTransportDescription(transportDescription)));
+                decoder = decoderFactory.getDecoder(new BufferedByteDataSource(dataSourceFactory.getSource(transportDescription)));
                 if (decoder == null) {
                     LOGGER.warning("Can not create decoder for new input.");
                 } else {
