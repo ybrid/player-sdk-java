@@ -73,7 +73,7 @@ public class ICYInputStream implements Closeable, ByteDataSource {
         return port;
     }
 
-    public ICYInputStream(@NotNull ServiceURITransportDescription transportDescription) throws MalformedURLException {
+    public ICYInputStream(@NotNull ServiceURITransportDescription transportDescription) {
         uri = transportDescription.getURI();
 
         this.transportDescription = transportDescription;

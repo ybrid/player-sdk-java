@@ -22,23 +22,16 @@
 
 package io.ybrid.player.io;
 
-import io.ybrid.api.transport.*;
-import io.ybrid.player.io.protocol.ICYInputStream;
-import io.ybrid.player.io.protocol.URLSource;
+import io.ybrid.api.transport.ServiceTransportDescription;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This factory is used to build {@link DataSource DataSources}.
  */
-public final class DataSourceFactory {
-    static final Logger LOGGER = Logger.getLogger(DataSourceFactory.class.getName());
-
+public interface DataSourceFactory {
     /**
      * This builds a {@link ByteDataSource} for the audio stream based on a {@link ServiceTransportDescription}.
      *
@@ -46,24 +39,21 @@ public final class DataSourceFactory {
      * @return The {@link ByteDataSource} for the stream.
      * @throws IOException I/O-Errors as thrown by the used backends.
      */
-    public static ByteDataSource getSourceByTransportDescription(@NotNull ServiceTransportDescription transportDescription) throws IOException {
-        if (transportDescription instanceof ServiceURITransportDescription) {
-            final @NotNull ServiceURITransportDescription uriTransportDescription = (ServiceURITransportDescription) transportDescription;
-            final @NotNull URI uri = uriTransportDescription.getURI();
-            final @NotNull String scheme = uri.getScheme();
+    @NotNull ByteDataSource getSource(@NotNull ServiceTransportDescription transportDescription) throws IOException;
 
-            LOGGER.log(Level.INFO, "getSourceByTransportDescription(transportDescription=" + transportDescription + "): uri=" + uri); //NON-NLS
-
-            if (scheme.equals("icyx") || scheme.equals("icyxs")) { //NON-NLS
-                try {
-                    return new ICYInputStream(uriTransportDescription);
-                } catch (MalformedURLException ignored) {
-                }
-            }
-
-            return new URLSource(uriTransportDescription);
-        } else {
-            throw new IllegalArgumentException("Unsupported transport description: " + transportDescription);
-        }
+    /**
+     * This builds a {@link ByteDataSource} for the audio stream based on a {@link ServiceTransportDescription}.
+     *
+     * @param transportDescription The {@link ServiceTransportDescription} to use.
+     * @return The {@link ByteDataSource} for the stream.
+     * @throws IOException I/O-Errors as thrown by the used backends.
+     * @deprecated This should no longer be used.
+     *             If required calls can be replaced with
+     *             {@code DataSourceFactorySelector.createWithDefaults().getSource(transportDescription)}.
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    static ByteDataSource getSourceByTransportDescription(@NotNull ServiceTransportDescription transportDescription) throws IOException {
+        return DataSourceFactorySelector.createWithDefaults().getSource(transportDescription);
     }
 }
