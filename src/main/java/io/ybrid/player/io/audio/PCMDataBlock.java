@@ -26,10 +26,7 @@ import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.audio.analysis.result.Block;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,11 +44,11 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
     /**
      * Internal storage for sample rate of the block.
      */
-    protected final int sampleRate;
+    protected final @Range(from = 1, to = Integer.MAX_VALUE) int sampleRate;
     /**
      * Internal storage for the number of channels represented this block.
      */
-    protected final int numberOfChannels;
+    protected final @Range(from = 1, to = Integer.MAX_VALUE) int numberOfChannels;
 
     protected @Nullable Runnable onAudible = null;
 
@@ -64,7 +61,11 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
      * @param sampleRate The sample rate of the signal in [Hz].
      * @param numberOfChannels The number of channels represented.
      */
-    public PCMDataBlock(@NotNull Sync sync, PlayoutInfo playoutInfo, short[] data, int sampleRate, int numberOfChannels) {
+    public PCMDataBlock(@NotNull Sync sync,
+                        PlayoutInfo playoutInfo,
+                        short[] data,
+                        @Range(from = 1, to = Integer.MAX_VALUE) int sampleRate,
+                        @Range(from = 1, to = Integer.MAX_VALUE) int numberOfChannels) {
         super(sync, playoutInfo);
         this.data = data;
         this.sampleRate = sampleRate;
@@ -90,7 +91,7 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
      * @return Returns the sample rate in [Hz].
      */
     @Override
-    public int getSampleRate() {
+    public @Range(from = 1, to = Integer.MAX_VALUE) int getSampleRate() {
         return sampleRate;
     }
 
@@ -100,7 +101,7 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
      * @return Returns the number of channels.
      */
     @Override
-    public int getNumberOfChannels() {
+    public @Range(from = 1, to = Integer.MAX_VALUE) int getNumberOfChannels() {
         return numberOfChannels;
     }
 
@@ -121,7 +122,7 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
      * @return The length in [frame].
      */
     @Override
-    public int getLengthAsFrames() {
+    public @Range(from = 0, to = Integer.MAX_VALUE) int getLengthAsFrames() {
         final int samples = getData().length;
 
         if ((samples % getNumberOfChannels()) != 0)

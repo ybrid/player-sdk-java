@@ -23,6 +23,7 @@
 package io.ybrid.player.io.audio.analysis.result;
 
 import io.ybrid.player.io.audio.analysis.Util;
+import org.jetbrains.annotations.Range;
 
 import java.util.Locale;
 
@@ -74,12 +75,12 @@ public class Channel implements Result {
     }
 
     @Override
-    public int getSampleRate() {
+    public @Range(from = 1, to = Integer.MAX_VALUE) int getSampleRate() {
         return sampleRate;
     }
 
     @Override
-    public int getLengthAsFrames() {
+    public @Range(from = 0, to = Integer.MAX_VALUE) int getLengthAsFrames() {
         return frames;
     }
 

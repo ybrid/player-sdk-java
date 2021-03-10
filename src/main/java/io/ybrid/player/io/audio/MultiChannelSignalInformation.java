@@ -22,11 +22,13 @@
 
 package io.ybrid.player.io.audio;
 
+import org.jetbrains.annotations.Range;
+
 public interface MultiChannelSignalInformation extends SignalInformation {
     /**
      * Gets the number of channels.
      *
      * @return Returns the number of channels.
      */
-    int getNumberOfChannels();
+    @Range(from = 1, to = Integer.MAX_VALUE) int getNumberOfChannels();
 }

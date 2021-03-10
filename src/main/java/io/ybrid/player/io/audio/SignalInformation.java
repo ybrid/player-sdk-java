@@ -22,6 +22,8 @@
 
 package io.ybrid.player.io.audio;
 
+import org.jetbrains.annotations.Range;
+
 import java.time.Duration;
 
 public interface SignalInformation {
@@ -30,14 +32,14 @@ public interface SignalInformation {
      *
      * @return Returns the sample rate in [Hz].
      */
-    int getSampleRate();
+    @Range(from = 1, to = Integer.MAX_VALUE) int getSampleRate();
 
     /**
      * This returns the length as units of frames.
      *
      * @return The length in [frame].
      */
-    int getLengthAsFrames();
+    @Range(from = 0, to = Integer.MAX_VALUE) int getLengthAsFrames();
 
     /**
      * This returns the length.

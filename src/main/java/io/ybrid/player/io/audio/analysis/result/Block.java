@@ -25,6 +25,7 @@ package io.ybrid.player.io.audio.analysis.result;
 import io.ybrid.player.io.audio.MultiChannelSignalInformation;
 import io.ybrid.player.io.audio.PCMDataBlock;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.Arrays;
 
@@ -55,7 +56,7 @@ public class Block implements MultiChannelSignalInformation {
      * @return Returns the sample rate in [Hz].
      */
     @Override
-    public int getSampleRate() {
+    public @Range(from = 1, to = Integer.MAX_VALUE) int getSampleRate() {
         return block.getSampleRate();
     }
 
@@ -65,7 +66,7 @@ public class Block implements MultiChannelSignalInformation {
      * @return Returns the number of channels.
      */
     @Override
-    public int getNumberOfChannels() {
+    public @Range(from = 1, to = Integer.MAX_VALUE) int getNumberOfChannels() {
         return block.getNumberOfChannels();
     }
 
@@ -75,7 +76,7 @@ public class Block implements MultiChannelSignalInformation {
      * @return The length in [frame].
      */
     @Override
-    public int getLengthAsFrames() {
+    public @Range(from = 0, to = Integer.MAX_VALUE) int getLengthAsFrames() {
         return block.getLengthAsFrames();
     }
 
