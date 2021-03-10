@@ -32,6 +32,7 @@ import io.ybrid.player.io.audio.BufferMuxer;
 import io.ybrid.player.io.audio.BufferStatusConsumer;
 import io.ybrid.player.io.decoder.DecoderFactorySelector;
 import io.ybrid.player.io.decoder.DemuxerDecoderFactory;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -126,39 +127,83 @@ abstract class PlayerStub implements Player {
      * @param request The request to execute.
      * @throws IOException Thrown as by the transaction.
      */
-    protected void executeRequestAsTransaction(@NotNull Request<?> request) throws IOException {
+    protected void executeTransaction(@NotNull Request<?> request) throws IOException {
         executeTransaction(session.createTransaction(request));
     }
 
     /**
      * Execute the given command as a transaction on this player.
      *
-     * This is the same as running {@link #executeRequestAsTransaction(Request)} with
+     * This is the same as running {@link #executeTransaction(Request)} with
      * the result of {@code command.makeRequest()}.
      *
      * @param command The command to execute.
      * @throws IOException Thrown as by the transaction.
-     * @see #executeRequestAsTransaction(Request)
+     * @see #executeTransaction(Request)
      * @see Command#makeRequest()
      */
-    protected void executeRequestAsTransaction(@NotNull Command<?> command) throws IOException {
-        executeRequestAsTransaction(command.makeRequest());
+    protected void executeTransaction(@NotNull Command<?> command) throws IOException {
+        executeTransaction(command.makeRequest());
     }
 
     /**
      * Execute the given command as a transaction on this player.
      *
-     * This is the same as running {@link #executeRequestAsTransaction(Request)} with
+     * This is the same as running {@link #executeTransaction(Request)} with
      * the result of {@code command.makeRequest(argument)}.
      *
      * @param command The command to execute.
      * @param argument The argument to pass to the transaction.
      * @throws IOException Thrown as by the transaction.
-     * @see #executeRequestAsTransaction(Request)
+     * @see #executeTransaction(Request)
      * @see Command#makeRequest(Object)
      */
-    protected void executeRequestAsTransaction(@NotNull Command<?> command, @Nullable Object argument) throws IOException {
-        executeRequestAsTransaction(command.makeRequest(argument));
+    protected void executeTransaction(@NotNull Command<?> command, @Nullable Object argument) throws IOException {
+        executeTransaction(command.makeRequest(argument));
+    }
+
+    /**
+     * Execute the given request as a transaction on this player.
+     *
+     * @param request The request to execute.
+     * @throws IOException Thrown as by the transaction.
+     * @deprecated Use {@link #executeTransaction(Request)}
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    protected void executeRequestAsTransaction(@NotNull io.ybrid.api.session.Request request) throws IOException {
+        executeTransaction(request);
+    }
+
+    /**
+     * Execute the given command as a transaction on this player.
+     *
+     * This is the same as running {@link #executeTransaction(Command)}.
+     *
+     * @param command The command to execute.
+     * @throws IOException Thrown as by the transaction.
+     * @deprecated Use {@link #executeTransaction(Command)}
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    protected void executeRequestAsTransaction(@NotNull io.ybrid.api.session.Command command) throws IOException {
+        executeTransaction(command);
+    }
+
+    /**
+     * Execute the given command as a transaction on this player.
+     *
+     * This is the same as running {@link #executeTransaction(Command, Object)}.
+     *
+     * @param command The command to execute.
+     * @param argument The argument to pass to the transaction.
+     * @throws IOException Thrown as by the transaction.
+     * @deprecated Use {@link #executeTransaction(Command, Object)}
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    protected void executeRequestAsTransaction(@NotNull io.ybrid.api.session.Command command, @Nullable Object argument) throws IOException {
+        executeTransaction(command, argument);
     }
 
 }
