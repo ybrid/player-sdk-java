@@ -22,8 +22,8 @@
 
 package io.ybrid.player.io.audio.analysis.result;
 
-import io.ybrid.player.io.audio.PCMDataBlock;
 import io.ybrid.player.io.audio.MultiChannelSignalInformation;
+import io.ybrid.player.io.audio.PCMDataBlock;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

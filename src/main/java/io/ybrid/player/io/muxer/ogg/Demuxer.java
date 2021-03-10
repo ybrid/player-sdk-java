@@ -30,8 +30,8 @@ import io.ybrid.player.io.container.ogg.Flag;
 import io.ybrid.player.io.container.ogg.Page;
 import io.ybrid.player.io.container.ogg.Sync;
 import io.ybrid.player.io.mapping.ogg.Generic;
-import io.ybrid.player.io.muxer.StreamInfo;
 import io.ybrid.player.io.mapping.ogg.opus.Mapping;
+import io.ybrid.player.io.muxer.StreamInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
