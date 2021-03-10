@@ -23,8 +23,8 @@
 package io.ybrid.player.player;
 
 import io.ybrid.api.Session;
-import io.ybrid.api.session.Command;
-import io.ybrid.api.session.Request;
+import io.ybrid.api.transaction.Command;
+import io.ybrid.api.transaction.Request;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.player.io.audio.output.AudioOutputFactory;
 import io.ybrid.player.io.decoder.DecoderFactory;
@@ -126,7 +126,7 @@ abstract class PlayerStub implements Player {
      * @param request The request to execute.
      * @throws IOException Thrown as by the transaction.
      */
-    protected void executeRequestAsTransaction(@NotNull Request request) throws IOException {
+    protected void executeRequestAsTransaction(@NotNull Request<?> request) throws IOException {
         executeTransaction(session.createTransaction(request));
     }
 
@@ -141,7 +141,7 @@ abstract class PlayerStub implements Player {
      * @see #executeRequestAsTransaction(Request)
      * @see Command#makeRequest()
      */
-    protected void executeRequestAsTransaction(@NotNull Command command) throws IOException {
+    protected void executeRequestAsTransaction(@NotNull Command<?> command) throws IOException {
         executeRequestAsTransaction(command.makeRequest());
     }
 
@@ -157,7 +157,7 @@ abstract class PlayerStub implements Player {
      * @see #executeRequestAsTransaction(Request)
      * @see Command#makeRequest(Object)
      */
-    protected void executeRequestAsTransaction(@NotNull Command command, @Nullable Object argument) throws IOException {
+    protected void executeRequestAsTransaction(@NotNull Command<?> command, @Nullable Object argument) throws IOException {
         executeRequestAsTransaction(command.makeRequest(argument));
     }
 

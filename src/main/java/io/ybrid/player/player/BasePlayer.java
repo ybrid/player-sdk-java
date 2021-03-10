@@ -25,16 +25,16 @@ package io.ybrid.player.player;
 import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.Session;
 import io.ybrid.api.SubInfo;
+import io.ybrid.api.player.Control;
 import io.ybrid.api.session.Command;
-import io.ybrid.api.session.PlayerControl;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transport.ServiceTransportDescription;
-import io.ybrid.player.io.audio.output.AudioOutputFactory;
-import io.ybrid.player.io.decoder.Decoder;
-import io.ybrid.player.io.decoder.DecoderFactory;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.DataSourceFactory;
+import io.ybrid.player.io.audio.output.AudioOutputFactory;
+import io.ybrid.player.io.decoder.Decoder;
+import io.ybrid.player.io.decoder.DecoderFactory;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,11 +47,11 @@ import java.util.logging.Logger;
 public class BasePlayer extends PlayerStub {
     static final @NonNls Logger LOGGER = Logger.getLogger(BasePlayer.class.getName());
 
-    private final @NotNull PlayerControl playerControl;
+    private final @NotNull Control control;
     protected final @NotNull PlaybackThread playbackThread;
 
-    private @NotNull PlayerControl buildPlayerControl() {
-        return new PlayerControl() {
+    private @NotNull Control buildPlayerControl() {
+        return new Control() {
             @Override
             public void onDetach(@NotNull Session unused) {
                 try {
@@ -125,8 +125,8 @@ public class BasePlayer extends PlayerStub {
     public BasePlayer(@NotNull Session session, @Nullable DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory externalAudioBackendFactory) {
         super(session, externalDecoderFactory, externalAudioBackendFactory);
         this.playbackThread = new PlaybackThread("YbridPlayer Playback Thread", session, muxer, externalAudioBackendFactory, this::onPlayerStateChange, this::onMetadataChange);
-        this.playerControl = buildPlayerControl();
-        session.attachPlayer(this.playerControl);
+        this.control = buildPlayerControl();
+        session.attachPlayer(this.control);
     }
 
     @Override
@@ -146,6 +146,6 @@ public class BasePlayer extends PlayerStub {
             muxer.close();
         } catch (IOException ignored) {
         }
-        session.detachPlayer(playerControl);
+        session.detachPlayer(control);
     }
 }
