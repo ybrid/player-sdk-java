@@ -28,6 +28,8 @@ import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.transport.ServiceURITransportDescription;
 import io.ybrid.api.transport.TransportConnectionState;
+import io.ybrid.api.util.QualityMap.QualityMap;
+import io.ybrid.api.util.Utils;
 import io.ybrid.player.io.ByteDataBlock;
 import io.ybrid.player.io.ByteDataSource;
 import io.ybrid.player.io.RealBlockingInputStream;
@@ -81,17 +83,12 @@ public class ICYInputStream implements Closeable, ByteDataSource {
         LOGGER.info("URL = " + uri);
     }
 
-    private static @NotNull String acceptListToHeader(@NotNull String header, @Nullable Map<String, Double> list) {
-        @NonNls StringBuilder ret = new StringBuilder();
+    private static @NotNull String acceptListToHeader(@NotNull String header, @Nullable QualityMap<?> list) {
+        final @Nullable String ret = Utils.transform(list, QualityMap::toHTTPHeaderLikeString);
 
-        if (list == null || list.isEmpty())
+        if (ret == null)
             return "";
 
-        for (Map.Entry<String, Double> entry : list.entrySet()) {
-            if (ret.length() > 0)
-                ret.append(", ");
-            ret.append(entry.getKey()).append("; q=").append(entry.getValue());
-        }
         return header + ": " + ret + "\r\n";
     }
 
@@ -114,8 +111,8 @@ public class ICYInputStream implements Closeable, ByteDataSource {
         req += "Host: " + uri.getHost() + ":" + getPort() + "\r\n";
         req += "Connection: close\r\n";
         req += "User-Agent: Ybrid Player\r\n";
-        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
-        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
+        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaTypes());
+        req += acceptListToHeader(HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguagesMap());
         req += "Accept-Charset: utf-8, *; q=0\r\n";
         req += "Accept-Encoding: identity, *; q=0\r\n";
         req += "Icy-MetaData: 1\r\n";

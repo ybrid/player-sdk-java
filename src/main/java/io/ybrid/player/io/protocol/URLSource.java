@@ -28,6 +28,8 @@ import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.transport.ServiceURITransportDescription;
 import io.ybrid.api.transport.TransportConnectionState;
+import io.ybrid.api.util.QualityMap.QualityMap;
+import io.ybrid.api.util.Utils;
 import io.ybrid.player.io.ByteDataBlock;
 import io.ybrid.player.io.ByteDataSource;
 import org.jetbrains.annotations.ApiStatus;
@@ -49,19 +51,13 @@ public class URLSource implements ByteDataSource {
     private final InputStream inputStream;
     private final String contentType;
 
-    private static void acceptListToHeader(@NotNull URLConnection connection, @NonNls @NotNull String header, @Nullable Map<String, Double> list) {
-        @NonNls StringBuilder ret = new StringBuilder();
+    private static void acceptListToHeader(@NotNull URLConnection connection, @NonNls @NotNull String header, @Nullable QualityMap<?> list) {
+        final @Nullable String ret = Utils.transform(list, QualityMap::toHTTPHeaderLikeString);
 
-        if (list == null || list.isEmpty())
+        if (ret == null)
             return;
 
-        for (Map.Entry<String, Double> entry : list.entrySet()) {
-            if (ret.length() > 0)
-                ret.append(", ");
-            ret.append(entry.getKey()).append("; q=").append(entry.getValue());
-        }
-
-        connection.setRequestProperty(header, ret.toString());
+        connection.setRequestProperty(header, ret);
     }
 
     private @NotNull Map<@NotNull String, @NotNull String> getHeadersAsMap(@NotNull URLConnection connection) {
@@ -90,8 +86,8 @@ public class URLSource implements ByteDataSource {
             connection.setDoInput(true);
             connection.setDoOutput(messageBody != null);
 
-            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaFormats());
-            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguages());
+            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT, transportDescription.getAcceptedMediaTypes());
+            acceptListToHeader(connection, HttpHelper.HEADER_ACCEPT_LANGUAGE, transportDescription.getAcceptedLanguagesMap());
             connection.setRequestProperty("Accept-Charset", "utf-8, *; q=0");
 
             if (messageBody != null) {

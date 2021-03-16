@@ -32,6 +32,8 @@ import io.ybrid.api.transaction.Request;
 import io.ybrid.api.transaction.RequestBasedTransaction;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transport.ServiceTransportDescription;
+import io.ybrid.api.util.MediaType;
+import io.ybrid.api.util.QualityMap.MediaTypeMap;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.DataSourceFactory;
@@ -70,8 +72,12 @@ public class BasePlayer extends PlayerStub {
             }
 
             @Override
-            public @NotNull Map<String, Double> getAcceptedMediaFormats() {
-                return decoderFactory.getSupportedFormats();
+            public @NotNull MediaTypeMap getAcceptedMediaTypes() {
+                final @NotNull MediaTypeMap map = new MediaTypeMap();
+                for (final @NotNull Map.Entry<String, Double> entry : decoderFactory.getSupportedFormats().entrySet()) {
+                    map.put(new MediaType(entry.getKey()), entry.getValue());
+                }
+                return map;
             }
 
             @Override
