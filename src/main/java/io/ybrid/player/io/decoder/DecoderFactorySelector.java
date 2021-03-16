@@ -22,8 +22,10 @@
 
 package io.ybrid.player.io.decoder;
 
+import io.ybrid.api.util.MediaType;
+import io.ybrid.api.util.QualityMap.MediaTypeMap;
+import io.ybrid.api.util.QualityMap.Quality;
 import io.ybrid.player.io.DataSource;
-import io.ybrid.player.io.MediaType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,14 +46,13 @@ public class DecoderFactorySelector implements DecoderFactory {
     public Decoder getDecoder(@NotNull DataSource dataSource) {
         final @Nullable String contentType = dataSource.getContentType();
         if (contentType != null) {
-            final @NotNull TreeMap<@NotNull Double, @NotNull DecoderFactory> map = new TreeMap<>(Comparator.reverseOrder());
+            final @NotNull TreeMap<@NotNull Quality, @NotNull DecoderFactory> map = new TreeMap<>(Comparator.reverseOrder());
             for (final @NotNull DecoderFactory factory : factories) {
-                final @Nullable Double quality = factory.getSupportedFormats().get(contentType);
-                if (quality != null)
-                    map.put(quality, factory);
+                final @Nullable Quality quality = factory.getSupportedMediaTypes().get(new MediaType(contentType));
+                map.put(quality, factory);
             }
 
-            for (final @NotNull Map.Entry<@NotNull Double, @NotNull DecoderFactory> entry : map.entrySet()) {
+            for (final @NotNull Map.Entry<@NotNull Quality, @NotNull DecoderFactory> entry : map.entrySet()) {
                 final @Nullable Decoder decoder = entry.getValue().getDecoder(dataSource);
                 if (decoder != null)
                     return decoder;
@@ -70,18 +71,18 @@ public class DecoderFactorySelector implements DecoderFactory {
     }
 
     @Override
-    public @NotNull Map<String, Double> getSupportedFormats() {
-        final @NotNull Map<@NotNull String, @NotNull Double> ret = new HashMap<>();
+    public @NotNull MediaTypeMap getSupportedMediaTypes() {
+        final @NotNull MediaTypeMap ret = new MediaTypeMap();
 
         for (final @NotNull DecoderFactory factory : factories) {
-            for (final @NotNull Map.Entry<@NotNull String, @NotNull Double> entry : factory.getSupportedFormats().entrySet()) {
-                final @NotNull String mediaType = entry.getKey();
-                final double quality = entry.getValue();
+            for (final @NotNull Map.Entry<@NotNull MediaType, @NotNull Quality> entry : factory.getSupportedMediaTypes().entrySet()) {
+                final @NotNull MediaType mediaType = entry.getKey();
+                final @NotNull Quality quality = entry.getValue();
 
-                if (MediaType.isInternal(mediaType))
+                if (io.ybrid.player.io.MediaType.isInternal(mediaType))
                     continue;
 
-                if (ret.containsKey(mediaType) && ret.get(mediaType) >= quality)
+                if (ret.containsKey(mediaType) && ret.get(mediaType).compareTo(quality) > 0)
                     continue;
 
                 ret.put(mediaType, quality);

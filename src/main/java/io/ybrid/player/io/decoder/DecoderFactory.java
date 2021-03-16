@@ -22,7 +22,10 @@
 
 package io.ybrid.player.io.decoder;
 
+import io.ybrid.api.util.MediaType;
+import io.ybrid.api.util.QualityMap.MediaTypeMap;
 import io.ybrid.player.io.DataSource;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -45,6 +48,26 @@ public interface DecoderFactory {
      * Query formats supported by the decoder and their corresponding weights.
      *
      * @return The list of supported formats.
+     * @deprecated This method should no longer be called.
+     *             {@link #getSupportedMediaTypes()} should be used for calls.
+     *             Implementations must provide {@link #getSupportedMediaTypes()}
      */
-    @NotNull Map<String, Double> getSupportedFormats();
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    default @NotNull Map<String, Double> getSupportedFormats() {
+        return getSupportedMediaTypes().toStringDoubleMap();
+    }
+
+    /**
+     * Query formats supported by the decoder and their corresponding weights.
+     *
+     * @return The list of supported formats.
+     */
+    default @NotNull MediaTypeMap getSupportedMediaTypes() {
+        final @NotNull MediaTypeMap map = new MediaTypeMap();
+        for (final @NotNull Map.Entry<String, Double> entry : getSupportedFormats().entrySet()) {
+            map.put(new MediaType(entry.getKey()), entry.getValue());
+        }
+        return map;
+    }
 }

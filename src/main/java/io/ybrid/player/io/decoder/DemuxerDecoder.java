@@ -22,22 +22,23 @@
 
 package io.ybrid.player.io.decoder;
 
+import io.ybrid.api.util.MediaType;
+import io.ybrid.api.util.QualityMap.MediaTypeMap;
+import io.ybrid.api.util.QualityMap.Quality;
 import io.ybrid.player.io.ByteDataSource;
-import io.ybrid.player.io.MediaType;
 import io.ybrid.player.io.audio.PCMDataBlock;
 import io.ybrid.player.io.muxer.Demuxer;
 import io.ybrid.player.io.muxer.Stream;
 import io.ybrid.player.io.muxer.StreamUsage;
-import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
+@ApiStatus.Internal
 public class DemuxerDecoder implements Decoder {
     private final @NotNull ByteDataSource source;
     private final @NotNull DecoderFactory decoderFactory;
@@ -68,14 +69,12 @@ public class DemuxerDecoder implements Decoder {
         decoder = null;
     }
 
-    public static @NotNull Map<String, Double> getSupportedFormats() {
-        @NonNls final Map<String, Double> list = new HashMap<>();
-
-        list.put(MediaType.APPLICATION_OGG, 1.);
-        list.put(MediaType.AUDIO_OGG, 1.);
-        list.put(MediaType.ANY, 0.);
-
-        return list;
+    public static @NotNull MediaTypeMap getSupportedMediaTypes() {
+        final @NotNull MediaTypeMap map = new MediaTypeMap();
+        map.put(new MediaType(io.ybrid.player.io.MediaType.APPLICATION_OGG), Quality.MOST_ACCEPTABLE);
+        map.put(new MediaType(io.ybrid.player.io.MediaType.AUDIO_OGG), Quality.MOST_ACCEPTABLE);
+        map.put(MediaType.MEDIA_TYPE_ANY, Quality.NOT_ACCEPTABLE);
+        return map;
     }
 
     public DemuxerDecoder(@NotNull ByteDataSource source, @NotNull DecoderFactory decoderFactory) throws IOException {
@@ -86,8 +85,8 @@ public class DemuxerDecoder implements Decoder {
             throw new IllegalStateException("Source is not valid");
 
         switch (Objects.requireNonNull(source.getContentType())) {
-            case MediaType.APPLICATION_OGG:
-            case MediaType.AUDIO_OGG:
+            case io.ybrid.player.io.MediaType.APPLICATION_OGG:
+            case io.ybrid.player.io.MediaType.AUDIO_OGG:
                 demuxer = new io.ybrid.player.io.muxer.ogg.Demuxer();
                 break;
             default:

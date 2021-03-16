@@ -22,12 +22,12 @@
 
 package io.ybrid.player.io.decoder;
 
+import io.ybrid.api.util.QualityMap.MediaTypeMap;
 import io.ybrid.player.io.ByteDataSource;
 import io.ybrid.player.io.DataSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class DemuxerDecoderFactory implements DecoderFactory {
     private final @NotNull DecoderFactory rootFactory;
@@ -49,7 +49,7 @@ public class DemuxerDecoderFactory implements DecoderFactory {
     }
 
     @Override
-    public @NotNull Map<String, Double> getSupportedFormats() {
-        return DemuxerDecoder.getSupportedFormats();
+    public @NotNull MediaTypeMap getSupportedMediaTypes() {
+        return DemuxerDecoder.getSupportedMediaTypes();
     }
 }

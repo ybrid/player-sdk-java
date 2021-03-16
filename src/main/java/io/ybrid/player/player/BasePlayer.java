@@ -32,7 +32,6 @@ import io.ybrid.api.transaction.Request;
 import io.ybrid.api.transaction.RequestBasedTransaction;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transport.ServiceTransportDescription;
-import io.ybrid.api.util.MediaType;
 import io.ybrid.api.util.QualityMap.MediaTypeMap;
 import io.ybrid.player.io.BufferedByteDataSource;
 import io.ybrid.player.io.DataBlock;
@@ -46,7 +45,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.EnumSet;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public class BasePlayer extends PlayerStub {
@@ -73,11 +71,7 @@ public class BasePlayer extends PlayerStub {
 
             @Override
             public @NotNull MediaTypeMap getAcceptedMediaTypes() {
-                final @NotNull MediaTypeMap map = new MediaTypeMap();
-                for (final @NotNull Map.Entry<String, Double> entry : decoderFactory.getSupportedFormats().entrySet()) {
-                    map.put(new MediaType(entry.getKey()), entry.getValue());
-                }
-                return map;
+                return decoderFactory.getSupportedMediaTypes();
             }
 
             @Override

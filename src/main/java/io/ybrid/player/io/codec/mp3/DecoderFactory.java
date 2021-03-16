@@ -22,13 +22,12 @@
 
 package io.ybrid.player.io.codec.mp3;
 
+import io.ybrid.api.util.MediaType;
+import io.ybrid.api.util.QualityMap.MediaTypeMap;
+import io.ybrid.api.util.QualityMap.Quality;
 import io.ybrid.player.io.ByteDataSource;
 import io.ybrid.player.io.DataSource;
-import io.ybrid.player.io.MediaType;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class DecoderFactory implements io.ybrid.player.io.decoder.DecoderFactory {
     @Override
@@ -37,13 +36,11 @@ public class DecoderFactory implements io.ybrid.player.io.decoder.DecoderFactory
     }
 
     @Override
-    public @NotNull Map<String, Double> getSupportedFormats() {
-        final Map<String, Double> list = new HashMap<>();
-
+    public @NotNull MediaTypeMap getSupportedMediaTypes() {
+        final @NotNull MediaTypeMap map = new MediaTypeMap();
         //noinspection MagicNumber
-        list.put(MediaType.AUDIO_MPEG, 0.1);
-        list.put(MediaType.ANY, 0.);
-
-        return list;
+        map.put(new MediaType(io.ybrid.player.io.MediaType.AUDIO_MPEG), Quality.valueOf(0.1));
+        map.put(MediaType.MEDIA_TYPE_ANY, Quality.NOT_ACCEPTABLE);
+        return map;
     }
 }

@@ -22,6 +22,7 @@
 
 package io.ybrid.player.io;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -63,7 +64,8 @@ public final class MediaType {
     public static final @NotNull String BLOCK_STREAM_OPUS = "!_block-stream/opus";
 
     /* --------[ Methods ]-------- */
-    public static boolean isInternal(@NotNull String mediaType) {
-        return mediaType.startsWith("!_");
+    @ApiStatus.Internal
+    public static boolean isInternal(@NotNull io.ybrid.api.util.MediaType mediaType) {
+        return mediaType.toString().startsWith("!_");
     }
 }
