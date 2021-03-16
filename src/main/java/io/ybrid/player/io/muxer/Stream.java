@@ -23,7 +23,6 @@
 package io.ybrid.player.io.muxer;
 
 import io.ybrid.api.util.MediaType;
-import io.ybrid.api.util.Utils;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.DataSource;
 import io.ybrid.player.io.mapping.Header;
@@ -146,6 +145,6 @@ public abstract class Stream<T extends Stream<T, H, D, I>, H extends Header, D e
 
     @Override
     public @Nullable MediaType getMediaType() {
-        return Utils.transform(streamInfo.getContentType(), MediaType::new);
+        return streamInfo.getMediaType();
     }
 }

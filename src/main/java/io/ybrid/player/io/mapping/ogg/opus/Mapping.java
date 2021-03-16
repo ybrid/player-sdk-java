@@ -22,8 +22,8 @@
 
 package io.ybrid.player.io.mapping.ogg.opus;
 
+import io.ybrid.api.util.MediaType;
 import io.ybrid.player.io.DataBlock;
-import io.ybrid.player.io.MediaType;
 import io.ybrid.player.io.container.ogg.Flag;
 import io.ybrid.player.io.container.ogg.GranularPosition;
 import io.ybrid.player.io.container.ogg.Page;
@@ -115,7 +115,7 @@ public class Mapping extends Generic {
     }
 
     @Override
-    public @NotNull String getContentType() {
-        return MediaType.BLOCK_STREAM_OPUS;
+    public io.ybrid.api.util.@Nullable MediaType getMediaType() {
+        return new MediaType(io.ybrid.player.io.MediaType.BLOCK_STREAM_OPUS);
     }
 }
