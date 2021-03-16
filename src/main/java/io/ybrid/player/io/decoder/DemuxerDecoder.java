@@ -71,8 +71,8 @@ public class DemuxerDecoder implements Decoder {
 
     public static @NotNull MediaTypeMap getSupportedMediaTypes() {
         final @NotNull MediaTypeMap map = new MediaTypeMap();
-        map.put(new MediaType(io.ybrid.player.io.MediaType.APPLICATION_OGG), Quality.MOST_ACCEPTABLE);
-        map.put(new MediaType(io.ybrid.player.io.MediaType.AUDIO_OGG), Quality.MOST_ACCEPTABLE);
+        map.put(MediaType.MEDIA_TYPE_APPLICATION_OGG, Quality.MOST_ACCEPTABLE);
+        map.put(MediaType.MEDIA_TYPE_AUDIO_OGG, Quality.MOST_ACCEPTABLE);
         map.put(MediaType.MEDIA_TYPE_ANY, Quality.NOT_ACCEPTABLE);
         return map;
     }

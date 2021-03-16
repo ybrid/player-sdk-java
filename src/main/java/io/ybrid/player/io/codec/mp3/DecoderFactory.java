@@ -39,7 +39,7 @@ public class DecoderFactory implements io.ybrid.player.io.decoder.DecoderFactory
     public @NotNull MediaTypeMap getSupportedMediaTypes() {
         final @NotNull MediaTypeMap map = new MediaTypeMap();
         //noinspection MagicNumber
-        map.put(new MediaType(io.ybrid.player.io.MediaType.AUDIO_MPEG), Quality.valueOf(0.1));
+        map.put(MediaType.MEDIA_TYPE_AUDIO_MPEG, Quality.valueOf(0.1));
         map.put(MediaType.MEDIA_TYPE_ANY, Quality.NOT_ACCEPTABLE);
         return map;
     }
