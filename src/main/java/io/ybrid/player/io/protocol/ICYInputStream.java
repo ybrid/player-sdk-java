@@ -240,7 +240,7 @@ public class ICYInputStream implements Closeable, ByteDataSource {
                 }
                 sendRequest();
                 receiveReply();
-                LOGGER.info("ICY Request to " + uri + " returned " + status + " [" + getContentType() + "]"); //NON-NLS
+                LOGGER.info("ICY Request to " + uri + " returned " + status + " [" + getMediaType() + "]"); //NON-NLS
 
                 if (HttpHelper.isRedirect(status)) {
                     final @Nullable String location = replyHeaders.get(HttpHelper.HEADER_LOCATION.toLowerCase(Locale.ROOT));

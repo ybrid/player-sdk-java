@@ -44,11 +44,11 @@ public class DecoderFactorySelector implements DecoderFactory {
 
     @Override
     public Decoder getDecoder(@NotNull DataSource dataSource) {
-        final @Nullable String contentType = dataSource.getContentType();
-        if (contentType != null) {
+        final @Nullable MediaType mediaType = dataSource.getMediaType();
+        if (mediaType != null) {
             final @NotNull TreeMap<@NotNull Quality, @NotNull DecoderFactory> map = new TreeMap<>(Comparator.reverseOrder());
             for (final @NotNull DecoderFactory factory : factories) {
-                final @Nullable Quality quality = factory.getSupportedMediaTypes().get(new MediaType(contentType));
+                final @Nullable Quality quality = factory.getSupportedMediaTypes().get(mediaType);
                 map.put(quality, factory);
             }
 

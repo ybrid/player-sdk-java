@@ -78,19 +78,17 @@ public class DemuxerDecoder implements Decoder {
     }
 
     public DemuxerDecoder(@NotNull ByteDataSource source, @NotNull DecoderFactory decoderFactory) throws IOException {
+        final @NotNull MediaType mediaType = Objects.requireNonNull(source.getMediaType());
         this.source = source;
         this.decoderFactory = decoderFactory;
 
         if (!source.isValid())
             throw new IllegalStateException("Source is not valid");
 
-        switch (Objects.requireNonNull(source.getContentType())) {
-            case io.ybrid.player.io.MediaType.APPLICATION_OGG:
-            case io.ybrid.player.io.MediaType.AUDIO_OGG:
-                demuxer = new io.ybrid.player.io.muxer.ogg.Demuxer();
-                break;
-            default:
-                throw new IOException("Input format not supported: " + source.getContentType());
+        if (mediaType.equals(MediaType.MEDIA_TYPE_APPLICATION_OGG) || mediaType.equals(MediaType.MEDIA_TYPE_AUDIO_OGG)) {
+            demuxer = new io.ybrid.player.io.muxer.ogg.Demuxer();
+        } else {
+            throw new IOException("Input format not supported: " + source.getMediaType());
         }
 
         demuxer.setAutofillSource(source);
