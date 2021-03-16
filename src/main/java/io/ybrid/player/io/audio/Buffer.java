@@ -23,6 +23,7 @@
 package io.ybrid.player.io.audio;
 
 import io.ybrid.api.util.Identifier;
+import io.ybrid.api.util.MediaType;
 import io.ybrid.api.util.hasIdentifier;
 import io.ybrid.player.io.DataBlock;
 import org.jetbrains.annotations.NotNull;
@@ -275,8 +276,8 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
         }
 
         @Override
-        public @NotNull String getContentType() {
-            return backend.getContentType();
+        public @Nullable MediaType getMediaType() {
+            return backend.getMediaType();
         }
 
         @Override

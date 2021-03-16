@@ -49,10 +49,4 @@ public class FilterPCMDataSource<T extends PCMDataSource> extends FilterDataSour
     public long getSkippedSamples() {
         return backend.getSkippedSamples();
     }
-
-    @Override
-    @NotNull
-    public String getContentType() {
-        return backend.getContentType();
-    }
 }

@@ -22,9 +22,10 @@
 
 package io.ybrid.player.io.audio;
 
+import io.ybrid.api.util.MediaType;
 import io.ybrid.player.io.DataSource;
-import io.ybrid.player.io.MediaType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -61,8 +62,8 @@ public interface PCMDataSource extends DataSource {
     }
 
     @Override
-    @NotNull
-    default String getContentType() {
-        return MediaType.PCM_STREAM_SHORT;
+    @Nullable
+    default MediaType getMediaType() {
+        return new MediaType(io.ybrid.player.io.MediaType.PCM_STREAM_SHORT);
     }
 }

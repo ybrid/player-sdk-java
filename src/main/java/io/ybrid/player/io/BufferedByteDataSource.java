@@ -22,7 +22,9 @@
 
 package io.ybrid.player.io;
 
+import io.ybrid.api.util.MediaType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -79,8 +81,8 @@ public class BufferedByteDataSource implements ByteDataSource {
     }
 
     @Override
-    public String getContentType() {
-        return backend.getContentType();
+    public @Nullable MediaType getMediaType() {
+        return backend.getMediaType();
     }
 
     @Override

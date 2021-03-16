@@ -28,6 +28,7 @@ import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.transport.ServiceURITransportDescription;
 import io.ybrid.api.transport.TransportConnectionState;
+import io.ybrid.api.util.MediaType;
 import io.ybrid.api.util.QualityMap.QualityMap;
 import io.ybrid.api.util.Utils;
 import io.ybrid.player.io.ByteDataBlock;
@@ -374,7 +375,7 @@ public class ICYInputStream implements Closeable, ByteDataSource {
     }
 
     @Override
-    public String getContentType() {
+    public @Nullable MediaType getMediaType() {
         try {
             connect();
         } catch (IOException ignored) {
@@ -383,6 +384,6 @@ public class ICYInputStream implements Closeable, ByteDataSource {
         if (replyHeaders == null)
             return null;
 
-        return replyHeaders.get(HttpHelper.HEADER_CONTENT_TYPE.toLowerCase(Locale.ROOT));
+        return Utils.transform(replyHeaders.get(HttpHelper.HEADER_CONTENT_TYPE.toLowerCase(Locale.ROOT)), MediaType::new);
     }
 }

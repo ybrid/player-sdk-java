@@ -22,6 +22,9 @@
 
 package io.ybrid.player.io;
 
+import io.ybrid.api.util.MediaType;
+import io.ybrid.api.util.Utils;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,7 +74,20 @@ public interface DataSource extends Closeable {
      * Calling this may connect if this source is {@link io.ybrid.api.util.Connectable}.
      *
      * @return The content-type or null.
+     * @deprecated Use {@link #getMediaType()}.
      */
-    @Nullable
-    String getContentType();
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    default @Nullable String getContentType() {
+        return Utils.transform(getMediaType(), Object::toString);
+    }
+
+    /**
+     * Return the content-type of the current stream.
+     *
+     * Calling this may connect if this source is {@link io.ybrid.api.util.Connectable}.
+     *
+     * @return The content-type or {@code null}.
+     */
+    @Nullable MediaType getMediaType();
 }

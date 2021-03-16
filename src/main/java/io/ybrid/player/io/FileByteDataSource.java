@@ -25,8 +25,9 @@ package io.ybrid.player.io;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.metadata.source.Source;
 import io.ybrid.api.metadata.source.SourceType;
+import io.ybrid.api.util.MediaType;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,8 +39,8 @@ import java.io.InputStream;
  */
 public class FileByteDataSource implements ByteDataSource {
     private final @NotNull InputStream inputStream;
-    private final @NotNull io.ybrid.api.metadata.Sync sync;
-    private final @NotNull String mediaType;
+    private final @NotNull Sync sync;
+    private final @NotNull MediaType mediaType;
 
     /**
      * Main constructor.
@@ -48,10 +49,24 @@ public class FileByteDataSource implements ByteDataSource {
      * @param mediaType The media type of the file.
      * @throws FileNotFoundException Thrown as per {@link FileInputStream#FileInputStream(String)}.
      */
-    public FileByteDataSource(@NotNull String filename, @NotNull String mediaType) throws FileNotFoundException {
+    public FileByteDataSource(@NotNull String filename, @NotNull MediaType mediaType) throws FileNotFoundException {
         this.mediaType = mediaType;
         this.inputStream = new FileInputStream(filename);
         this.sync = new Sync.Builder(new Source(SourceType.TRANSPORT)).build();
+    }
+
+    /**
+     * Deprecated main constructor.
+     *
+     * @param filename The name of the file to open.
+     * @param mediaType The media type of the file.
+     * @throws FileNotFoundException Thrown as per {@link FileInputStream#FileInputStream(String)}.
+     * @deprecated Use {@link #FileByteDataSource(String, io.ybrid.api.util.MediaType)}.
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    public FileByteDataSource(@NotNull String filename, @NotNull String mediaType) throws FileNotFoundException {
+        this(filename, new MediaType(mediaType));
     }
 
     /**
@@ -61,7 +76,7 @@ public class FileByteDataSource implements ByteDataSource {
      * @throws FileNotFoundException Thrown as per {@link FileInputStream#FileInputStream(String)}.
      */
     public FileByteDataSource(@NotNull String filename) throws FileNotFoundException {
-        this(filename, MediaType.APPLICATION_OCTET_STREAM);
+        this(filename, MediaType.MEDIA_TYPE_APPLICATION_OCTET_STREAM);
     }
 
     @Override
@@ -75,7 +90,7 @@ public class FileByteDataSource implements ByteDataSource {
     }
 
     @Override
-    public @Nullable String getContentType() {
+    public @NotNull MediaType getMediaType() {
         return mediaType;
     }
 

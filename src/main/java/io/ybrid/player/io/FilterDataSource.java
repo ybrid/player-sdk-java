@@ -22,6 +22,7 @@
 
 package io.ybrid.player.io;
 
+import io.ybrid.api.util.MediaType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,9 +66,8 @@ public class FilterDataSource<T extends DataSource> implements DataSource {
     }
 
     @Override
-    @Nullable
-    public String getContentType() {
-        return backend.getContentType();
+    public @Nullable MediaType getMediaType() {
+        return backend.getMediaType();
     }
 
     @Override

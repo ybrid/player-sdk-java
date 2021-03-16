@@ -28,6 +28,7 @@ import io.ybrid.api.message.MessageBody;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.transport.ServiceURITransportDescription;
 import io.ybrid.api.transport.TransportConnectionState;
+import io.ybrid.api.util.MediaType;
 import io.ybrid.api.util.QualityMap.QualityMap;
 import io.ybrid.api.util.Utils;
 import io.ybrid.player.io.ByteDataBlock;
@@ -49,7 +50,7 @@ public class URLSource implements ByteDataSource {
     private final @NotNull ServiceURITransportDescription transportDescription;
     private final @NotNull Sync sync;
     private final InputStream inputStream;
-    private final String contentType;
+    private final MediaType contentType;
 
     private static void acceptListToHeader(@NotNull URLConnection connection, @NonNls @NotNull String header, @Nullable QualityMap<?> list) {
         final @Nullable String ret = Utils.transform(list, QualityMap::toHTTPHeaderLikeString);
@@ -103,7 +104,7 @@ public class URLSource implements ByteDataSource {
             connection.connect();
 
             inputStream = connection.getInputStream();
-            contentType = connection.getContentType();
+            contentType = Utils.transform(connection.getContentType(), MediaType::new);
         } catch (Exception e) {
             transportDescription.signalConnectionState(TransportConnectionState.ERROR);
             throw e;
@@ -127,7 +128,7 @@ public class URLSource implements ByteDataSource {
     }
 
     @Override
-    public String getContentType() {
+    public @Nullable MediaType getMediaType() {
         return contentType;
     }
 
