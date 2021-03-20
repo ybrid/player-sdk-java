@@ -144,7 +144,10 @@ abstract class PlayerStub implements Player {
      * @throws IOException Thrown as by the transaction.
      * @see #executeTransaction(Request)
      * @see Command#makeRequest()
+     * @deprecated Use {@link #executeTransaction(Request)}.
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     protected void executeTransaction(@NotNull Command<?> command) throws IOException {
         executeTransaction(command.makeRequest());
     }
@@ -160,7 +163,10 @@ abstract class PlayerStub implements Player {
      * @throws IOException Thrown as by the transaction.
      * @see #executeTransaction(Request)
      * @see Command#makeRequest(Object)
+     * @deprecated Use {@link #executeTransaction(Request)}
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     protected void executeTransaction(@NotNull Command<?> command, @Nullable Object argument) throws IOException {
         executeTransaction(command.makeRequest(argument));
     }
@@ -185,12 +191,12 @@ abstract class PlayerStub implements Player {
      *
      * @param command The command to execute.
      * @throws IOException Thrown as by the transaction.
-     * @deprecated Use {@link #executeTransaction(Command)}
+     * @deprecated Use {@link #executeTransaction(Request)}
      */
     @Deprecated
     @ApiStatus.ScheduledForRemoval
     protected void executeRequestAsTransaction(@NotNull io.ybrid.api.session.Command command) throws IOException {
-        executeTransaction(command);
+        executeTransaction(command.makeRequest());
     }
 
     /**
@@ -201,12 +207,12 @@ abstract class PlayerStub implements Player {
      * @param command The command to execute.
      * @param argument The argument to pass to the transaction.
      * @throws IOException Thrown as by the transaction.
-     * @deprecated Use {@link #executeTransaction(Command, Object)}
+     * @deprecated Use {@link #executeTransaction(Request)}
      */
     @Deprecated
     @ApiStatus.ScheduledForRemoval
     protected void executeRequestAsTransaction(@NotNull io.ybrid.api.session.Command command, @Nullable Object argument) throws IOException {
-        executeTransaction(command, argument);
+        executeTransaction(command.makeRequest(argument));
     }
 
 }

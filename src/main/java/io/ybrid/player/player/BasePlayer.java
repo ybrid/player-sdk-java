@@ -134,7 +134,7 @@ public class BasePlayer extends PlayerStub {
         }
 
         try {
-            executeTransaction(Command.REFRESH, EnumSet.of(SubInfo.VALIDITY));
+            executeTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.VALIDITY)));
         } catch (IOException e) {
             LOGGER.warning("Validating session failed.");
         }
