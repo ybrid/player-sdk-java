@@ -22,7 +22,10 @@
 
 package io.ybrid.player.player;
 
+import io.ybrid.api.player.SimpleCommand;
+import io.ybrid.api.transaction.Request;
 import io.ybrid.player.io.audio.BufferStatusProvider;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -32,31 +35,53 @@ import java.io.IOException;
  */
 public interface Player extends MetadataProvider, BufferStatusProvider, Closeable {
     /**
-     * Prepare the player for playback.
+     * Execute the given request as a transaction on this player.
+     * No statement is made whether this is run synchronously (blocking) or queued
+     * for asynchronous (non-blocking) execution.
      *
+     * @param request The request to execute.
+     * @throws IOException Thrown as by the transaction.
+     */
+    void executeTransaction(@NotNull Request<?> request) throws IOException;
+
+    /**
+     * Prepare the player for playback.
+     * <p>
      * This call may do I/O-operation and may block.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @throws IOException Thrown when there is any problem with the I/O.
      */
-    void prepare() throws IOException;
+    default void prepare() throws IOException {
+        executeTransaction(SimpleCommand.PREPARE.makeRequest());
+    }
 
     /**
      * Starts playback.
-     *
+     * <p>
      * If not called before this behaves as if it would call {@link #prepare()} before being called.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @throws IOException Thrown when there is any problem with the I/O.
      */
-    void play() throws IOException;
+    default void play() throws IOException {
+        executeTransaction(SimpleCommand.PLAY.makeRequest());
+    }
 
     /**
      * Stops the playback.
-     *
+     * <p>
      * After stop the player instance must not be reused.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @throws IOException Thrown when there is any problem with the I/O.
      */
-    void stop() throws IOException;
+    default void stop() throws IOException {
+        executeTransaction(SimpleCommand.STOP.makeRequest());
+    }
 
     @Override
     default void close() throws IOException {

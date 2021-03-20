@@ -129,13 +129,8 @@ abstract class PlayerStub implements Player {
         throw new IOException(error);
     }
 
-    /**
-     * Execute the given request as a transaction on this player.
-     *
-     * @param request The request to execute.
-     * @throws IOException Thrown as by the transaction.
-     */
-    protected void executeTransaction(@NotNull Request<?> request) throws IOException {
+    @Override
+    public void executeTransaction(@NotNull Request<?> request) throws IOException {
         executeTransaction(session.createTransaction(request));
     }
 

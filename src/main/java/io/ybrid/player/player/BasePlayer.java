@@ -154,19 +154,4 @@ public class BasePlayer extends PlayerStub {
         this.control = buildPlayerControl();
         session.attachPlayer(this.control);
     }
-
-    @Override
-    public void prepare() throws IOException {
-        executeTransaction(SimpleCommand.PREPARE);
-    }
-
-    @Override
-    public void play() throws IOException {
-        executeTransaction(SimpleCommand.PLAY);
-    }
-
-    @Override
-    public void stop() throws IOException {
-        executeTransaction(SimpleCommand.STOP);
-    }
 }
