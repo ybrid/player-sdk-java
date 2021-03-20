@@ -25,11 +25,7 @@ package io.ybrid.player.player;
 import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.Session;
 import io.ybrid.api.SubInfo;
-import io.ybrid.api.SwapMode;
 import io.ybrid.api.bouquet.Bouquet;
-import io.ybrid.api.bouquet.Service;
-import io.ybrid.api.metadata.ItemType;
-import io.ybrid.api.session.Command;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.audio.BufferStatusProvider;
@@ -41,9 +37,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.logging.Logger;
 
 /**
@@ -135,46 +128,6 @@ public class YbridPlayer extends BasePlayer implements SessionClient, BufferStat
     @Override
     public @NotNull Bouquet getBouquet() {
         return session.getMetadataMixer().getBouquet();
-    }
-
-    @Override
-    public void windToLive() throws IOException {
-        executeTransaction(Command.WIND_TO_LIVE);
-    }
-
-    @Override
-    public void windTo(@NotNull Instant timestamp) throws IOException {
-        executeTransaction(Command.WIND_TO, timestamp);
-    }
-
-    @Override
-    public void wind(@NotNull Duration duration) throws IOException {
-        executeTransaction(Command.WIND_BY, duration);
-    }
-
-    @Override
-    public void skipForwards(ItemType itemType) throws IOException {
-        executeTransaction(Command.SKIP_FORWARD, itemType);
-    }
-
-    @Override
-    public void skipBackwards(ItemType itemType) throws IOException {
-        executeTransaction(Command.SKIP_BACKWARD, itemType);
-    }
-
-    @Override
-    public void swapItem(SwapMode mode) throws IOException {
-        executeTransaction(Command.SWAP_ITEM, mode);
-    }
-
-    @Override
-    public void swapService(@NotNull Service service) throws IOException {
-        executeTransaction(Command.SWAP_SERVICE, service);
-    }
-
-    @Override
-    public void swapToMain() throws IOException {
-        executeTransaction(Command.SWAP_TO_MAIN_SERVICE);
     }
 
     @Override

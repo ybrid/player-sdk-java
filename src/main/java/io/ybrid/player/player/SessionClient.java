@@ -26,6 +26,8 @@ import io.ybrid.api.*;
 import io.ybrid.api.bouquet.Bouquet;
 import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
+import io.ybrid.api.session.Command;
+import io.ybrid.api.transaction.Request;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -82,59 +84,96 @@ public interface SessionClient extends Player, KnowsSubInfoState {
 
     /**
      * This call requests the session to be brought back to the live portion of the current service.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     *
      * @throws IOException Thrown on any I/O-Error.
      */
-    void windToLive() throws IOException;
+    default void windToLive() throws IOException {
+        executeTransaction(Command.WIND_TO_LIVE.makeRequest());
+    }
 
     /**
      * This call requests the session to be brought to the given time within the current service.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     *
      * @param timestamp The timestamp to jump to.
      * @throws IOException Thrown on any I/O-Error.
      */
-    void windTo(@NotNull Instant timestamp) throws IOException;
+    default void windTo(@NotNull Instant timestamp) throws IOException {
+        executeTransaction(Command.WIND_TO.makeRequest(timestamp));
+    }
 
     /**
      * This call allows to move in the stream by a relative time.
      * The time can be positive to move into the future or negative to move into the past
      * relative to the current position.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     *
      * @param duration The duration to wind.
      * @throws IOException Thrown on any I/O-Error.
      */
-    void wind(@NotNull Duration duration) throws IOException;
+    default void wind(@NotNull Duration duration) throws IOException {
+        executeTransaction(Command.WIND_BY.makeRequest(duration));
+    }
 
     /**
      * Skip to the next Item of the given type.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     *
      * @param itemType The ItemType to skip to.
      * @throws IOException Thrown on any I/O-Error.
      */
-    void skipForwards(ItemType itemType) throws IOException;
+    default void skipForwards(ItemType itemType) throws IOException {
+        executeTransaction(Command.SKIP_FORWARD.makeRequest(itemType));
+    }
 
     /**
      * Skip to the previous Item of the given type.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     *
      * @param itemType The ItemType to skip to.
      * @throws IOException Thrown on any I/O-Error.
      */
-    void skipBackwards(ItemType itemType) throws IOException;
+    default void skipBackwards(ItemType itemType) throws IOException {
+        executeTransaction(Command.SKIP_BACKWARD.makeRequest(itemType));
+    }
 
     /**
      * Swap the current Item with a different one.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     *
      * @param mode The mode for the swap. See {@link SwapMode} for details.
      * @throws IOException Thrown on any I/O-Error.
      */
-    void swapItem(SwapMode mode) throws IOException;
+    default void swapItem(SwapMode mode) throws IOException {
+        executeTransaction(Command.SWAP_ITEM.makeRequest(mode));
+    }
 
     /**
      * This call requests the session to be brought back to the main service of this bouquet.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @throws IOException Thrown on any I/O-Error.
      */
     default void swapToMain() throws IOException {
-        swapService(getBouquet().getDefaultService());
+        executeTransaction(Command.SWAP_TO_MAIN_SERVICE.makeRequest());
     }
 
     /**
      * Swap to a different Service.
+     * <p>
+     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     *
      * @param service The new service to listen to.
      */
-    void swapService(@NotNull Service service) throws IOException;
+    default void swapService(@NotNull Service service) throws IOException {
+        executeTransaction(Command.SWAP_SERVICE.makeRequest(service));
+    }
 }
