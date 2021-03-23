@@ -126,13 +126,16 @@ abstract class PlayerStub implements Player {
     }
 
     @Override
-    public void executeTransaction(@NotNull Request<?> request) throws IOException {
+    public @NotNull Transaction executeTransaction(@NotNull Request<?> request) throws TransactionExecutionException {
+        final @NotNull Transaction transaction = session.createTransaction(request);
         try {
-            executeTransaction(session.createTransaction(request));
+            executeTransaction(transaction);
         } catch (IOException e) {
             LOGGER.warning("executeTransaction() threw deprecated IOException: " + e);
-            throw e;
+            throw new RuntimeException(e);
         }
+
+        return transaction;
     }
 
     /**

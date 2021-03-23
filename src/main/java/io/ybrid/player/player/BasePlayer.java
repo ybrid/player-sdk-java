@@ -127,15 +127,20 @@ public class BasePlayer extends PlayerStub {
         LOGGER.info("Auto Reconnect is enabled, we have a valid session, and are not in a handover. Connecting new source and validating session.");
 
         {
-            final @NotNull Transaction transaction = session.createTransaction(Command.RECONNECT_TRANSPORT.makeRequest());
-            transaction.run();
+            final @NotNull Transaction transaction = executeTransaction(Command.RECONNECT_TRANSPORT.makeRequest());
+            try {
+                transaction.waitControlComplete();
+            } catch (InterruptedException ignored) {
+            }
             if (transaction.getError() != null)
                 LOGGER.warning("Connecting new source failed: " + transaction.getError()); //NON-NLS
         }
 
         try {
-            executeTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.VALIDITY)));
-        } catch (IOException e) {
+            final @NotNull Transaction transaction = executeTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.VALIDITY)));
+            transaction.waitControlComplete();
+            transaction.assertSuccess();
+        } catch (Throwable e) {
             LOGGER.warning("Validating session failed.");
         }
     }

@@ -24,6 +24,7 @@ package io.ybrid.player.player;
 
 import io.ybrid.api.player.SimpleCommand;
 import io.ybrid.api.transaction.Request;
+import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transaction.TransactionExecutionException;
 import io.ybrid.player.io.audio.BufferStatusProvider;
 import org.jetbrains.annotations.NotNull;
@@ -41,10 +42,10 @@ public interface Player extends MetadataProvider, BufferStatusProvider, Closeabl
      * for asynchronous (non-blocking) execution.
      *
      * @param request The request to execute.
-     * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if the transaction failed while this method was still executing.
+     * @return The {@link Transaction} created and executed.
      */
-    void executeTransaction(@NotNull Request<?> request) throws IOException, TransactionExecutionException;
+    @NotNull Transaction executeTransaction(@NotNull Request<?> request) throws TransactionExecutionException;
 
     /**
      * Prepare the player for playback.
