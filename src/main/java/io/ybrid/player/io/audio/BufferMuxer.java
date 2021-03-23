@@ -28,6 +28,7 @@ import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transport.ServiceTransportDescription;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.DataBlockMetadataUpdateThread;
+import io.ybrid.player.transaction.RequestExecutor;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -154,8 +155,8 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
     private final @NotNull Object callbackLock = new Object();
     private final @NotNull Callback inputEOFCallback = new Callback();
 
-    public BufferMuxer(@NotNull Session session) {
-        metadataUpdateThread = new DataBlockMetadataUpdateThread("Main Metadata Update Thread", session);
+    public BufferMuxer(@NotNull Session session, @NotNull RequestExecutor requestExecutor) {
+        metadataUpdateThread = new DataBlockMetadataUpdateThread("Main Metadata Update Thread", session, requestExecutor);
         metadataUpdateThread.start();
     }
 

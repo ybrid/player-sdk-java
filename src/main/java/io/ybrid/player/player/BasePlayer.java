@@ -93,7 +93,7 @@ public class BasePlayer extends PlayerStub {
             }
 
             @Override
-            public <C extends io.ybrid.api.player.Command<C>> void executeTransaction(@NotNull RequestBasedTransaction<Request<C>> transaction) throws Exception {
+            public <C extends io.ybrid.api.player.Command<C>> void executeTransaction(@NotNull RequestBasedTransaction<Request<C>> transaction) throws Throwable {
                 final @NotNull Request<C> request = transaction.getRequest();
                 final @NotNull C command = request.getCommand();
 
@@ -155,7 +155,7 @@ public class BasePlayer extends PlayerStub {
 
     public BasePlayer(@NotNull Session session, @Nullable DecoderFactory externalDecoderFactory, @NotNull AudioOutputFactory audioOutputFactory, @Nullable DataSourceFactory dataSourceFactory) {
         super(session, externalDecoderFactory, audioOutputFactory, dataSourceFactory);
-        this.playbackThread = new PlaybackThread("YbridPlayer Playback Thread", session, muxer, audioOutputFactory, this::onPlayerStateChange, this::onMetadataChange);
+        this.playbackThread = new PlaybackThread("YbridPlayer Playback Thread", session, muxer, audioOutputFactory, this::onPlayerStateChange, this::onMetadataChange, this);
         this.control = buildPlayerControl();
         session.attachPlayer(this.control);
     }

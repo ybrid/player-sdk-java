@@ -28,6 +28,7 @@ import io.ybrid.api.metadata.MetadataMixer;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.transaction.Transaction;
+import io.ybrid.player.transaction.RequestExecutor;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,10 +42,12 @@ public class DataBlockMetadataUpdateThread extends Thread implements Consumer<Da
 
     private final @NotNull BlockingQueue<DataBlock> metadataBlockQueue = new LinkedBlockingQueue<>(METADATA_BLOCK_QUEUE_SIZE);
     private final @NotNull Session session;
+    private final @NotNull RequestExecutor requestExecutor;
 
-    public DataBlockMetadataUpdateThread(@NonNls String name, @NotNull Session session) {
+    public DataBlockMetadataUpdateThread(@NonNls String name, @NotNull Session session, @NotNull RequestExecutor requestExecutor) {
         super(name);
         this.session = session;
+        this.requestExecutor = requestExecutor;
     }
 
     @Override
@@ -69,8 +72,8 @@ public class DataBlockMetadataUpdateThread extends Thread implements Consumer<Da
                 }
 
                 if (playoutInfoChanged || !newSync.equals(oldSync)) {
-                    final @NotNull Transaction transaction = session.createTransaction(Command.REFRESH.makeRequest(newSync));
-                    transaction.run();
+                    final @NotNull Transaction transaction = requestExecutor.executeTransaction(Command.REFRESH.makeRequest(newSync));
+                    transaction.waitControlComplete();
                     if (transaction.getError() == null) {
                         playoutInfo = session.getPlayoutInfo();
                     }

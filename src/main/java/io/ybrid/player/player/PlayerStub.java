@@ -69,7 +69,7 @@ abstract class PlayerStub implements Player {
 
         this.dataSourceFactory = dataSourceFactory;
 
-        this.muxer = new BufferMuxer(session);
+        this.muxer = new BufferMuxer(session, this);
 
         this.decoderFactory = new DecoderFactorySelector();
         this.decoderFactory.add(new DemuxerDecoderFactory(this.decoderFactory));
