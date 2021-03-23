@@ -28,6 +28,7 @@ import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.transaction.Request;
+import io.ybrid.api.transaction.TransactionExecutionException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -87,9 +88,10 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * <p>
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
-     * @throws IOException Thrown on any I/O-Error.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void windToLive() throws IOException {
+    default void windToLive() throws IOException, TransactionExecutionException {
         executeTransaction(Command.WIND_TO_LIVE.makeRequest());
     }
 
@@ -99,9 +101,10 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @param timestamp The timestamp to jump to.
-     * @throws IOException Thrown on any I/O-Error.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void windTo(@NotNull Instant timestamp) throws IOException {
+    default void windTo(@NotNull Instant timestamp) throws IOException, TransactionExecutionException {
         executeTransaction(Command.WIND_TO.makeRequest(timestamp));
     }
 
@@ -113,9 +116,10 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @param duration The duration to wind.
-     * @throws IOException Thrown on any I/O-Error.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void wind(@NotNull Duration duration) throws IOException {
+    default void wind(@NotNull Duration duration) throws IOException, TransactionExecutionException {
         executeTransaction(Command.WIND_BY.makeRequest(duration));
     }
 
@@ -125,9 +129,10 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @param itemType The ItemType to skip to.
-     * @throws IOException Thrown on any I/O-Error.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void skipForwards(ItemType itemType) throws IOException {
+    default void skipForwards(ItemType itemType) throws IOException, TransactionExecutionException {
         executeTransaction(Command.SKIP_FORWARD.makeRequest(itemType));
     }
 
@@ -137,9 +142,10 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @param itemType The ItemType to skip to.
-     * @throws IOException Thrown on any I/O-Error.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void skipBackwards(ItemType itemType) throws IOException {
+    default void skipBackwards(ItemType itemType) throws IOException, TransactionExecutionException {
         executeTransaction(Command.SKIP_BACKWARD.makeRequest(itemType));
     }
 
@@ -149,9 +155,10 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @param mode The mode for the swap. See {@link SwapMode} for details.
-     * @throws IOException Thrown on any I/O-Error.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void swapItem(SwapMode mode) throws IOException {
+    default void swapItem(SwapMode mode) throws IOException, TransactionExecutionException {
         executeTransaction(Command.SWAP_ITEM.makeRequest(mode));
     }
 
@@ -160,9 +167,10 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * <p>
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
-     * @throws IOException Thrown on any I/O-Error.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void swapToMain() throws IOException {
+    default void swapToMain() throws IOException, TransactionExecutionException {
         executeTransaction(Command.SWAP_TO_MAIN_SERVICE.makeRequest());
     }
 
@@ -172,8 +180,10 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
      * @param service The new service to listen to.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void swapService(@NotNull Service service) throws IOException {
+    default void swapService(@NotNull Service service) throws IOException, TransactionExecutionException {
         executeTransaction(Command.SWAP_SERVICE.makeRequest(service));
     }
 }

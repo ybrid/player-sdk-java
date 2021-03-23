@@ -24,6 +24,7 @@ package io.ybrid.player.player;
 
 import io.ybrid.api.player.SimpleCommand;
 import io.ybrid.api.transaction.Request;
+import io.ybrid.api.transaction.TransactionExecutionException;
 import io.ybrid.player.io.audio.BufferStatusProvider;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,9 +41,10 @@ public interface Player extends MetadataProvider, BufferStatusProvider, Closeabl
      * for asynchronous (non-blocking) execution.
      *
      * @param request The request to execute.
-     * @throws IOException Thrown as by the transaction.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if the transaction failed while this method was still executing.
      */
-    void executeTransaction(@NotNull Request<?> request) throws IOException;
+    void executeTransaction(@NotNull Request<?> request) throws IOException, TransactionExecutionException;
 
     /**
      * Prepare the player for playback.
@@ -51,9 +53,10 @@ public interface Player extends MetadataProvider, BufferStatusProvider, Closeabl
      * <p>
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
-     * @throws IOException Thrown when there is any problem with the I/O.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void prepare() throws IOException {
+    default void prepare() throws IOException, TransactionExecutionException {
         executeTransaction(SimpleCommand.PREPARE.makeRequest());
     }
 
@@ -64,9 +67,10 @@ public interface Player extends MetadataProvider, BufferStatusProvider, Closeabl
      * <p>
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
-     * @throws IOException Thrown when there is any problem with the I/O.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void play() throws IOException {
+    default void play() throws IOException, TransactionExecutionException {
         executeTransaction(SimpleCommand.PLAY.makeRequest());
     }
 
@@ -77,9 +81,10 @@ public interface Player extends MetadataProvider, BufferStatusProvider, Closeabl
      * <p>
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
-     * @throws IOException Thrown when there is any problem with the I/O.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void stop() throws IOException {
+    default void stop() throws IOException, TransactionExecutionException {
         executeTransaction(SimpleCommand.STOP.makeRequest());
     }
 

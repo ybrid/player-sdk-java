@@ -26,6 +26,7 @@ import io.ybrid.api.Session;
 import io.ybrid.api.transaction.Command;
 import io.ybrid.api.transaction.Request;
 import io.ybrid.api.transaction.Transaction;
+import io.ybrid.api.transaction.TransactionExecutionException;
 import io.ybrid.player.io.DataSourceFactory;
 import io.ybrid.player.io.DataSourceFactorySelector;
 import io.ybrid.player.io.audio.BufferMuxer;
@@ -35,10 +36,12 @@ import io.ybrid.player.io.decoder.DecoderFactory;
 import io.ybrid.player.io.decoder.DecoderFactorySelector;
 import io.ybrid.player.io.decoder.DemuxerDecoderFactory;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * This class is used as a raw skeleton for player implementation.
@@ -47,6 +50,8 @@ import java.io.IOException;
  * This does not contain any audio processing.
  */
 abstract class PlayerStub implements Player {
+    static final @NonNls Logger LOGGER = Logger.getLogger(PlayerStub.class.getName());
+
     protected final @NotNull Session session;
     protected final @NotNull BufferMuxer muxer;
     protected final @NotNull DecoderFactorySelector decoderFactory;
@@ -112,26 +117,22 @@ abstract class PlayerStub implements Player {
      * Execute the given transaction on this player.
      *
      * @param transaction The transaction to execute.
-     * @throws IOException Thrown as by the transaction.
+     * @throws IOException Deprecated: Should no longer be thrown.
+     * @throws TransactionExecutionException Thrown if the transaction failed while this method was still executing.
      */
-    protected void executeTransaction(@NotNull Transaction transaction) throws IOException {
-        final @Nullable Throwable error;
-
+    protected void executeTransaction(@NotNull Transaction transaction) throws IOException, TransactionExecutionException {
         transaction.run();
-        error = transaction.getError();
-
-        if (error == null)
-            return;
-
-        if (error instanceof IOException)
-            throw (IOException)error;
-
-        throw new IOException(error);
+        transaction.assertSuccess();
     }
 
     @Override
     public void executeTransaction(@NotNull Request<?> request) throws IOException {
-        executeTransaction(session.createTransaction(request));
+        try {
+            executeTransaction(session.createTransaction(request));
+        } catch (IOException e) {
+            LOGGER.warning("executeTransaction() threw deprecated IOException: " + e);
+            throw e;
+        }
     }
 
     /**
