@@ -35,6 +35,7 @@ import io.ybrid.player.io.audio.PCMDataBlock;
 import io.ybrid.player.io.audio.output.AudioOutput;
 import io.ybrid.player.io.audio.output.AudioOutputFactory;
 import io.ybrid.player.transaction.RequestExecutor;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +49,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+@ApiStatus.Internal
 public class PlaybackThread extends Thread {
     private static final @NonNls Logger LOGGER = Logger.getLogger(PlaybackThread.class.getName());
     private static final double AUDIO_BUFFER_MAX_BEFORE_REBUFFER = 0.01; // [s]. Must be > 0.
