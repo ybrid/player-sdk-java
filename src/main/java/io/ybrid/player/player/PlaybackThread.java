@@ -42,7 +42,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.BiConsumer;
@@ -56,6 +58,8 @@ public class PlaybackThread extends Thread {
     private static final double AUDIO_BUFFER_DEFAULT_GOAL = 10.0; // [s].
 
     private final @NotNull BlockingQueue<BufferStatus> bufferStateQueue = new LinkedBlockingQueue<>();
+    private final @NotNull Set<Transaction> startTransactions = new HashSet<>();
+    private final @NotNull Set<Transaction> stopTransactions = new HashSet<>();
     // We need to store this in a variable so add and remove gets the same one:
     private final @NotNull BufferStatusConsumer bufferStatusConsumer = bufferStateQueue::offer;
     private final @NotNull Session session;
@@ -115,6 +119,11 @@ public class PlaybackThread extends Thread {
 
         setPlayerState(PlayerState.PREPARING);
         transaction = requestExecutor.executeTransaction(Command.CONNECT_INITIAL_TRANSPORT.makeRequest());
+        transaction.onAudioComplete(() -> {
+            for (final @NotNull Transaction t : startTransactions) {
+                t.setAudioComplete();
+            }
+        });
         transaction.waitControlComplete();
         transaction.assertSuccess();
 
@@ -193,7 +202,22 @@ public class PlaybackThread extends Thread {
         } catch (IOException ignored) {
         }
         audioOutput = null;
+        for (final @NotNull Transaction t : stopTransactions) {
+            t.setAudioComplete();
+        }
 
         setPlayerState(PlayerState.STOPPED);
+    }
+
+    public void stop(@Nullable Transaction transaction) {
+        if (transaction != null)
+            stopTransactions.add(transaction);
+        interrupt();
+    }
+
+    public void start(@Nullable Transaction transaction) {
+        if (transaction != null)
+            startTransactions.add(transaction);
+        super.start();
     }
 }
