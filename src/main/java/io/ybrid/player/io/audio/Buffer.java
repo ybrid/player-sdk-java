@@ -146,8 +146,9 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
 
     private static class BufferThread extends Thread implements PCMDataSource, BufferStatusProvider {
         private static final long POLL_TIMEOUT = 123; /* [ms] */
-        private static final int SLEEP_TIME = 371; /* [ms] */
+        private static final int SLEEP_TIME = 773; /* [ms] */
 
+        private final @NotNull Object readAnnounce = new Object();
         private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
         private final Status state;
         @NotNull private final PCMDataSource backend;
@@ -171,8 +172,9 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
                 while (!isInterrupted()) {
                     if (getBufferLength() > target) {
                         state.overrun();
-                        //noinspection BusyWait
-                        sleep(SLEEP_TIME);
+                        synchronized (readAnnounce) {
+                            readAnnounce.wait(SLEEP_TIME);
+                        }
                     } else {
                         pump();
                     }
@@ -218,6 +220,9 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
                     getBufferLength();
                     samplesForwarded += block.getData().length;
 
+                    synchronized (readAnnounce) {
+                        readAnnounce.notifyAll();
+                    }
                     return block;
                 }
 
@@ -234,6 +239,9 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
                 getBufferLength();
                 samplesForwarded += block.getData().length;
 
+                synchronized (readAnnounce) {
+                    readAnnounce.notifyAll();
+                }
                 return block;
             } catch (InterruptedException e) {
                 throw toIOException(e);
