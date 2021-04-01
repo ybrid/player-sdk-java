@@ -147,6 +147,8 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
     private static class BufferThread extends Thread implements PCMDataSource, BufferStatusProvider {
         private static final long POLL_TIMEOUT = 123; /* [ms] */
         private static final int SLEEP_TIME = 773; /* [ms] */
+        private static final double STARVATION_FACTOR = 0.1; /* maximum as factor of target */
+        private static final double STARVATION_ABSOLUTE = 0.5; /* maximum as absolute [s] */
 
         private final @NotNull Object readAnnounce = new Object();
         private final BlockingQueue<PCMDataBlock> buffer = new LinkedBlockingQueue<>();
@@ -155,6 +157,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
         private final Consumer<DataBlock> inputConsumer;
         private Exception exception = null;
         private double target;
+        private double starvationTarget;
         private long samplesRead = 0;
         private long samplesForwarded = 0;
 
@@ -162,16 +165,31 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
             super(name);
             this.backend = backend;
             this.inputConsumer = inputConsumer;
-            this.target = target;
             this.state = new Status(buffer);
+            setTarget(target);
+        }
+
+        private void setTarget(double target) {
+            this.target = target;
+
+            if ((target * STARVATION_FACTOR) > STARVATION_ABSOLUTE) {
+                this.starvationTarget = target - STARVATION_ABSOLUTE;
+            } else {
+                this.starvationTarget = target * (1. - STARVATION_FACTOR);
+            }
+            if (this.starvationTarget < 0)
+                this.starvationTarget = target;
         }
 
         @Override
         public void run() {
             try {
                 while (!isInterrupted()) {
-                    if (getBufferLength() > target) {
+                    final double length = getBufferLength();
+                    if (length > target) {
                         state.overrun();
+                        //noinspection BusyWait
+                        sleep((long) ((length - starvationTarget) * 1000));
                         synchronized (readAnnounce) {
                             readAnnounce.wait(SLEEP_TIME);
                         }
