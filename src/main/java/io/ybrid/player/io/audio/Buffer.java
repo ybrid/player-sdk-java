@@ -325,7 +325,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
      * @param inputConsumer A {@link Consumer} that is called when a new block is read into the buffer.
      */
     public Buffer(double target, @NotNull PCMDataSource backend, Consumer<DataBlock> inputConsumer) {
-        this(new Identifier(), target, backend, inputConsumer);
+        this(new Identifier(Buffer.class), target, backend, inputConsumer);
     }
 
     /**
