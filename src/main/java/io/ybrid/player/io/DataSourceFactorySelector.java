@@ -105,11 +105,17 @@ public final class DataSourceFactorySelector implements DataSourceFactory {
         LOGGER.info("Supported schemes: " + schemes.keySet() + " (We have " + (fallbackSource != null ? "a" : "no") + " fallbackSource)");
 
         provider = schemes.get(scheme);
-        if (provider != null)
+        if (provider == null) {
+            LOGGER.info("We have no provider for " + scheme);
+        } else {
+            LOGGER.info("We have a provider for " + scheme + " at " + provider);
             return provider.getSource(transportDescription);
+        }
 
-        if (fallbackSource != null)
+        if (fallbackSource != null) {
+            LOGGER.info("Using fallbackSource for " + scheme);
             return fallbackSource.getSource(transportDescription);
+        }
 
         throw new UnsupportedOperationException("Scheme not supported: " + scheme);
     }
