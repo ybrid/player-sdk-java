@@ -26,6 +26,7 @@ import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.Session;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.session.Command;
+import io.ybrid.api.transaction.CompletionState;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.audio.BufferMuxer;
@@ -121,7 +122,7 @@ public class PlaybackThread extends Thread {
         transaction = requestExecutor.executeTransaction(Command.CONNECT_INITIAL_TRANSPORT.makeRequest());
         transaction.onAudioComplete(() -> {
             for (final @NotNull Transaction t : startTransactions) {
-                t.setAudioComplete();
+                t.setAudioComplete(CompletionState.DONE);
             }
         });
         transaction.waitControlComplete();
@@ -203,7 +204,7 @@ public class PlaybackThread extends Thread {
         }
         audioOutput = null;
         for (final @NotNull Transaction t : stopTransactions) {
-            t.setAudioComplete();
+            t.setAudioComplete(CompletionState.DONE);
         }
 
         setPlayerState(PlayerState.STOPPED);

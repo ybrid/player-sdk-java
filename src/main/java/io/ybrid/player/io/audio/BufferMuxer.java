@@ -24,6 +24,7 @@ package io.ybrid.player.io.audio;
 
 import io.ybrid.api.Session;
 import io.ybrid.api.Workaround;
+import io.ybrid.api.transaction.CompletionState;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transport.ServiceTransportDescription;
 import io.ybrid.player.io.DataBlock;
@@ -80,9 +81,9 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
             final @NotNull Transaction transaction = transportDescription.getTransaction();
 
             if (onAudible == null) {
-                block.setOnAudible(transaction::setAudioComplete);
+                block.setOnAudible(() -> transaction.setAudioComplete(CompletionState.DONE));
             } else {
-                block.setOnAudible(() -> {onAudible.run(); transaction.setAudioComplete();});
+                block.setOnAudible(() -> {onAudible.run(); transaction.setAudioComplete(CompletionState.DONE);});
             }
 
             if (silenceEliminator != null && silenceEliminator.getSkippedSamples() > source.getSkippedSamples()) {
