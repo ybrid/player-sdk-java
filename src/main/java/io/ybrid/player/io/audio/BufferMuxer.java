@@ -77,14 +77,9 @@ public class BufferMuxer implements PCMDataSource, BufferStatusProvider, BufferS
 
         public @NotNull PCMDataBlock read() throws IOException {
             final @NotNull PCMDataBlock block = buffer.read();
-            final @Nullable Runnable onAudible = block.getOnAudible();
             final @NotNull Transaction transaction = transportDescription.getTransaction();
 
-            if (onAudible == null) {
-                block.setOnAudible(() -> transaction.setAudioComplete(CompletionState.DONE));
-            } else {
-                block.setOnAudible(() -> {onAudible.run(); transaction.setAudioComplete(CompletionState.DONE);});
-            }
+            block.onAudible(() -> transaction.setAudioComplete(CompletionState.DONE));
 
             if (silenceEliminator != null && silenceEliminator.getSkippedSamples() > source.getSkippedSamples()) {
                 transportDescription.getActiveWorkarounds().enableIfAutomatic(Workaround.WORKAROUND_SKIP_SILENCE);

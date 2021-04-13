@@ -28,6 +28,8 @@ import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.audio.analysis.result.Block;
 import org.jetbrains.annotations.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,7 +52,7 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
      */
     protected final @Range(from = 1, to = Integer.MAX_VALUE) int numberOfChannels;
 
-    protected @Nullable Runnable onAudible = null;
+    protected final @NotNull Set<@NotNull Runnable> onAudible = new HashSet<>();
 
     /**
      * Create a block from an array if samples.
@@ -137,10 +139,18 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
      *
      * @return The callback or {@code null}.
      * @see #audible()
+     * @deprecated This should not never be called.
      */
+    @ApiStatus.ScheduledForRemoval
     @Contract(pure = true)
+    @Deprecated
     public @Nullable Runnable getOnAudible() {
-        return onAudible;
+        final @NotNull Set<Runnable> callbacks = new HashSet<>(onAudible);
+        return () -> {
+            for (final @NotNull Runnable runnable : callbacks) {
+                runnable.run();
+            }
+        };
     }
 
     /**
@@ -148,19 +158,35 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
      * This callback can be called multiple times.
      *
      * @param onAudible The callback to set or {@code null}.
+     * @deprecated Use {@link #onAudible(Runnable)}.
      */
+    @ApiStatus.ScheduledForRemoval
+    @Deprecated
     public void setOnAudible(@Nullable Runnable onAudible) {
-        this.onAudible = onAudible;
+        this.onAudible.clear();
+        if (onAudible != null)
+        this.onAudible.add(onAudible);
+    }
+
+    /**
+     * Adds a callback for when the block is audible.
+     * This callback can be called multiple times.
+     *
+     * @param runnable The callback to add.
+     */
+    public void onAudible(@NotNull Runnable runnable) {
+        onAudible.add(runnable);
     }
 
     /**
      * This should be called when the block is audible.
-     * It calls the callback set by {@link #setOnAudible(Runnable)} if any.
+     * It calls the callbacks scheduled by {@link #onAudible(Runnable)} if any.
      * This may also update statistics or provide hints to other parts of the runtime.
      */
     public void audible() {
-        if (onAudible != null)
-            onAudible.run();
+        for (final @NotNull Runnable runnable : onAudible) {
+            runnable.run();
+        }
     }
 
     /**
