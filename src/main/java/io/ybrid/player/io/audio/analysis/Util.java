@@ -22,11 +22,13 @@
 
 package io.ybrid.player.io.audio.analysis;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 /**
  * This class contains helper methods for signal analysis.
  */
+@ApiStatus.Internal
 public final class Util {
     /**
      * Converts a {@code short} to a {@code double} with correct scaling.

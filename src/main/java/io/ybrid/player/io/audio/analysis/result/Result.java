@@ -24,10 +24,12 @@ package io.ybrid.player.io.audio.analysis.result;
 
 import io.ybrid.player.io.audio.SignalInformation;
 import io.ybrid.player.io.audio.analysis.Util;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * This interface is implemented by classes providing a signal analysis result.
  */
+@ApiStatus.Experimental
 public interface Result extends SignalInformation {
     /**
      * Gets the minimum value in the signal as a {@code short}.

@@ -23,10 +23,12 @@
 package io.ybrid.player.io.audio.analysis.result;
 
 import io.ybrid.player.io.audio.analysis.Util;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Range;
 
 import java.util.Locale;
 
+@ApiStatus.Experimental
 public class Channel implements Result {
     private final int sampleRate;
     private final int frames;

@@ -194,6 +194,7 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
      *
      * @return The analyse result.
      */
+    @ApiStatus.Experimental
     public @NotNull Block analyse() {
         return new Block(this);
     }
