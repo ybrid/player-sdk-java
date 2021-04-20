@@ -4,6 +4,7 @@
         * *.executeTransaction(Command<?>), *.executeTransaction(Command<?>, Object)
         * PCMDataBlock.getOnAudible()
         * PCMDataBlock.setOnAudible(Runnable) (replaced by onAudible(Runnable))
+        * AudioOutput.play()
     * Migrated from IOException to TransactionExecutionException
     * Fixed audio complete state for PLAY and STOP Transactions
 
