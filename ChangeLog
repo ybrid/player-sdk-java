@@ -1,3 +1,12 @@
+1.1.2 - UNRELEASED
+    * Newly ScheduledForRemoval:
+        * MediaType.ANY/APPLICATION_*/AUDIO_* (replaced by API SDK's MediaType.*)
+        * *.executeTransaction(Command<?>), *.executeTransaction(Command<?>, Object)
+        * PCMDataBlock.getOnAudible()
+        * PCMDataBlock.setOnAudible(Runnable) (replaced by onAudible(Runnable))
+    * Migrated from IOException to TransactionExecutionException
+    * Fixed audio complete state for PLAY and STOP Transactions
+
 1.1.1 - 2021-03-10
     * Added support for player Transactions
     * Newly ScheduledForRemoval:
