@@ -1,0 +1,7 @@
+1.1.1 - 2021-03-10
+    * Added support for player Transactions
+    * Newly ScheduledForRemoval:
+        * *Player*.executeRequestAsTransaction(*) (replaced by executeTransaction(Request<?>))
+        * DataSourceFactory.getSourceByTransportDescription(ServiceTransportDescription) (replaced by
+          DataSourceFactory.getSource(ServiceTransportDescription))
+    * Updates *Player* constructors
