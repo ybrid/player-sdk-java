@@ -22,6 +22,9 @@
 
 package io.ybrid.player.io.audio.output;
 
+import io.ybrid.player.io.audio.output.implementation.DefaultFactory;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,4 +38,14 @@ public interface AudioOutputFactory {
      */
     @NotNull
     AudioOutput getAudioOutput();
+
+    /**
+     * Gets the default factory that tries to select a suitable driver.
+     * @return The default factory.
+     */
+    @Contract(pure = true)
+    @ApiStatus.Experimental
+    static @NotNull AudioOutputFactory getDefaultFactory() {
+        return DefaultFactory.INSTANCE;
+    }
 }
