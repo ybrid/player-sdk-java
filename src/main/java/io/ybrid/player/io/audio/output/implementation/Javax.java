@@ -23,6 +23,7 @@
 package io.ybrid.player.io.audio.output.implementation;
 
 import io.ybrid.player.io.audio.PCMDataBlock;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,6 +33,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
 
+@ApiStatus.Internal
 class Javax extends Base {
     private final static ByteOrder byteOrder = ByteOrder.nativeOrder();
 
