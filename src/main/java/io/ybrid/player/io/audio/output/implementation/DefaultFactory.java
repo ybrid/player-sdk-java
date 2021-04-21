@@ -30,7 +30,10 @@ import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
 public final class DefaultFactory implements AudioOutputFactory {
-    private final static Factory[] drivers = new Factory[]{new Factory(Javax.class)};
+    private final static Factory[] drivers = new Factory[]{
+            new Factory(Javax.class),
+            new Factory(LazyLoadingAndroidAudioOutput.class)
+    };
 
     public final static AudioOutputFactory INSTANCE = new DefaultFactory();
 
