@@ -60,7 +60,7 @@ class myPlayer {
         session.connect();
 
         /* We create a player using the Decoder and AudioBackend we provide */
-        Player player = new YbridPlayer(session, myAudioOutputFactory.getInstance());
+        Player player = new YbridPlayer(session);
 
         /* We set the sink for the Metadata. This could be the user interface. */
         player.setMetadataConsumer(myMetadataConsumer);
