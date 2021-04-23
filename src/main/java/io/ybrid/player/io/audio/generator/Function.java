@@ -22,8 +22,10 @@
 
 package io.ybrid.player.io.audio.generator;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+@ApiStatus.Experimental
 public abstract class Function {
     public interface State {
     }

@@ -28,12 +28,14 @@ import io.ybrid.api.metadata.source.Source;
 import io.ybrid.api.metadata.source.SourceType;
 import io.ybrid.player.io.audio.PCMDataBlock;
 import io.ybrid.player.io.audio.PCMDataSource;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.EOFException;
 import java.io.IOException;
 
+@ApiStatus.Experimental
 public class Generator implements PCMDataSource {
     private @NotNull Function function;
     private @NotNull Function.State state;
