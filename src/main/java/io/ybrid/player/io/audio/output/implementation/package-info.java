@@ -20,32 +20,7 @@
  * SOFTWARE.
  */
 
-package io.ybrid.player.io.audio.output;
+@ApiStatus.Internal
+package io.ybrid.player.io.audio.output.implementation;
 
-import io.ybrid.player.io.audio.output.implementation.DefaultFactory;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
-/**
- * This interface is implemented by factory classes that allow to build a {@link AudioOutput}.
- */
-public interface AudioOutputFactory {
-    /**
-     * Build a new {@link AudioOutput}.
-     *
-     * @return The new {@link AudioOutput}.
-     */
-    @NotNull
-    AudioOutput getAudioOutput();
-
-    /**
-     * Gets the default factory that tries to select a suitable driver.
-     * @return The default factory.
-     */
-    @Contract(pure = true)
-    @ApiStatus.Experimental
-    static @NotNull AudioOutputFactory getDefaultFactory() {
-        return DefaultFactory.INSTANCE;
-    }
-}

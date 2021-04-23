@@ -33,6 +33,7 @@ import io.ybrid.player.io.audio.output.AudioOutput;
 import io.ybrid.player.io.audio.output.AudioOutputFactory;
 import io.ybrid.player.io.decoder.Decoder;
 import io.ybrid.player.io.decoder.DecoderFactory;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +51,16 @@ public class YbridPlayer extends BasePlayer implements SessionClient, BufferStat
     private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
 
     private PlayerState playerState = PlayerState.STOPPED;
+
+    /**
+     * Creates a new instance of the player using {@link AudioOutputFactory#getDefaultFactory()} as {@link AudioOutputFactory}.
+     *
+     * @param session The {@link Session} to use for retrieval and interaction with the stream.
+     */
+    @ApiStatus.Experimental
+    public YbridPlayer(@NotNull Session session) {
+        this(session, null, AudioOutputFactory.getDefaultFactory(), null);
+    }
 
     /**
      * Creates a new instance of the player.
