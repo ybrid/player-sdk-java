@@ -25,8 +25,10 @@ package io.ybrid.player.transaction;
 import io.ybrid.api.transaction.Request;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transaction.TransactionExecutionException;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+@ApiStatus.Experimental
 public interface RequestExecutor {
     /**
      * Execute the given request as a transaction.
@@ -37,5 +39,6 @@ public interface RequestExecutor {
      * @throws TransactionExecutionException Thrown if the transaction failed while this method was still executing.
      * @return The {@link Transaction} created and executed.
      */
+    @ApiStatus.Experimental
     @NotNull Transaction executeTransaction(@NotNull Request<?> request) throws TransactionExecutionException;
 }
