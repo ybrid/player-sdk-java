@@ -5,8 +5,12 @@
         * PCMDataBlock.getOnAudible()
         * PCMDataBlock.setOnAudible(Runnable) (replaced by onAudible(Runnable))
         * AudioOutput.play()
+    * Newly marked Experimental:
+        * interface RequestExecutor (maybe moved to API SDK)
+        * classes Function, and Generator
     * Migrated from IOException to TransactionExecutionException
     * Fixed audio complete state for PLAY and STOP Transactions
+    * Added new experimental AudioOutputs
 
 1.1.1 - 2021-03-10
     * Added support for player Transactions
