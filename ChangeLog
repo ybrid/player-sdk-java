@@ -1,3 +1,5 @@
+1.2.0 - UNRELEASED
+
 1.1.2 - 2021-04-23
     * Newly ScheduledForRemoval:
         * MediaType.ANY/APPLICATION_*/AUDIO_* (replaced by API SDK's MediaType.*)
