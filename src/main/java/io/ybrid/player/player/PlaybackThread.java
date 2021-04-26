@@ -53,7 +53,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 @ApiStatus.Internal
-public class PlaybackThread extends Thread {
+class PlaybackThread extends Thread {
     private static final @NonNls Logger LOGGER = Logger.getLogger(PlaybackThread.class.getName());
     private static final double AUDIO_BUFFER_MAX_BEFORE_REBUFFER = 0.01; // [s]. Must be > 0.
     private static final double AUDIO_BUFFER_DEFAULT_GOAL = 10.0; // [s].
