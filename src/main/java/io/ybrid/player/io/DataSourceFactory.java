@@ -23,7 +23,6 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.transport.ServiceTransportDescription;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -40,20 +39,4 @@ public interface DataSourceFactory {
      * @throws IOException I/O-Errors as thrown by the used backends.
      */
     @NotNull ByteDataSource getSource(@NotNull ServiceTransportDescription transportDescription) throws IOException;
-
-    /**
-     * This builds a {@link ByteDataSource} for the audio stream based on a {@link ServiceTransportDescription}.
-     *
-     * @param transportDescription The {@link ServiceTransportDescription} to use.
-     * @return The {@link ByteDataSource} for the stream.
-     * @throws IOException I/O-Errors as thrown by the used backends.
-     * @deprecated This should no longer be used.
-     *             If required calls can be replaced with
-     *             {@code DataSourceFactorySelector.createWithDefaults().getSource(transportDescription)}.
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    static ByteDataSource getSourceByTransportDescription(@NotNull ServiceTransportDescription transportDescription) throws IOException {
-        return DataSourceFactorySelector.createWithDefaults().getSource(transportDescription);
-    }
 }

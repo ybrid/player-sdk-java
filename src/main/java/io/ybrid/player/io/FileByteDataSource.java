@@ -26,7 +26,6 @@ import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.metadata.source.Source;
 import io.ybrid.api.metadata.source.SourceType;
 import io.ybrid.api.util.MediaType;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileInputStream;
@@ -53,20 +52,6 @@ public class FileByteDataSource implements ByteDataSource {
         this.mediaType = mediaType;
         this.inputStream = new FileInputStream(filename);
         this.sync = new Sync.Builder(new Source(SourceType.TRANSPORT)).build();
-    }
-
-    /**
-     * Deprecated main constructor.
-     *
-     * @param filename The name of the file to open.
-     * @param mediaType The media type of the file.
-     * @throws FileNotFoundException Thrown as per {@link FileInputStream#FileInputStream(String)}.
-     * @deprecated Use {@link #FileByteDataSource(String, io.ybrid.api.util.MediaType)}.
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public FileByteDataSource(@NotNull String filename, @NotNull String mediaType) throws FileNotFoundException {
-        this(filename, new MediaType(mediaType));
     }
 
     /**

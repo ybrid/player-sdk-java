@@ -108,17 +108,6 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
     }
 
     /**
-     * This returns the length of the block as units of time.
-     *
-     * @return The length of this block in [s].
-     * @deprecated Use {@link #getLength()} instead.
-     */
-    @Deprecated
-    public double getBlockLength() {
-        return (double)getData().length / (double)(getSampleRate() * getNumberOfChannels());
-    }
-
-    /**
      * This returns the length as units of frames.
      *
      * @return The length in [frame].
@@ -131,41 +120,6 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
             throw new IllegalArgumentException("Number of samples (" + samples + ") is not a multiple of number of channels (" + getNumberOfChannels() + ")");
 
         return samples / getNumberOfChannels();
-    }
-
-    /**
-     * Gets the callback for for when the block is audible.
-     * For calling the callback {@link #audible()} should be used.
-     *
-     * @return The callback or {@code null}.
-     * @see #audible()
-     * @deprecated This should not never be called.
-     */
-    @ApiStatus.ScheduledForRemoval
-    @Contract(pure = true)
-    @Deprecated
-    public @Nullable Runnable getOnAudible() {
-        final @NotNull Set<Runnable> callbacks = new HashSet<>(onAudible);
-        return () -> {
-            for (final @NotNull Runnable runnable : callbacks) {
-                runnable.run();
-            }
-        };
-    }
-
-    /**
-     * Sets a callback for when the block is audible.
-     * This callback can be called multiple times.
-     *
-     * @param onAudible The callback to set or {@code null}.
-     * @deprecated Use {@link #onAudible(Runnable)}.
-     */
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated
-    public void setOnAudible(@Nullable Runnable onAudible) {
-        this.onAudible.clear();
-        if (onAudible != null)
-        this.onAudible.add(onAudible);
     }
 
     /**

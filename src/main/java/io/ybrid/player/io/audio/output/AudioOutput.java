@@ -23,7 +23,6 @@
 package io.ybrid.player.io.audio.output;
 
 import io.ybrid.player.io.audio.PCMDataBlock;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
@@ -53,17 +52,6 @@ public interface AudioOutput extends Closeable {
      * Start playback mode of the backend.
      */
     void play();
-
-    /**
-     * Set the backend into pause mode. Can be resumed by calling {@link #play()}.
-     *
-     * @deprecated Unused. Do not use in new code.
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    default void pause() {
-        throw new UnsupportedOperationException();
-    }
 
     /**
      * Writes an actual block of PCM data to the output buffer of the interface.

@@ -23,10 +23,8 @@
 package io.ybrid.player.io.mapping;
 
 import io.ybrid.api.util.MediaType;
-import io.ybrid.api.util.Utils;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.muxer.StreamUsage;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,20 +38,6 @@ public interface Mapping<I extends DataBlock, O extends DataBlock> {
     @NotNull StreamUsage getPrimaryStreamUsage();
     @Contract(pure = true)
     @NotNull Set<StreamUsage> getStreamUsage();
-
-    /**
-     * Return the content-type of the stream.
-     *
-     * @return The content-type or {@code null}.
-     * @deprecated
-     */
-    @Contract(pure = true)
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    @Nullable
-    default String getContentType() {
-        return Utils.transform(getMediaType(), Object::toString);
-    }
 
     /**
      * Return the {@link MediaType} of the stream.

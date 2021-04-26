@@ -23,14 +23,12 @@
 package io.ybrid.player.io.muxer;
 
 import io.ybrid.api.util.MediaType;
-import io.ybrid.api.util.Utils;
 import io.ybrid.player.io.mapping.Mapping;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -78,18 +76,6 @@ public class StreamInfo {
     @Contract(pure = true)
     public @NotNull Set<StreamUsage> getStreamUsage() {
         return mapping.getStreamUsage();
-    }
-
-    /**
-     * Return the content-type of the stream.
-     *
-     * @return The content-type or {@code null}.
-     * @deprecated Use {@link #getMediaType()}.
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    @Nullable String getContentType() {
-        return Utils.transform(getMediaType(), Objects::toString);
     }
 
     /**

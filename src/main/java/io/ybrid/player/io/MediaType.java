@@ -30,44 +30,6 @@ import org.jetbrains.annotations.NotNull;
  */
 @SuppressWarnings("HardCodedStringLiteral")
 public final class MediaType {
-    /* --------[ Special Media Types ]-------- */
-    /**
-     * Any Media type, used for {@code Accept:}-Headers.
-     * @deprecated Use {@link io.ybrid.api.util.MediaType#MEDIA_TYPE_ANY}.
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static final @NotNull String ANY = "*/*";
-    /* --------[ Official Media Types ]-------- */
-    /**
-     * Any stream of octets. Often used as fallback.
-     * @deprecated Use {@link io.ybrid.api.util.MediaType#MEDIA_TYPE_APPLICATION_OCTET_STREAM}.
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static final @NotNull String APPLICATION_OCTET_STREAM = "application/octet-stream";
-    /**
-     * Ogg with any content.
-     * @deprecated Use {@link io.ybrid.api.util.MediaType#MEDIA_TYPE_APPLICATION_OGG}.
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static final @NotNull String APPLICATION_OGG = "application/ogg";
-    /**
-     * Ogg with audio content.
-     * @deprecated Use {@link io.ybrid.api.util.MediaType#MEDIA_TYPE_AUDIO_OGG}.
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static final @NotNull String AUDIO_OGG = "audio/ogg";
-    /**
-     * MP3.
-     * @deprecated Use {@link io.ybrid.api.util.MediaType#MEDIA_TYPE_AUDIO_MPEG}.
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static final @NotNull String AUDIO_MPEG = "audio/mpeg";
-
     /* --------[ Internal Media Types ]-------- */
     /**
      * PCM stream as stream of blocks of {@code short[]}.
