@@ -39,7 +39,7 @@ import java.time.Instant;
 /**
  * This interface is implemented by objects that control a session.
  */
-public interface SessionClient extends Player, KnowsSubInfoState {
+public interface MediaController extends Player, KnowsSubInfoState {
     /* --- Object Status --- */
 
     /**

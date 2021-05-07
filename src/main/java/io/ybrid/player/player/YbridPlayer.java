@@ -43,9 +43,9 @@ import java.util.logging.Logger;
 /**
  * This implements a Ybrid capable {@link Player}.
  *
- * See also {@link SessionClient}.
+ * See also {@link MediaController}.
  */
-public class YbridPlayer extends BasePlayer implements SessionClient, BufferStatusProvider {
+public class YbridPlayer extends BasePlayer implements MediaController, BufferStatusProvider {
     static final @NonNls Logger LOGGER = Logger.getLogger(YbridPlayer.class.getName());
 
     private static final double AUDIO_BUFFER_PREBUFFER = 1.5; /* [s] */
