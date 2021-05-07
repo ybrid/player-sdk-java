@@ -91,24 +91,24 @@ public interface MediaController extends Player, KnowsSubInfoState {
     /**
      * This call requests the session to be brought back to the live portion of the current service.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default  @NotNull Transaction windToLive() throws TransactionExecutionException {
-        return executeTransaction(Command.WIND_TO_LIVE.makeRequest());
+        return execute(Command.WIND_TO_LIVE.makeRequest());
     }
 
     /**
      * This call requests the session to be brought to the given time within the current service.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @param timestamp The timestamp to jump to.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction windTo(@NotNull Instant timestamp) throws TransactionExecutionException {
-        return executeTransaction(Command.WIND_TO.makeRequest(timestamp));
+        return execute(Command.WIND_TO.makeRequest(timestamp));
     }
 
     /**
@@ -116,71 +116,71 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * The time can be positive to move into the future or negative to move into the past
      * relative to the current position.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @param duration The duration to wind.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction wind(@NotNull Duration duration) throws TransactionExecutionException {
-        return executeTransaction(Command.WIND_BY.makeRequest(duration));
+        return execute(Command.WIND_BY.makeRequest(duration));
     }
 
     /**
      * Skip to the next Item of the given type.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @param itemType The ItemType to skip to.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction skipForwards(ItemType itemType) throws TransactionExecutionException {
-        return executeTransaction(Command.SKIP_FORWARD.makeRequest(itemType));
+        return execute(Command.SKIP_FORWARD.makeRequest(itemType));
     }
 
     /**
      * Skip to the previous Item of the given type.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @param itemType The ItemType to skip to.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction skipBackwards(ItemType itemType) throws TransactionExecutionException {
-        return executeTransaction(Command.SKIP_BACKWARD.makeRequest(itemType));
+        return execute(Command.SKIP_BACKWARD.makeRequest(itemType));
     }
 
     /**
      * Swap the current Item with a different one.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @param mode The mode for the swap. See {@link SwapMode} for details.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction swapItem(SwapMode mode) throws TransactionExecutionException {
-        return executeTransaction(Command.SWAP_ITEM.makeRequest(mode));
+        return execute(Command.SWAP_ITEM.makeRequest(mode));
     }
 
     /**
      * This call requests the session to be brought back to the main service of this bouquet.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction swapToMain() throws TransactionExecutionException {
-        return executeTransaction(Command.SWAP_TO_MAIN_SERVICE.makeRequest());
+        return execute(Command.SWAP_TO_MAIN_SERVICE.makeRequest());
     }
 
     /**
      * Swap to a different Service.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @param service The new service to listen to.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction swapService(@NotNull Service service) throws TransactionExecutionException {
-        return executeTransaction(Command.SWAP_SERVICE.makeRequest(service));
+        return execute(Command.SWAP_SERVICE.makeRequest(service));
     }
 }

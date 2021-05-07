@@ -124,7 +124,7 @@ abstract class PlayerStub implements Player {
     }
 
     @Override
-    public @NotNull Transaction executeTransaction(@NotNull Request<?> request) throws TransactionExecutionException {
+    public @NotNull Transaction execute(@NotNull Request<?> request) throws TransactionExecutionException {
         final @NotNull Transaction transaction = session.createTransaction(request);
         try {
             executeTransaction(transaction);

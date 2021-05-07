@@ -127,7 +127,7 @@ public class BasePlayer extends PlayerStub {
         LOGGER.info("Auto Reconnect is enabled, we have a valid session, and are not in a handover. Connecting new source and validating session.");
 
         {
-            final @NotNull Transaction transaction = executeTransaction(Command.RECONNECT_TRANSPORT.makeRequest());
+            final @NotNull Transaction transaction = execute(Command.RECONNECT_TRANSPORT.makeRequest());
             try {
                 transaction.waitControlComplete();
             } catch (InterruptedException ignored) {
@@ -137,7 +137,7 @@ public class BasePlayer extends PlayerStub {
         }
 
         try {
-            final @NotNull Transaction transaction = executeTransaction(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.VALIDITY)));
+            final @NotNull Transaction transaction = execute(Command.REFRESH.makeRequest(EnumSet.of(SubInfo.VALIDITY)));
             transaction.waitControlComplete();
             transaction.assertSuccess();
         } catch (Throwable e) {

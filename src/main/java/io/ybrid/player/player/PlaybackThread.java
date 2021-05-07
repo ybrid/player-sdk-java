@@ -27,6 +27,7 @@ import io.ybrid.api.Session;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.transaction.CompletionState;
+import io.ybrid.api.transaction.RequestExecutor;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.audio.BufferMuxer;
@@ -35,7 +36,6 @@ import io.ybrid.player.io.audio.BufferStatusConsumer;
 import io.ybrid.player.io.audio.PCMDataBlock;
 import io.ybrid.player.io.audio.output.AudioOutput;
 import io.ybrid.player.io.audio.output.AudioOutputFactory;
-import io.ybrid.player.transaction.RequestExecutor;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -119,7 +119,7 @@ class PlaybackThread extends Thread {
             return;
 
         setPlayerState(PlayerState.PREPARING);
-        transaction = requestExecutor.executeTransaction(Command.CONNECT_INITIAL_TRANSPORT.makeRequest());
+        transaction = requestExecutor.execute(Command.CONNECT_INITIAL_TRANSPORT.makeRequest());
         transaction.onAudioComplete(() -> {
             for (final @NotNull Transaction t : startTransactions) {
                 t.setAudioComplete(CompletionState.DONE);

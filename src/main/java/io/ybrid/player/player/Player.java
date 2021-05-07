@@ -24,10 +24,10 @@ package io.ybrid.player.player;
 
 import io.ybrid.api.player.SimpleCommand;
 import io.ybrid.api.transaction.Request;
+import io.ybrid.api.transaction.RequestExecutor;
 import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transaction.TransactionExecutionException;
 import io.ybrid.player.io.audio.BufferStatusProvider;
-import io.ybrid.player.transaction.RequestExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
@@ -42,12 +42,12 @@ public interface Player extends MetadataProvider, BufferStatusProvider, RequestE
      * <p>
      * This call may do I/O-operation and may block.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction prepare() throws TransactionExecutionException {
-        return executeTransaction(SimpleCommand.PREPARE.makeRequest());
+        return execute(SimpleCommand.PREPARE.makeRequest());
     }
 
     /**
@@ -55,12 +55,12 @@ public interface Player extends MetadataProvider, BufferStatusProvider, RequestE
      * <p>
      * If not called before this behaves as if it would call {@link #prepare()} before being called.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction play() throws TransactionExecutionException {
-        return executeTransaction(SimpleCommand.PLAY.makeRequest());
+        return execute(SimpleCommand.PLAY.makeRequest());
     }
 
     /**
@@ -68,12 +68,12 @@ public interface Player extends MetadataProvider, BufferStatusProvider, RequestE
      * <p>
      * After stop the player instance must not be reused.
      * <p>
-     * The default implementation makes use of {@link #executeTransaction(Request)}.
+     * The default implementation makes use of {@link #execute(Request)}.
      *
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction stop() throws TransactionExecutionException {
-        return executeTransaction(SimpleCommand.STOP.makeRequest());
+        return execute(SimpleCommand.STOP.makeRequest());
     }
 
     @Override
