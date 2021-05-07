@@ -44,10 +44,9 @@ public interface Player extends MetadataProvider, BufferStatusProvider, RequestE
      * <p>
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
-     * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default @NotNull Transaction prepare() throws IOException, TransactionExecutionException {
+    default @NotNull Transaction prepare() throws TransactionExecutionException {
         return executeTransaction(SimpleCommand.PREPARE.makeRequest());
     }
 
@@ -58,10 +57,9 @@ public interface Player extends MetadataProvider, BufferStatusProvider, RequestE
      * <p>
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
-     * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default @NotNull Transaction play() throws IOException, TransactionExecutionException {
+    default @NotNull Transaction play() throws TransactionExecutionException {
         return executeTransaction(SimpleCommand.PLAY.makeRequest());
     }
 
@@ -72,10 +70,9 @@ public interface Player extends MetadataProvider, BufferStatusProvider, RequestE
      * <p>
      * The default implementation makes use of {@link #executeTransaction(Request)}.
      *
-     * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default @NotNull Transaction stop() throws IOException, TransactionExecutionException {
+    default @NotNull Transaction stop() throws TransactionExecutionException {
         return executeTransaction(SimpleCommand.STOP.makeRequest());
     }
 
