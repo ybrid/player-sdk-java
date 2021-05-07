@@ -28,6 +28,7 @@ import io.ybrid.api.bouquet.Service;
 import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.transaction.Request;
+import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transaction.TransactionExecutionException;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -96,8 +97,8 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void windToLive() throws IOException, TransactionExecutionException {
-        executeTransaction(Command.WIND_TO_LIVE.makeRequest());
+    default  @NotNull Transaction windToLive() throws IOException, TransactionExecutionException {
+        return executeTransaction(Command.WIND_TO_LIVE.makeRequest());
     }
 
     /**
@@ -109,8 +110,8 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void windTo(@NotNull Instant timestamp) throws IOException, TransactionExecutionException {
-        executeTransaction(Command.WIND_TO.makeRequest(timestamp));
+    default @NotNull Transaction windTo(@NotNull Instant timestamp) throws IOException, TransactionExecutionException {
+        return executeTransaction(Command.WIND_TO.makeRequest(timestamp));
     }
 
     /**
@@ -124,8 +125,8 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void wind(@NotNull Duration duration) throws IOException, TransactionExecutionException {
-        executeTransaction(Command.WIND_BY.makeRequest(duration));
+    default @NotNull Transaction wind(@NotNull Duration duration) throws IOException, TransactionExecutionException {
+        return executeTransaction(Command.WIND_BY.makeRequest(duration));
     }
 
     /**
@@ -137,8 +138,8 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void skipForwards(ItemType itemType) throws IOException, TransactionExecutionException {
-        executeTransaction(Command.SKIP_FORWARD.makeRequest(itemType));
+    default @NotNull Transaction skipForwards(ItemType itemType) throws IOException, TransactionExecutionException {
+        return executeTransaction(Command.SKIP_FORWARD.makeRequest(itemType));
     }
 
     /**
@@ -150,8 +151,8 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void skipBackwards(ItemType itemType) throws IOException, TransactionExecutionException {
-        executeTransaction(Command.SKIP_BACKWARD.makeRequest(itemType));
+    default @NotNull Transaction skipBackwards(ItemType itemType) throws IOException, TransactionExecutionException {
+        return executeTransaction(Command.SKIP_BACKWARD.makeRequest(itemType));
     }
 
     /**
@@ -163,8 +164,8 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void swapItem(SwapMode mode) throws IOException, TransactionExecutionException {
-        executeTransaction(Command.SWAP_ITEM.makeRequest(mode));
+    default @NotNull Transaction swapItem(SwapMode mode) throws IOException, TransactionExecutionException {
+        return executeTransaction(Command.SWAP_ITEM.makeRequest(mode));
     }
 
     /**
@@ -175,8 +176,8 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void swapToMain() throws IOException, TransactionExecutionException {
-        executeTransaction(Command.SWAP_TO_MAIN_SERVICE.makeRequest());
+    default @NotNull Transaction swapToMain() throws IOException, TransactionExecutionException {
+        return executeTransaction(Command.SWAP_TO_MAIN_SERVICE.makeRequest());
     }
 
     /**
@@ -188,7 +189,7 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void swapService(@NotNull Service service) throws IOException, TransactionExecutionException {
-        executeTransaction(Command.SWAP_SERVICE.makeRequest(service));
+    default @NotNull Transaction swapService(@NotNull Service service) throws IOException, TransactionExecutionException {
+        return executeTransaction(Command.SWAP_SERVICE.makeRequest(service));
     }
 }

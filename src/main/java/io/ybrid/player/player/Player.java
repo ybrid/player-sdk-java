@@ -24,9 +24,11 @@ package io.ybrid.player.player;
 
 import io.ybrid.api.player.SimpleCommand;
 import io.ybrid.api.transaction.Request;
+import io.ybrid.api.transaction.Transaction;
 import io.ybrid.api.transaction.TransactionExecutionException;
 import io.ybrid.player.io.audio.BufferStatusProvider;
 import io.ybrid.player.transaction.RequestExecutor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -45,8 +47,8 @@ public interface Player extends MetadataProvider, BufferStatusProvider, RequestE
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void prepare() throws IOException, TransactionExecutionException {
-        executeTransaction(SimpleCommand.PREPARE.makeRequest());
+    default @NotNull Transaction prepare() throws IOException, TransactionExecutionException {
+        return executeTransaction(SimpleCommand.PREPARE.makeRequest());
     }
 
     /**
@@ -59,8 +61,8 @@ public interface Player extends MetadataProvider, BufferStatusProvider, RequestE
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void play() throws IOException, TransactionExecutionException {
-        executeTransaction(SimpleCommand.PLAY.makeRequest());
+    default @NotNull Transaction play() throws IOException, TransactionExecutionException {
+        return executeTransaction(SimpleCommand.PLAY.makeRequest());
     }
 
     /**
@@ -73,8 +75,8 @@ public interface Player extends MetadataProvider, BufferStatusProvider, RequestE
      * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
-    default void stop() throws IOException, TransactionExecutionException {
-        executeTransaction(SimpleCommand.STOP.makeRequest());
+    default @NotNull Transaction stop() throws IOException, TransactionExecutionException {
+        return executeTransaction(SimpleCommand.STOP.makeRequest());
     }
 
     @Override
