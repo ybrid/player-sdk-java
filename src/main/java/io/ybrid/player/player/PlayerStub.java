@@ -38,7 +38,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
@@ -115,10 +114,9 @@ abstract class PlayerStub implements Player {
      * Execute the given transaction on this player.
      *
      * @param transaction The transaction to execute.
-     * @throws IOException Deprecated: Should no longer be thrown.
      * @throws TransactionExecutionException Thrown if the transaction failed while this method was still executing.
      */
-    protected void executeTransaction(@NotNull Transaction transaction) throws IOException, TransactionExecutionException {
+    protected void executeTransaction(@NotNull Transaction transaction) throws TransactionExecutionException {
         transaction.run();
         transaction.assertSuccess();
     }
@@ -126,13 +124,7 @@ abstract class PlayerStub implements Player {
     @Override
     public @NotNull Transaction execute(@NotNull Request<?> request) throws TransactionExecutionException {
         final @NotNull Transaction transaction = session.createTransaction(request);
-        try {
-            executeTransaction(transaction);
-        } catch (IOException e) {
-            LOGGER.warning("executeTransaction() threw deprecated IOException: " + e);
-            throw new RuntimeException(e);
-        }
-
+        executeTransaction(transaction);
         return transaction;
     }
 }
