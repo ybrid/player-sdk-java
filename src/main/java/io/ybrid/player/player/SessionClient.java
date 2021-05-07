@@ -29,6 +29,7 @@ import io.ybrid.api.metadata.ItemType;
 import io.ybrid.api.session.Command;
 import io.ybrid.api.transaction.Request;
 import io.ybrid.api.transaction.TransactionExecutionException;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -46,6 +47,7 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * If the Session is invalid the client must no longer use it and create a new session if necessary.
      * @return Returns validity of this Session.
      */
+    @ApiStatus.Experimental
     boolean isValid();
 
 
@@ -58,6 +60,7 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * Calling this resets the flag returned by {@link KnowsSubInfoState#hasChanged(SubInfo)}
      * @return Returns the set of current {@link Capability Capabilities}.
      */
+    @ApiStatus.Experimental
     @NotNull
     CapabilitySet getCapabilities();
 
@@ -68,6 +71,7 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * Calling this resets the flag returned by {@link KnowsSubInfoState#hasChanged(SubInfo)}
      * @return Returns the current Bouquet.
      */
+    @ApiStatus.Experimental
     @NotNull
     Bouquet getBouquet();
 
@@ -77,6 +81,7 @@ public interface SessionClient extends Player, KnowsSubInfoState {
      * Calling this resets the flag returned by {@link KnowsSubInfoState#hasChanged(SubInfo)}
      * @return Returns the current {@link PlayoutInfo}.
      */
+    @ApiStatus.Experimental
     @NotNull
     PlayoutInfo getPlayoutInfo();
 
