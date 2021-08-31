@@ -64,6 +64,6 @@ public interface PCMDataSource extends DataSource {
     @Override
     @Nullable
     default MediaType getMediaType() {
-        return new MediaType(io.ybrid.player.io.MediaType.PCM_STREAM_SHORT);
+        return io.ybrid.player.io.MediaType.PCM_STREAM_SHORT;
     }
 }

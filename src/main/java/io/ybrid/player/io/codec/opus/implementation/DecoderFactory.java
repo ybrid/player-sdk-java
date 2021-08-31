@@ -44,7 +44,7 @@ public class DecoderFactory  implements io.ybrid.player.io.decoder.DecoderFactor
         try {
             LazyLoadingAndroidDecoder.assertAvailable();
             //noinspection MagicNumber
-            map.put(new MediaType(io.ybrid.player.io.MediaType.BLOCK_STREAM_OPUS), Quality.valueOf(0.1));
+            map.put(io.ybrid.player.io.MediaType.BLOCK_STREAM_OPUS, Quality.valueOf(0.1));
         } catch (Exception ignored) {
         }
         map.put(MediaType.MEDIA_TYPE_ANY, Quality.NOT_ACCEPTABLE);

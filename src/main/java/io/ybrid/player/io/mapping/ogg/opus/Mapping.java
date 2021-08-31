@@ -116,6 +116,6 @@ public class Mapping extends Generic {
 
     @Override
     public io.ybrid.api.util.@Nullable MediaType getMediaType() {
-        return new MediaType(io.ybrid.player.io.MediaType.BLOCK_STREAM_OPUS);
+        return io.ybrid.player.io.MediaType.BLOCK_STREAM_OPUS;
     }
 }
