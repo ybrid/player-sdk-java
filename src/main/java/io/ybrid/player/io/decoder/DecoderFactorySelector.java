@@ -26,12 +26,16 @@ import io.ybrid.api.util.MediaType;
 import io.ybrid.api.util.QualityMap.MediaTypeMap;
 import io.ybrid.api.util.QualityMap.Quality;
 import io.ybrid.player.io.DataSource;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class DecoderFactorySelector implements DecoderFactory {
+    static final @NonNls Logger LOGGER = Logger.getLogger(DecoderFactorySelector.class.getName());
+
     private final @NotNull Set<@NotNull DecoderFactory> factories = new HashSet<>();
 
     public boolean add(@NotNull DecoderFactory decoderFactory) {
@@ -46,6 +50,8 @@ public class DecoderFactorySelector implements DecoderFactory {
     public Decoder getDecoder(@NotNull DataSource dataSource) {
         final @Nullable MediaType mediaType = dataSource.getMediaType();
         if (mediaType != null) {
+            LOGGER.info("Looking for a decoder for media type " + mediaType);
+
             final @NotNull TreeMap<@NotNull Quality, @NotNull DecoderFactory> map = new TreeMap<>(Comparator.reverseOrder());
             for (final @NotNull DecoderFactory factory : factories) {
                 final @Nullable Quality quality = factory.getSupportedMediaTypes().get(mediaType);
@@ -54,19 +60,25 @@ public class DecoderFactorySelector implements DecoderFactory {
 
             for (final @NotNull Map.Entry<@NotNull Quality, @NotNull DecoderFactory> entry : map.entrySet()) {
                 final @Nullable Decoder decoder = entry.getValue().getDecoder(dataSource);
-                if (decoder != null)
+                if (decoder != null) {
+                    LOGGER.info("Got decoder " + decoder + " with quality " + entry.getKey());
                     return decoder;
+                }
             }
         }
 
         // try all:
+        LOGGER.info("Looking for decoder in media type independent mode");
         for (final @NotNull DecoderFactory factory : factories) {
             final @Nullable Decoder decoder = factory.getDecoder(dataSource);
-            if (decoder != null)
+            if (decoder != null) {
+                LOGGER.info("Got decoder " + decoder);
                 return decoder;
+            }
         }
 
         // none found:
+        LOGGER.warning("Can not find any decoder for given datasource (media type: " + (mediaType == null ? "<null>" : mediaType) + ")");
         return null;
     }
 

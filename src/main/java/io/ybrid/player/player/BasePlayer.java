@@ -83,7 +83,12 @@ public class BasePlayer extends PlayerStub {
                  * server sending EOF and us adding the new buffer.
                  */
                 muxer.setInputEOFCallback(null);
-                decoder = decoderFactory.getDecoder(new BufferedByteDataSource(dataSourceFactory.getSource(transportDescription)));
+                try {
+                    decoder = decoderFactory.getDecoder(new BufferedByteDataSource(dataSourceFactory.getSource(transportDescription)));
+                } catch (Throwable e) {
+                    LOGGER.severe("Unexpected exception thrown while getting decoder" + e);
+                    throw e;
+                }
                 if (decoder == null) {
                     LOGGER.warning("Can not create decoder for new input.");
                 } else {

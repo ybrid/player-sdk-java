@@ -31,15 +31,19 @@ import io.ybrid.player.io.muxer.Demuxer;
 import io.ybrid.player.io.muxer.Stream;
 import io.ybrid.player.io.muxer.StreamUsage;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 @ApiStatus.Internal
 public class DemuxerDecoder implements Decoder {
+    static final @NonNls Logger LOGGER = Logger.getLogger(DemuxerDecoder.class.getName());
+
     private final @NotNull ByteDataSource source;
     private final @NotNull DecoderFactory decoderFactory;
     private @NotNull final Demuxer<?, ?> demuxer;
@@ -105,6 +109,7 @@ public class DemuxerDecoder implements Decoder {
             try {
                 return Objects.requireNonNull(decoder).read();
             } catch (EOFException e) {
+                LOGGER.warning("Can not read from decoder (" + e + "), closing.");
                 closeDecoder();
             }
         }
