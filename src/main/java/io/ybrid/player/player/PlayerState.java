@@ -47,7 +47,7 @@ public enum PlayerState {
      */
     BUFFERING,
     /**
-     * The player has a error condition.
+     * The player has an error condition.
      * {@link Player#close()} should be called on the player and the object discarded.
      */
     ERROR,
