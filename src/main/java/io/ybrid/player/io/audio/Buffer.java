@@ -271,6 +271,21 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
          * @return The fullness in [s].
          */
         public double getBufferLength() {
+            /* This is a faster implementation, but it breaks abstraction: */
+            final long skipped = backend.getSkippedSamples();
+            double ret = 0;
+
+            for (PCMDataBlock block : buffer) {
+                ret += (double)block.getLengthAsFrames() / (double)block.getSampleRate();
+            }
+
+            state.setCurrent(ret, samplesRead + skipped, samplesForwarded > 0 ? samplesForwarded + skipped : 0);
+
+            return ret;
+        }
+
+        /* Nice implementation yet incredibly slow on Android:
+        public double getBufferLength() {
             final long skipped = backend.getSkippedSamples();
             Duration duration = Duration.ZERO;
             double ret;
@@ -285,6 +300,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
 
             return ret;
         }
+         */
 
         @Override
         public void addBufferStatusConsumer(@NotNull BufferStatusConsumer consumer) {

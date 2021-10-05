@@ -47,7 +47,14 @@ public interface SignalInformation {
      * @return The length.
      */
     default Duration getLength() {
-        return Duration.ofSeconds(getLengthAsFrames()).dividedBy(getSampleRate());
+        /* This is the nicer implementation, yet it is incredibly slow on Android: */
+        // return Duration.ofSeconds(getLengthAsFrames()).dividedBy(getSampleRate());
+
+        /* This is the not so nice implementation, but way faster on Android: */
+        long nanos = getLengthAsFrames();
+        nanos *= 1_000_000_000L;
+        nanos /= getSampleRate();
+        return Duration.ofNanos(nanos);
     }
 
 }
