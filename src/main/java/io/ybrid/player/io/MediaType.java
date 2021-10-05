@@ -34,11 +34,11 @@ public final class MediaType {
     /**
      * PCM stream as stream of blocks of {@code short[]}.
      */
-    public static final @NotNull String PCM_STREAM_SHORT = "!_block-stream/pcm-java-short-array";
+    public static final @NotNull io.ybrid.api.util.MediaType PCM_STREAM_SHORT = new io.ybrid.api.util.MediaType("!_block-stream/pcm-java-short-array");
     /**
      * Demuxed Opus stream.
      */
-    public static final @NotNull String BLOCK_STREAM_OPUS = "!_block-stream/opus";
+    public static final @NotNull io.ybrid.api.util.MediaType BLOCK_STREAM_OPUS = new io.ybrid.api.util.MediaType("!_block-stream/opus");
 
     /* --------[ Methods ]-------- */
     @ApiStatus.Internal

@@ -22,6 +22,7 @@
 
 package io.ybrid.player.io.mapping.ogg.opus;
 
+import io.ybrid.api.metadata.Sync;
 import io.ybrid.player.io.ByteDataBlock;
 import io.ybrid.player.io.codec.opus.TableOfContents;
 import io.ybrid.player.io.container.ogg.GranularPosition;
@@ -37,8 +38,8 @@ public class OpusDataBlock extends ByteDataBlock implements hasGranularPosition 
     private final @NotNull TableOfContents tableOfContents;
     private @NotNull GranularPosition granularPosition;
 
-    public OpusDataBlock(@NotNull OpusHead opusHead, @NotNull PacketAdapter packet, @Nullable GranularPosition granularPosition) {
-        super(packet.getSync(), packet.getPlayoutInfo(), packet.getData());
+    public OpusDataBlock(@NotNull OpusHead opusHead, @NotNull Sync sync, @NotNull PacketAdapter packet, @Nullable GranularPosition granularPosition) {
+        super(sync, packet.getPlayoutInfo(), packet.getData());
         this.opusHead = opusHead;
         this.packet = packet;
         this.tableOfContents = new TableOfContents(packet.getData(), 0);

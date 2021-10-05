@@ -22,7 +22,10 @@
 
 package io.ybrid.player.io.mapping.ogg.opus;
 
-import io.ybrid.api.util.MediaType;
+import io.ybrid.api.metadata.Sync;
+import io.ybrid.api.metadata.source.Source;
+import io.ybrid.api.metadata.source.SourceType;
+import io.ybrid.api.metadata.source.VorbisCommentBasedMetadata;
 import io.ybrid.player.io.DataBlock;
 import io.ybrid.player.io.container.ogg.Flag;
 import io.ybrid.player.io.container.ogg.GranularPosition;
@@ -41,9 +44,13 @@ import java.util.logging.Logger;
 public class Mapping extends Generic {
     static final @NonNls Logger LOGGER = Logger.getLogger(Mapping.class.getName());
 
+    private final @NotNull Source source = new Source(SourceType.FORMAT);
     private @Nullable OpusHead opusHead = null;
+    private @Nullable OpusTags opusTags = null;
     private @NotNull GranularPosition granularPosition = GranularPosition.INVALID;
     private @Nullable Deque<OpusDataBlock> stack = new ArrayDeque<>();
+    private @Nullable Sync lastInputSync;
+    private @Nullable Sync lastOutputSync;
 
     private void processStack(@NotNull OpusDataBlock block) {
         @NotNull GranularPosition granularPosition;
@@ -68,13 +75,37 @@ public class Mapping extends Generic {
         }
     }
 
+    private @NotNull Sync getSync(final @NotNull Sync inputSync) {
+        final @NotNull Sync.Builder builder;
+
+        if (lastOutputSync != null && inputSync.equals(lastInputSync))
+            return lastOutputSync;
+
+        if (opusTags == null)
+            throw new NullPointerException("No OpusTags found. BAD.");
+
+        lastInputSync = inputSync;
+
+        if (lastOutputSync == null) {
+            builder = new Sync.Builder(source, inputSync);
+        } else {
+            builder = new Sync.Builder(inputSync, lastOutputSync);
+        }
+        builder.autoFill();
+        builder.setCurrentTrack(new VorbisCommentBasedMetadata(source, opusTags.getVendorString(), opusTags.getComments()));
+        lastOutputSync = builder.build();
+
+        return lastOutputSync;
+    }
+
     @Override
     public @NotNull DataBlock process(@NotNull PacketAdapter block) {
         if (Header.isHeader(block, OpusHead.MAGIC)) {
             opusHead = new OpusHead(block);
             return opusHead;
         } else if (Header.isHeader(block, OpusTags.MAGIC)) {
-            return new OpusTags(block);
+            opusTags = new OpusTags(block);
+            return opusTags;
         } else {
             final @NotNull OpusDataBlock ret;
             final @NotNull GranularPosition fromBlock = block.getPacket().getGranularPosition();
@@ -90,7 +121,7 @@ public class Mapping extends Generic {
                 granularPosition = fromBlock;
             }
 
-            ret = new OpusDataBlock(Objects.requireNonNull(opusHead), block, granularPosition);
+            ret = new OpusDataBlock(Objects.requireNonNull(opusHead), getSync(block.getSync()), block, granularPosition);
             processStack(ret);
             granularPosition = granularPosition.add(ret.getTableOfContents().getAudioFrameCount());
             return ret;
@@ -116,6 +147,6 @@ public class Mapping extends Generic {
 
     @Override
     public io.ybrid.api.util.@Nullable MediaType getMediaType() {
-        return new MediaType(io.ybrid.player.io.MediaType.BLOCK_STREAM_OPUS);
+        return io.ybrid.player.io.MediaType.BLOCK_STREAM_OPUS;
     }
 }
