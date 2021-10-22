@@ -1,4 +1,13 @@
 1.2.0 - UNRELEASED
+    * Removed most deprecated, and ScheduledForRemoval API
+    * Renamed SessionClient to MediaController
+    * MediaController methods now return Transactions
+    * Newly marked Experimental:
+        * in MediaController: isValid(), getCapabilities(), getBouquet(), and getPlayoutInfo()
+    * Improved performance on Android devices
+    * Added Opus decoder for Android devices
+    * Make it the responsibility of the AudioOutput to call PCMDataBlock.audible()
+      This allows better synchronisation when using custom AudioOutputs, or filtering AudioOutputs.
 
 1.1.2 - 2021-04-23
     * Newly ScheduledForRemoval:
