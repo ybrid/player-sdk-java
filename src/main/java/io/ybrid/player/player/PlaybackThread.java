@@ -50,11 +50,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 @ApiStatus.Internal
 class PlaybackThread extends Thread {
-    private static final @NonNls Logger LOGGER = Logger.getLogger(PlaybackThread.class.getName());
     private static final double AUDIO_BUFFER_MAX_BEFORE_REBUFFER = 0.01; // [s]. Must be > 0.
     private static final double AUDIO_BUFFER_DEFAULT_GOAL = 10.0; // [s].
 
@@ -170,11 +168,6 @@ class PlaybackThread extends Thread {
         while (!isInterrupted()) {
             try {
                 audioOutput.write(block);
-                try {
-                    block.audible();
-                } catch (Throwable e) {
-                    LOGGER.warning("on audible handler for PCM block " + block + " failed with " + e);
-                }
             } catch (IOException e) {
                 setPlayerState(PlayerState.ERROR);
                 break;

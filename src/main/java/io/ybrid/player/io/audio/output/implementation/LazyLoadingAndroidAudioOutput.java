@@ -155,6 +155,8 @@ public class LazyLoadingAndroidAudioOutput extends Base {
         if (ret != buffer.length) {
             throw new RuntimeException("Short write");
         }
+
+        block.audible();
     }
 
     @Override

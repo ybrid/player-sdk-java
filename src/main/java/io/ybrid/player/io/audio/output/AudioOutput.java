@@ -56,7 +56,9 @@ public interface AudioOutput extends Closeable {
     /**
      * Writes an actual block of PCM data to the output buffer of the interface.
      *
-     * This call blocks on average for the time represented by the block,
+     * This call blocks on average for the time represented by the block.
+     * Also, this call is responsible to call {@link PCMDataBlock#audible()} on {@code block}
+     * when the block is audible.
      *
      * @param block The block to write to the backend.
      * @throws IOException Thrown on backend related I/O-Error.

@@ -139,7 +139,11 @@ public class PCMDataBlock extends DataBlock implements MultiChannelSignalInforma
      */
     public void audible() {
         for (final @NotNull Runnable runnable : onAudible) {
-            runnable.run();
+            try {
+                runnable.run();
+            } catch (Throwable e) {
+                LOGGER.warning("on audible handler " + runnable + " for PCM block " + this + " failed with " + e);
+            }
         }
     }
 

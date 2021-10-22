@@ -91,5 +91,7 @@ class Javax extends Base {
         buffer.position(0);
 
         Objects.requireNonNull(line).write(buffer.array(), 0, buffer.array().length);
+
+        block.audible();
     }
 }
