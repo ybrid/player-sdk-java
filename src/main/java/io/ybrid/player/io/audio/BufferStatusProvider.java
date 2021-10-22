@@ -25,7 +25,7 @@ package io.ybrid.player.io.audio;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * This interface is implemented by classes providing states of a audio Buffer
+ * This interface is implemented by classes providing states of an audio Buffer
  * such as {@link Buffer}.
  */
 public interface BufferStatusProvider {

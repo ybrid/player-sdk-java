@@ -122,7 +122,7 @@ public final class Page implements hasGranularPosition {
     }
 
     /**
-     * Constructs a page object from a array of raw bytes.
+     * Constructs a page object from an array of raw bytes.
      * @param raw The bytes to read from.
      * @param offset The offset to use.
      */

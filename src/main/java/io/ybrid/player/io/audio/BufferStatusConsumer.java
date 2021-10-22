@@ -40,7 +40,7 @@ public interface BufferStatusConsumer {
     void onBufferStatusUpdate(@NotNull BufferStatus status);
 
     /**
-     * Builds a adapter to log buffer state updates.
+     * Builds an adapter to log buffer state updates.
      * This is for debugging purpose only.
      *
      * @param logger The logger to use.

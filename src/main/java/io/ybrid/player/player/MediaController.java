@@ -112,7 +112,7 @@ public interface MediaController extends Player, KnowsSubInfoState {
     }
 
     /**
-     * This call allows to move in the stream by a relative time.
+     * This call allows moving in the stream by a relative time.
      * The time can be positive to move into the future or negative to move into the past
      * relative to the current position.
      * <p>

@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 
 class myPlayer {
     private void run() throws IOException {
-        /* First create a Alias object and a Session. */
+        /* First create an Alias object and a Session. */
         final MediaEndpoint mediaEndpoint = new MediaEndpoint(new URI("https://stagecast.ybrid.io/adaptive-demo"));
         final Session session = mediaEndpoint.createSession();
 

@@ -55,7 +55,7 @@ public class FileByteDataSource implements ByteDataSource {
     }
 
     /**
-     * Creates a instance with a media type of {@code "application/octet-stream"},
+     * Creates an instance with a media type of {@code "application/octet-stream"},
      *
      * @param filename The name of the file to open.
      * @throws FileNotFoundException Thrown as per {@link FileInputStream#FileInputStream(String)}.

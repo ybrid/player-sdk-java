@@ -85,7 +85,7 @@ public final class Util {
     }
 
     /**
-     * Concatenate a array with a subarray.
+     * Concatenate an array with a subarray.
      * @param base The base array to append to.
      * @param addition The array to take the additional elements from.
      * @param offset The offset of the addition array.

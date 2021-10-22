@@ -83,7 +83,7 @@ public final class Sync {
     }
 
     /**
-     * Returns whether the auto fill source signaled EOF.
+     * Returns whether the autofill source signaled EOF.
      * @return The EOF state of the autofill source.
      * @see #setAutoFillSource(InputStream)
      */
@@ -92,8 +92,8 @@ public final class Sync {
     }
 
     /**
-     * Sets a data source for auto filling.
-     * In auto filling mode calls to {@link #read()} will automatically read from this source
+     * Sets a data source for autofilling.
+     * In autofilling mode calls to {@link #read()} will automatically read from this source
      * and append the data to the internal buffer as if {@link #fill(byte[], int, int)} was called
      * to fill the buffer when the request for a page can not be satisfied with the current buffer.
      * <P>
@@ -111,7 +111,7 @@ public final class Sync {
 
     /**
      * Reads a {@link Page} from the buffer. If no {@link Page} can be read {@code null} is returned.
-     * This may read from auto fill sources if any are set.
+     * This may read from autofill sources if any are set.
      * @return The newly parsed {@link Page} or {@code null}.
      * @throws IOException As thrown by reading from backends.
      */

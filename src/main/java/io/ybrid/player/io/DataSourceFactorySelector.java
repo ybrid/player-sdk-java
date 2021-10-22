@@ -68,7 +68,7 @@ public final class DataSourceFactorySelector implements DataSourceFactory {
     }
 
     /**
-     * Creates a instance with default factories already installed.
+     * Creates an instance with default factories already installed.
      * @return The new instance.
      */
     public static @NotNull DataSourceFactorySelector createWithDefaults() {
@@ -79,7 +79,7 @@ public final class DataSourceFactorySelector implements DataSourceFactory {
     }
 
     /**
-     * Creates a instance with no default factories installed.
+     * Creates an instance with no default factories installed.
      * @param fallbackSource The default {@link SimpleProvider} to use if no other factory can handle a request.
      * @return The new instance.
      */

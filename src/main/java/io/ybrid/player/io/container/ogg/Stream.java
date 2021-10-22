@@ -95,7 +95,7 @@ public final class Stream {
         }
     }
 
-    private void extractSegements(@NotNull Page page, boolean afterHole) {
+    private void extractSegments(@NotNull Page page, boolean afterHole) {
         final @NotNull byte[] body = page.getBody();
         final @NotNull byte[] segmentTable = page.getSegmentTable();
         boolean continued = page.getFlags().contains(Flag.CONTINUED);
@@ -150,7 +150,7 @@ public final class Stream {
         hole = page.getSequence() != (lastSequence + 1);
         lastSequence = page.getSequence();
 
-        extractSegements(page, hole);
+        extractSegments(page, hole);
     }
 
     /**
