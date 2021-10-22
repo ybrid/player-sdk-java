@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -95,7 +94,7 @@ public class LazyLoadingAndroidAudioOutput extends Base {
     private @Nullable Object audioTrack;
 
     @Override
-    protected void configureBackend(@NotNull PCMDataBlock block) throws IOException {
+    protected void configureBackend(@NotNull PCMDataBlock block) {
         try {
             final int sampleRate = block.getSampleRate();
             final int channels = block.getNumberOfChannels();
@@ -140,14 +139,14 @@ public class LazyLoadingAndroidAudioOutput extends Base {
     }
 
     @Override
-    protected void deConfigureBackend() throws IOException {
+    protected void deConfigureBackend() {
         invoke(METHOD_AUDIO_TRACK_FLUSH, audioTrack);
         invoke(METHOD_AUDIO_TRACK_STOP, audioTrack);
         invoke(METHOD_AUDIO_TRACK_RELEASE, audioTrack);
     }
 
     @Override
-    protected void writeToBackend(@NotNull PCMDataBlock block) throws IOException {
+    protected void writeToBackend(@NotNull PCMDataBlock block) {
         final short[] buffer = block.getData();
         final int ret;
 

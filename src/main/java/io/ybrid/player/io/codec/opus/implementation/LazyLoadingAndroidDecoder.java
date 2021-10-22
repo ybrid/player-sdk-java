@@ -115,7 +115,7 @@ public class LazyLoadingAndroidDecoder extends StreamDecoder<Stream<?, ?, ? exte
     private Method dequeueInputBuffer;
     private Method queueInputBuffer;
 
-    public static void assertAvailable() throws Exception {
+    public static void assertAvailable() {
         /* noop */
         LOGGER.info("LazyLoadingAndroidDecoder is available");
     }
@@ -123,14 +123,7 @@ public class LazyLoadingAndroidDecoder extends StreamDecoder<Stream<?, ?, ? exte
     public LazyLoadingAndroidDecoder(@NotNull Stream<?, ?, ? extends ByteDataBlock, ?> stream) {
         super(stream);
         //this.skipper = new OpusSkipper(new OpusPCMDataSource(this::readInternal, this::closeInternal, this::isValidInternal));
-        this.skipper = new OpusSkipper(new OpusPCMDataSource(() -> {
-            try {
-                return this.readInternal();
-            } catch (Throwable e) {
-                e.printStackTrace();
-                throw e;
-            }
-        }, this::closeInternal, this::isValidInternal));
+        this.skipper = new OpusSkipper(new OpusPCMDataSource(this::readInternal, this::closeInternal, this::isValidInternal));
         LOGGER.info("Created new instance of LazyLoadingAndroidDecoder for stream " + stream);
     }
 
@@ -286,12 +279,7 @@ public class LazyLoadingAndroidDecoder extends StreamDecoder<Stream<?, ?, ? exte
     @Override
     @NotNull
     public PCMDataBlock read() throws IOException {
-        try {
-            return skipper.read();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw e;
-        }
+        return skipper.read();
     }
 
     @Override

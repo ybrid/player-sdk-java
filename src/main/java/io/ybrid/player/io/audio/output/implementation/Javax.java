@@ -70,7 +70,7 @@ class Javax extends Base {
     }
 
     @Override
-    protected synchronized void deConfigureBackend() throws IOException {
+    protected synchronized void deConfigureBackend() {
         if (line == null)
             return;
 
@@ -81,7 +81,7 @@ class Javax extends Base {
     }
 
     @Override
-    protected void writeToBackend(@NotNull PCMDataBlock block) throws IOException {
+    protected void writeToBackend(@NotNull PCMDataBlock block) {
         final short[] data = block.getData();
         final @NotNull ByteBuffer buffer = ByteBuffer.allocate(data.length * 2).order(byteOrder);
 
