@@ -48,7 +48,7 @@ public class Buffer implements PCMDataSource, BufferStatusProvider, hasIdentifie
     private static final String AUDIO_BUFFER_THREAD_NAME = "Audio Buffer Thread"; //NON-NLS
 
     private final BufferThread thread;
-    private @NotNull Identifier identifier;
+    private Identifier identifier;
 
     private static class Status implements BufferStatusProvider {
         private static final Duration MINIMUM_BETWEEN_ANNOUNCE = Duration.ofMillis(1000);
