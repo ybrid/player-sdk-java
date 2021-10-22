@@ -45,11 +45,11 @@ public final class DefaultFactory implements AudioOutputFactory {
         private final Class<? extends Base> supplier;
 
         @Contract(pure = true)
-        private Factory(Class<? extends Base> supplier) {
+        public Factory(Class<? extends Base> supplier) {
             this.supplier = supplier;
         }
 
-        private AudioOutput tryGetDriver() throws Throwable {
+        public @NotNull AudioOutput tryGetDriver() throws Throwable {
             final @NotNull Base driver = supplier.newInstance();
 
             if (!driver.available())
