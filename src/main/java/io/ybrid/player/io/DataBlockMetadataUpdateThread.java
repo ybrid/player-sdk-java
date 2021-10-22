@@ -72,7 +72,7 @@ public class DataBlockMetadataUpdateThread extends Thread implements Consumer<Da
                 }
 
                 if (playoutInfoChanged || !newSync.equals(oldSync)) {
-                    final @NotNull Transaction transaction = requestExecutor.execute(Command.REFRESH.makeRequest(newSync));
+                    final @NotNull Transaction transaction = requestExecutor.execute(Command.REFRESH.makeRequest(newSync.getIdentifier()));
                     transaction.waitControlComplete();
                     if (transaction.getError() == null) {
                         playoutInfo = session.getPlayoutInfo();

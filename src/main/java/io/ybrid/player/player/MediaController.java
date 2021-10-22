@@ -181,6 +181,6 @@ public interface MediaController extends Player, KnowsSubInfoState {
      * @throws TransactionExecutionException Thrown if a transaction failed while this method was still executing.
      */
     default @NotNull Transaction swapService(@NotNull Service service) throws TransactionExecutionException {
-        return execute(Command.SWAP_SERVICE.makeRequest(service));
+        return execute(Command.SWAP_SERVICE.makeRequest(service.getIdentifier()));
     }
 }
