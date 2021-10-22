@@ -37,7 +37,7 @@ public final class Util {
     public static long readLE64(@NotNull byte[] raw, int offset) {
         long ret = 0;
         for (int i = 0; i < 8; i++) {
-            ret += (raw[offset + i] & 0xFF) << (8 * i);
+            ret += (long) (raw[offset + i] & 0xFF) << (8 * i);
         }
         return ret;
     }
