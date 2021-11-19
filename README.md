@@ -45,7 +45,7 @@ The player implements the full protocol and can then be controlled using its API
 
 ```java
 import io.ybrid.api.MediaEndpoint;
-import io.ybrid.api.Session;
+import io.ybrid.api.session.Session;
 import io.ybrid.api.session.Command;
 import io.ybrid.player.player.Player;
 import io.ybrid.player.player.YbridPlayer;

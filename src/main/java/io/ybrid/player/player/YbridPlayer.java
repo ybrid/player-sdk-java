@@ -23,7 +23,7 @@
 package io.ybrid.player.player;
 
 import io.ybrid.api.PlayoutInfo;
-import io.ybrid.api.Session;
+import io.ybrid.api.session.Session;
 import io.ybrid.api.SubInfo;
 import io.ybrid.api.bouquet.Bouquet;
 import io.ybrid.player.io.DataBlock;

@@ -23,7 +23,7 @@
 package io.ybrid.player.io;
 
 import io.ybrid.api.PlayoutInfo;
-import io.ybrid.api.Session;
+import io.ybrid.api.session.Session;
 import io.ybrid.api.metadata.MetadataMixer;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.api.session.Command;

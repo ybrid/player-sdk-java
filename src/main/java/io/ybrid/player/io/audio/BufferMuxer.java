@@ -22,7 +22,7 @@
 
 package io.ybrid.player.io.audio;
 
-import io.ybrid.api.Session;
+import io.ybrid.api.session.Session;
 import io.ybrid.api.Workaround;
 import io.ybrid.api.transaction.CompletionState;
 import io.ybrid.api.transaction.RequestExecutor;
