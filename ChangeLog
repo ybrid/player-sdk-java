@@ -1,4 +1,4 @@
-1.2.0 - UNRELEASED
+1.2.0 - 2021-11-21
     * Removed most deprecated, and ScheduledForRemoval API
     * Renamed SessionClient to MediaController
     * MediaController methods now return Transactions

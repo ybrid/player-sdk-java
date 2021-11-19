@@ -33,7 +33,7 @@ Then you also need to add the following dependency:
         <dependency>
             <groupId>io.ybrid</groupId>
             <artifactId>player-sdk-java</artifactId>
-            <version>1.1.2</version>
+            <version>1.2.0</version>
         </dependency>
 ```
 
