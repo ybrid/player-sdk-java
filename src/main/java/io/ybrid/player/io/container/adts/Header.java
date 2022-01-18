@@ -63,6 +63,18 @@ public class Header {
         frameCount = (data[6] & 0x3) + 1;
     }
 
+    public @NotNull SamplingFrequency getSamplingFrequency() {
+        return samplingFrequency;
+    }
+
+    public @NotNull ChannelConfiguration getChannelConfiguration() {
+        return channelConfiguration;
+    }
+
+    public int getFrameCount() {
+        return frameCount;
+    }
+
     public int getFrameLength() {
         return frameLength;
     }

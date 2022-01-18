@@ -25,10 +25,12 @@ package io.ybrid.player.io.container.adts;
 import io.ybrid.api.PlayoutInfo;
 import io.ybrid.api.metadata.Sync;
 import io.ybrid.player.io.ByteDataBlock;
+import io.ybrid.player.io.audio.MultiChannelSignalInformation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
-public class Frame extends ByteDataBlock {
+public class Frame extends ByteDataBlock implements MultiChannelSignalInformation {
     private final @NotNull Header header;
 
     private Frame(@NotNull Sync sync, PlayoutInfo playoutInfo, byte[] data, @NotNull Header header) {
@@ -36,13 +38,28 @@ public class Frame extends ByteDataBlock {
         this.header = header;
     }
 
-    @Contract("_, _, _ -> new")
+    @Contract("_, _ -> new")
     public static @NotNull Frame parse(@NotNull ByteDataBlock block, @NotNull Header header) {
         return new Frame(block.getSync(), block.getPlayoutInfo(), block.getData(), header);
     }
 
     public @NotNull Header getHeader() {
         return header;
+    }
+
+    @Override
+    public @Range(from = 1, to = Integer.MAX_VALUE) int getNumberOfChannels() {
+        return header.getChannelConfiguration().getCount();
+    }
+
+    @Override
+    public @Range(from = 1, to = Integer.MAX_VALUE) int getSampleRate() {
+        return header.getSamplingFrequency().getFrequency();
+    }
+
+    @Override
+    public @Range(from = 0, to = Integer.MAX_VALUE) int getLengthAsFrames() {
+        return 1024;
     }
 
     @Override
