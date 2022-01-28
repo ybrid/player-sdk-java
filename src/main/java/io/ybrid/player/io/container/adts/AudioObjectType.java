@@ -47,4 +47,8 @@ public enum AudioObjectType {
         }
         throw new NoSuchElementException();
     }
+
+    public int toWire() {
+        return value - 1;
+    }
 }

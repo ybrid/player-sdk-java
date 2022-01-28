@@ -51,6 +51,9 @@ public enum ChannelConfiguration {
         throw new NoSuchElementException();
     }
 
+    public int toWire() {
+        return value;
+    }
 
     public int getCount() {
         return count;

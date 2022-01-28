@@ -57,6 +57,10 @@ public enum SamplingFrequency {
         throw new NoSuchElementException();
     }
 
+    public int toWire() {
+        return value;
+    }
+
     public int getFrequency() {
         return frequency;
     }

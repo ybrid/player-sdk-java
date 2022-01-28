@@ -63,6 +63,10 @@ public class Header {
         frameCount = (data[6] & 0x3) + 1;
     }
 
+    public @NotNull AudioObjectType getAudioObjectType() {
+        return audioObjectType;
+    }
+
     public @NotNull SamplingFrequency getSamplingFrequency() {
         return samplingFrequency;
     }
