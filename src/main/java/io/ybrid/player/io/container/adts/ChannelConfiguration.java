@@ -22,10 +22,14 @@
 
 package io.ybrid.player.io.container.adts;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 
+/**
+ * Channel configuration as used by ADTS.
+ */
 public enum ChannelConfiguration {
     MONO(1, 1),
     STEREO(2, 2),
@@ -43,6 +47,11 @@ public enum ChannelConfiguration {
         this.count = count;
     }
 
+    /**
+     * Get the configuration from the given value.
+     * @param value The value as used by ADTS.
+     * @return The corresponding configuration.
+     */
     static @NotNull ChannelConfiguration fromWire(int value) {
         for (final @NotNull ChannelConfiguration configuration : values()) {
             if (configuration.value == value)
@@ -51,10 +60,20 @@ public enum ChannelConfiguration {
         throw new NoSuchElementException();
     }
 
+    /**
+     * Get the raw ADTS value from the given configuration.
+     * @return The value as used by ADTS.
+     */
+    @Contract(pure = true)
     public int toWire() {
         return value;
     }
 
+    /**
+     * Gets the channel count for the given configuration.
+     * @return The corresponding channel count.
+     */
+    @Contract(pure = true)
     public int getCount() {
         return count;
     }

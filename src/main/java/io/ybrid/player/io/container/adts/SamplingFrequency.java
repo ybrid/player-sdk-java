@@ -22,10 +22,14 @@
 
 package io.ybrid.player.io.container.adts;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 
+/**
+ * This represents a possible sampling frequency.
+ */
 public enum SamplingFrequency {
     FREQUENCY_96000(0, 96000),
     FREQUENCY_88200(1, 88200),
@@ -49,6 +53,11 @@ public enum SamplingFrequency {
         this.frequency = frequency;
     }
 
+    /**
+     * Get the frequency from the given value.
+     * @param value The value as used by ADTS.
+     * @return The corresponding frequency.
+     */
     static @NotNull SamplingFrequency fromWire(int value) {
         for (final @NotNull SamplingFrequency frequency : values()) {
             if (frequency.value == value)
@@ -57,10 +66,20 @@ public enum SamplingFrequency {
         throw new NoSuchElementException();
     }
 
+    /**
+     * Get the raw ADTS value from the given frequency.
+     * @return The value as used by ADTS.
+     */
+    @Contract(pure = true)
     public int toWire() {
         return value;
     }
 
+    /**
+     * Get the actual sampling frequency.
+     * @return The frequency in [Hz].
+     */
+    @Contract(pure = true)
     public int getFrequency() {
         return frequency;
     }

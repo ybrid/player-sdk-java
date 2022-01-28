@@ -26,9 +26,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 
+/**
+ * This type enumerates the possible layers.
+ */
 public enum Layer {
     ZERO;
 
+    /**
+     * Get the layer from the given value.
+     * @param value The value as used by ADTS.
+     * @return The corresponding layer.
+     */
     static @NotNull Layer fromWire(int value) {
         if (value == 0)
             return ZERO;

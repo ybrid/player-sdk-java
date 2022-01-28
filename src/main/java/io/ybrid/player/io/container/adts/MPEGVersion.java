@@ -26,6 +26,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 
+/**
+ * Represents a MPEG version.
+ */
 public enum MPEGVersion {
     MPEG_2(1),
     MPEG_4(0);
@@ -36,6 +39,11 @@ public enum MPEGVersion {
         this.value = value;
     }
 
+    /**
+     * Get the version from the given value.
+     * @param value The value as used by ADTS.
+     * @return The corresponding version.
+     */
     static @NotNull MPEGVersion fromWire(int value) {
         for (final @NotNull MPEGVersion version : values()) {
             if (version.value == value)

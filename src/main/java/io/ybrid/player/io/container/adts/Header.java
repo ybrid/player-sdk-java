@@ -24,6 +24,9 @@ package io.ybrid.player.io.container.adts;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * This class stores a parsed ADTS header.
+ */
 public class Header {
     private final @NotNull MPEGVersion mpegVersion;
     private final @NotNull Layer layer;
@@ -34,6 +37,11 @@ public class Header {
     private final int frameLength;
     private final int frameCount;
 
+    /**
+     * Main constructor.
+     * @param data The data to parse the header from. The buffer must include at least the full header.
+     * @apiNote The API may be changed later to require a buffer that holds all the frame.
+     */
     public Header(byte @NotNull [] data) {
         if (data.length < 7)
             throw new IllegalArgumentException("Too little data");
@@ -63,22 +71,44 @@ public class Header {
         frameCount = (data[6] & 0x3) + 1;
     }
 
+    /**
+     * Gets the {@link AudioObjectType} for this frame.
+     * @return The {@link AudioObjectType}.
+     */
     public @NotNull AudioObjectType getAudioObjectType() {
         return audioObjectType;
     }
 
+    /**
+     * Gets the sampling rate of this frame as {@link SamplingFrequency}.
+     * @return The sampling rate.
+     * @see SamplingFrequency#getFrequency()
+     */
     public @NotNull SamplingFrequency getSamplingFrequency() {
         return samplingFrequency;
     }
 
+    /**
+     * Gets the channel configuration for this frame.
+     * @return The configuration.
+     * @see ChannelConfiguration#getCount()
+     */
     public @NotNull ChannelConfiguration getChannelConfiguration() {
         return channelConfiguration;
     }
 
+    /**
+     * Get the count of frames in this packet.
+     * @return The frame count
+     */
     public int getFrameCount() {
         return frameCount;
     }
 
+    /**
+     * Gets the size of this frame.
+     * @return The length in [byte].
+     */
     public int getFrameLength() {
         return frameLength;
     }

@@ -30,6 +30,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
+/**
+ * A complete ADTS frame as {@link ByteDataBlock}.
+ */
 public class Frame extends ByteDataBlock implements MultiChannelSignalInformation {
     private final @NotNull Header header;
 
@@ -38,11 +41,22 @@ public class Frame extends ByteDataBlock implements MultiChannelSignalInformatio
         this.header = header;
     }
 
+    /**
+     * Parses a frame from a {@link ByteDataBlock} with a given {@link Header}.
+     * @param block The block to use as input.
+     * @param header The header for the given block.
+     * @return The new frame object.
+     * @see Header#Header(byte[])
+     */
     @Contract("_, _ -> new")
     public static @NotNull Frame parse(@NotNull ByteDataBlock block, @NotNull Header header) {
         return new Frame(block.getSync(), block.getPlayoutInfo(), block.getData(), header);
     }
 
+    /**
+     * Gets the header for the current block.
+     * @return The header.
+     */
     public @NotNull Header getHeader() {
         return header;
     }

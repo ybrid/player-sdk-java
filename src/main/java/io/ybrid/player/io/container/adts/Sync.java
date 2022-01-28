@@ -33,6 +33,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * This class implements a frame syncer for ADTS streams.
+ *
+ * Reading from this results in reading full valid frames.
+ * Any invalid data between frames is discarded.
+ */
 public class Sync extends FilterDataSource<ByteDataSource> {
     static final @NonNls Logger LOGGER = Logger.getLogger(Sync.class.getName());
 
@@ -63,7 +69,7 @@ public class Sync extends FilterDataSource<ByteDataSource> {
         }
     }
 
-    private @NotNull byte[] requestArray(int length) throws IOException {
+    private byte @NotNull [] requestArray(int length) throws IOException {
         final byte[] n = new byte[length];
         int have = 0;
 

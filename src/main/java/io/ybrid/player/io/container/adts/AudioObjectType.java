@@ -22,10 +22,14 @@
 
 package io.ybrid.player.io.container.adts;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 
+/**
+ * MPEG-4 Audio Object Type
+ */
 public enum AudioObjectType {
     AAC_MAIN(1),
     AAC_LC(2),
@@ -38,6 +42,11 @@ public enum AudioObjectType {
         this.value = value;
     }
 
+    /**
+     * Get the Audio Object Type from the given value.
+     * @param value The value as used by ADTS (zero meaning main profile).
+     * @return The corresponding Audio Object Type.
+     */
     static @NotNull AudioObjectType fromWire(int value) {
         value++; // as per specs
 
@@ -48,6 +57,11 @@ public enum AudioObjectType {
         throw new NoSuchElementException();
     }
 
+    /**
+     * Get the raw ADTS value from the given Audio Object Type.
+     * @return The value as used by ADTS (zero meaning main).
+     */
+    @Contract(pure = true)
     public int toWire() {
         return value - 1;
     }
