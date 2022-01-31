@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.NoSuchElementException;
 
 /**
- * Represents a MPEG version.
+ * Represents an MPEG version.
  */
 public enum MPEGVersion {
     MPEG_2(1),
